@@ -1,12 +1,19 @@
+// lib/api/nasa.ts (or wherever your API functions are located)
 import { NEOResponse } from "../types/neo";
 
-export async function getNEO(start_date:string, end_date:string): Promise<NEOResponse>{
+export async function getNEO(start_date: string, end_date: string): Promise<NEOResponse> {
     try {
-        const url = `https://api.nasa.gov/neo/rest/v1/feed?start_date=${start_date}&end_date=${end_date}&api_key=${process.env.NEXT_PUBLIC_NASA_API_KEY}`;        
+        // Use your internal API route instead of direct NASA API
+        const url = `/api/nasa/neo?start_date=${start_date}&end_date=${end_date}`;
+        
         const response = await fetch(url);
+        
         if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+            // Parse error response from your API route
+            const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+            throw new Error(`API error! status: ${response.status}, message: ${errorData.error || 'Unknown error'}`);
         }
+        
         const data = await response.json();
         return data;
     } catch (error) {
