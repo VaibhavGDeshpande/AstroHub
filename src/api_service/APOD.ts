@@ -11,16 +11,16 @@ interface APODResponse {
 // api_service/APOD.ts
 export async function getAPOD(date?: string, startDate?: string, endDate?: string): Promise<APODResponse> {
   try {
-    let url = `https://api.nasa.gov/planetary/apod?api_key=${process.env.NEXT_PUBLIC_NASA_API_KEY}`;
-    
-    // Add date parameters
+    const qs = new URLSearchParams();
     if (startDate && endDate) {
-      url += `&start_date=${startDate}&end_date=${endDate}`;
+      qs.set('start_date', startDate);
+      qs.set('end_date', endDate);
     } else if (date) {
-      url += `&date=${date}`;
+      qs.set('date', date);
     }
 
-    const response = await fetch(url);
+    const url = qs.toString() ? `/api/nasa/apod?${qs.toString()}` : `/api/nasa/apod`;
+    const response = await fetch(url, { cache: 'no-store' });
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);

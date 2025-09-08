@@ -1,34 +1,41 @@
-// app/layout.tsx
+// app/epic/layout.tsx
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'EPIC Earth Observatory | NASA Earth Images',
-  description: 'View daily Earth images from NASA\'s DSCOVR satellite at the L1 Lagrange point. Interactive zoom and date selection for Earth observation.',
-  keywords: ['NASA', 'Earth images', 'DSCOVR', 'EPIC', 'satellite imagery'],
-  viewport: 'width=device-width, initial-scale=1',
+  title: 'NASA EPIC | Daily Earth Images',
+  description:
+    "Explore daily Earth images captured by NASA's DSCOVR EPIC camera at the L1 Lagrange point. Browse by date and view our planet from space.",
+  keywords: ['NASA', 'EPIC', 'Earth images', 'DSCOVR', 'satellite', 'space'],
+  openGraph: {
+    title: 'NASA EPIC | Daily Earth Images',
+    description:
+      "Explore daily Earth images captured by NASA's DSCOVR EPIC camera at the L1 Lagrange point.",
+    url: 'https://yourdomain.com/epic',
+    siteName: 'NASA EPIC Explorer',
+    images: [
+      {
+        url: '/epic-og.png', // Replace with your Open Graph preview
+        width: 1200,
+        height: 630,
+        alt: 'NASA EPIC Earth Image',
+      },
+    ],
+    locale: 'en_US',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'NASA EPIC | Daily Earth Images',
+    description:
+      "Explore daily Earth images captured by NASA's DSCOVR EPIC camera at the L1 Lagrange point.",
+    images: ['/epic-twitter.png'], // Replace with your Twitter preview
+  },
 };
 
-interface RootLayoutProps {
-  children: React.ReactNode;
-}
-
-export default function RootLayout({ children }: RootLayoutProps) {
+export default function EpicLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className="h-full">
-      <body 
-        className={`
-          h-full
-          antialiased 
-          bg-gradient-to-br 
-          from-slate-900 
-          via-blue-900 
-          to-indigo-900 
-          text-white
-          overflow-x-hidden
-        `}
-      >
-        {children}
-      </body>
-    </html>
+    <main className="min-h-screen">
+      {children}
+    </main>
   );
 }

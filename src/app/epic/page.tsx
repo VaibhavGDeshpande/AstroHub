@@ -1,13 +1,13 @@
 // pages/epic.tsx or components/EPICPage.tsx
-'use client'
+'use client';
+
 import { useState, useEffect } from 'react';
 import EPICImageInfo from '@/components/EPIC/Epic';
 import { getEpicData } from '@/api_service/get_epic';
-import { EPICImage } from '@/types/epic'; // Import the correct type
+import { EPICImage } from '@/types/epic';
 import Link from 'next/link';
 import { ArrowLeftIcon } from '@heroicons/react/24/outline';
 
-// Use the correct interface that matches your component expectations
 interface EPICData {
   images: EPICImage[];
   imageUrls: string[];
@@ -17,11 +17,18 @@ const EPICPage = () => {
   const MAX_DATE = '2025-07-15';
   const [epicData, setEpicData] = useState<EPICData>({ images: [], imageUrls: [] });
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [selectedDate, setSelectedDate] = useState(MAX_DATE);
+  const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [imageLoaded, setImageLoaded] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [mounted, setMounted] = useState(false);
+
+  // Ensure this component only renders on client to avoid hydration mismatch
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
+    if (!selectedDate) return; // Don't fetch until date is set
     const fetchEpicData = async () => {
       setLoading(true);
       try {
@@ -39,16 +46,31 @@ const EPICPage = () => {
     fetchEpicData();
   }, [selectedDate]);
 
+  // Set initial date only after client mount
+  useEffect(() => {
+    if (mounted) {
+      setSelectedDate(MAX_DATE);
+    }
+  }, [mounted]);
+
   const openImageInNewTab = (url: string) => {
-    window.open(url, '_blank');
+    if (typeof window !== 'undefined') {
+      window.open(url, '_blank');
+    }
   };
 
   const handleDateChange = (date: string) => {
     setSelectedDate(date);
   };
 
+  if (!mounted) {
+    // Prevent SSR → CSR mismatch
+    return null;
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 p-4">
+      {/* Back button */}
       <div className="fixed top-4 left-4 z-50">
         <Link
           href="/"
@@ -58,18 +80,21 @@ const EPICPage = () => {
           <span className="text-sm">Back</span>
         </Link>
       </div>
+
       <div className="max-w-7xl mx-auto">
         <header className="text-center mb-8">
           <h1 className="text-4xl font-bold text-white mb-2">EPIC - Earth Images</h1>
-          <p className="text-slate-300">View Earth from the DSCOVR satellite at L1 Lagrange point</p>
+          <p className="text-slate-300">
+            View Earth from the DSCOVR satellite at L1 Lagrange point
+          </p>
         </header>
-        
+
         <div className="h-[calc(100vh-200px)]">
           <EPICImageInfo
             data={epicData}
             currentImageIndex={currentImageIndex}
             setCurrentImageIndex={setCurrentImageIndex}
-            selectedDate={selectedDate}
+            selectedDate={selectedDate ?? MAX_DATE}
             onDateChange={handleDateChange}
             imageLoaded={imageLoaded}
             setImageLoaded={setImageLoaded}
