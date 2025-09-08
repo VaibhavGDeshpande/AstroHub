@@ -32,45 +32,48 @@ const CanvasEarthViewer: React.FC<CanvasEarthViewerProps> = ({
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const [canvasSize, setCanvasSize] = useState({ width: 800, height: 600 });
 
-  // Load and cache the image
-  useEffect(() => {
-    if (!imageUrl) return;
+  // Draw grid overlay (like the NASA EPIC interface)
+  const drawGridOverlay = useCallback((
+    ctx: CanvasRenderingContext2D,
+    canvasWidth: number,
+    canvasHeight: number,
+    imageX: number,
+    imageY: number,
+    imageWidth: number,
+    imageHeight: number
+  ) => {
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([2, 4]);
 
-    onImageLoadStart();
-    const img = new Image();
-    img.crossOrigin = 'anonymous'; // For CORS
-    
-    img.onload = () => {
-      imageRef.current = img;
-      onImageLoad();
-      drawCanvas();
-    };
-    
-    img.onerror = () => {
-      console.error('Failed to load image:', imageUrl);
-    };
-    
-    img.src = imageUrl;
-  }, [imageUrl, onImageLoad, onImageLoadStart]);
-
-  // Handle canvas resize
-  useEffect(() => {
-    const updateCanvasSize = () => {
-      if (containerRef.current) {
-        const rect = containerRef.current.getBoundingClientRect();
-        setCanvasSize({
-          width: rect.width,
-          height: rect.height
-        });
+    // Draw longitude lines (vertical)
+    const lonStep = imageWidth / 12; // 30-degree intervals
+    for (let i = 0; i <= 12; i++) {
+      const x = imageX + i * lonStep;
+      if (x >= 0 && x <= canvasWidth) {
+        ctx.beginPath();
+        ctx.moveTo(x, Math.max(0, imageY));
+        ctx.lineTo(x, Math.min(canvasHeight, imageY + imageHeight));
+        ctx.stroke();
       }
-    };
+    }
 
-    updateCanvasSize();
-    window.addEventListener('resize', updateCanvasSize);
-    return () => window.removeEventListener('resize', updateCanvasSize);
+    // Draw latitude lines (horizontal)
+    const latStep = imageHeight / 8; // Approximate latitude intervals
+    for (let i = 0; i <= 8; i++) {
+      const y = imageY + i * latStep;
+      if (y >= 0 && y <= canvasHeight) {
+        ctx.beginPath();
+        ctx.moveTo(Math.max(0, imageX), y);
+        ctx.lineTo(Math.min(canvasWidth, imageX + imageWidth), y);
+        ctx.stroke();
+      }
+    }
+
+    ctx.setLineDash([]); // Reset line dash
   }, []);
 
-  // Draw the canvas
+  // Draw the canvas - FIXED: Wrapped with useCallback and proper dependencies
   const drawCanvas = useCallback(() => {
     const canvas = canvasRef.current;
     const ctx = canvas?.getContext('2d');
@@ -117,55 +120,52 @@ const CanvasEarthViewer: React.FC<CanvasEarthViewerProps> = ({
     if (zoom > 1.5) {
       drawGridOverlay(ctx, canvas.width, canvas.height, drawX, drawY, drawWidth, drawHeight);
     }
-  }, [zoom, pan]);
+  }, [zoom, pan, drawGridOverlay]); // FIXED: Added proper dependencies
 
-  // Draw grid overlay (like the NASA EPIC interface)
-  const drawGridOverlay = (
-    ctx: CanvasRenderingContext2D,
-    canvasWidth: number,
-    canvasHeight: number,
-    imageX: number,
-    imageY: number,
-    imageWidth: number,
-    imageHeight: number
-  ) => {
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
-    ctx.lineWidth = 1;
-    ctx.setLineDash([2, 4]);
+  // Load and cache the image
+  useEffect(() => {
+    if (!imageUrl) return;
 
-    // Draw longitude lines (vertical)
-    const lonStep = imageWidth / 12; // 30-degree intervals
-    for (let i = 0; i <= 12; i++) {
-      const x = imageX + i * lonStep;
-      if (x >= 0 && x <= canvasWidth) {
-        ctx.beginPath();
-        ctx.moveTo(x, Math.max(0, imageY));
-        ctx.lineTo(x, Math.min(canvasHeight, imageY + imageHeight));
-        ctx.stroke();
+    onImageLoadStart();
+    const img = new Image();
+    img.crossOrigin = 'anonymous'; // For CORS
+    
+    img.onload = () => {
+      imageRef.current = img;
+      onImageLoad();
+      drawCanvas();
+    };
+    
+    img.onerror = () => {
+      console.error('Failed to load image:', imageUrl);
+    };
+    
+    img.src = imageUrl;
+  }, [imageUrl, onImageLoad, onImageLoadStart, drawCanvas]); // FIXED: Added drawCanvas
+
+  // Handle canvas resize
+  useEffect(() => {
+    const updateCanvasSize = () => {
+      if (containerRef.current) {
+        const rect = containerRef.current.getBoundingClientRect();
+        setCanvasSize({
+          width: rect.width,
+          height: rect.height
+        });
       }
-    }
+    };
 
-    // Draw latitude lines (horizontal)
-    const latStep = imageHeight / 8; // Approximate latitude intervals
-    for (let i = 0; i <= 8; i++) {
-      const y = imageY + i * latStep;
-      if (y >= 0 && y <= canvasHeight) {
-        ctx.beginPath();
-        ctx.moveTo(Math.max(0, imageX), y);
-        ctx.lineTo(Math.min(canvasWidth, imageX + imageWidth), y);
-        ctx.stroke();
-      }
-    }
+    updateCanvasSize();
+    window.addEventListener('resize', updateCanvasSize);
+    return () => window.removeEventListener('resize', updateCanvasSize);
+  }, []);
 
-    ctx.setLineDash([]); // Reset line dash
-  };
-
-  // Redraw canvas when zoom or pan changes
+  // Redraw canvas when zoom or pan changes - FIXED: Included drawCanvas in dependencies
   useEffect(() => {
     if (imageRef.current && imageLoaded) {
       drawCanvas();
     }
-  }, [zoom, pan, imageLoaded, canvasSize, drawCanvas]);
+  }, [zoom, pan, imageLoaded, canvasSize, drawCanvas]); // FIXED: Added drawCanvas
 
   // Mouse event handlers
   const handleMouseDown = (e: React.MouseEvent) => {
@@ -240,7 +240,7 @@ const CanvasEarthViewer: React.FC<CanvasEarthViewerProps> = ({
         <div className="absolute inset-0 flex items-center justify-center bg-slate-800/50 backdrop-blur-sm">
           <motion.div
             animate={{ rotate: 360 }}
-            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+            transition={{ duration: 1, repeat: Infinity }}
             className="w-8 h-8 border-2 border-blue-500/30 border-t-blue-500 rounded-full"
           />
         </div>

@@ -165,7 +165,7 @@ const APODImageInfo: React.FC<APODImageInfoProps> = ({
                 <div className="absolute inset-0 flex items-center justify-center bg-slate-800/50 backdrop-blur-sm">
                   <motion.div
                     animate={{ rotate: 360 }}
-                    transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                    transition={{ duration: 1, repeat: Infinity }}
                     className="w-6 h-6 sm:w-8 sm:h-8 border-2 border-blue-500/30 border-t-blue-500 rounded-full"
                   />
                 </div>
@@ -412,7 +412,7 @@ const APODImageInfo: React.FC<APODImageInfoProps> = ({
                   <div className="absolute inset-0 flex items-center justify-center bg-slate-800/50 backdrop-blur-sm">
                     <motion.div
                       animate={{ rotate: 360 }}
-                      transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                      transition={{ duration: 1, repeat: Infinity }}
                       className="w-8 h-8 border-2 border-blue-500/30 border-t-blue-500 rounded-full"
                     />
                   </div>

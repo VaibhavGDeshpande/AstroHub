@@ -1,5 +1,6 @@
 // api/epicImage.ts
 import { getEPIC } from "./epic";
+import { EPICImage } from "@/types/epic";
 
 // const NASA_API_KEY = process.env.NEXT_PUBLIC_NASA_API_KEY || "DEMO_KEY";
 
@@ -23,7 +24,7 @@ export async function getEpicImageUrl(date?: string, imageIndex: number = 0): Pr
     }
 }
 
-export async function getEpicData(date?: string): Promise<{ images: any[], imageUrls: string[] }> {
+export async function getEpicData(date?: string): Promise<{ images: EPICImage[], imageUrls: string[] }> {
     try {
         const epicData = await getEPIC(date);
         

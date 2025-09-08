@@ -122,7 +122,7 @@ const NEOExplorer = () => {
         >
           <motion.div
             animate={{ rotate: 360 }}
-            transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+            transition={{ duration: 2, repeat: Infinity }}
             className="w-16 h-16 border-4 border-blue-500/30 border-t-blue-500 rounded-full mx-auto mb-6"
           />
           <h2 className="text-2xl font-bold text-white mb-2">Scanning for asteroids...</h2>

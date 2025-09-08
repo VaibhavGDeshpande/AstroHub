@@ -103,8 +103,7 @@ const Cards = () => {
       opacity: 1,
       y: 0,
       transition: {
-        duration: 0.6,
-        ease: "easeOut"
+        duration: 0.6
       }
     }
   };
@@ -158,7 +157,7 @@ const Cards = () => {
                 'linear-gradient(45deg, #a855f7, #ffffff)'
               ]
             }}
-            transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+            transition={{ duration: 4, repeat: Infinity }}
             style={{ backgroundClip: 'text', WebkitBackgroundClip: 'text', color: 'transparent' }}
           >
             Explore NASA&apos;s Universe

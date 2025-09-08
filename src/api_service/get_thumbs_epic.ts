@@ -23,7 +23,7 @@ export async function getEpicThumbsImage(date?: string, imageIndex: number = 0):
     }
 }
 
-export async function getEpicData(date?: string): Promise<{ images: any[], imageUrls: string[] }> {
+export async function getEpicData(date?: string): Promise<{ images: { image: string; date: string }[], imageUrls: string[] }> {
     try {
         const epicData = await getEPIC(date);
         

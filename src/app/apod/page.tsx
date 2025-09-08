@@ -137,7 +137,7 @@ export default function APODPage() {
         >
           <motion.div
             animate={{ rotate: 360 }}
-            transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+            transition={{ duration: 2, repeat: Infinity }}
             className="w-12 h-12 sm:w-16 sm:h-16 border-4 border-blue-500/30 border-t-blue-500 rounded-full mx-auto mb-4 sm:mb-6"
           />
           <motion.h2

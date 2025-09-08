@@ -9,6 +9,10 @@ const nextConfig = {
       {
         protocol: 'https', 
         hostname: 'www.nasa.gov',
+      },
+      {
+        protocol:'https',
+        hostname:'epic.gsfc.nasa.gov'
       }
     ],
   },

@@ -7,7 +7,7 @@ import axios from "axios";
 export const getEPIC = async (date?: string): Promise<EPICResponse> => {
     try {
 
-        const formattedDate = date.split(' ')[0].replace(/-/g, '');
+        const formattedDate = date ? date.split(' ')[0].replace(/-/g, '') : '';
 
         const url = `https://epic.gsfc.nasa.gov/api/natural/date/${formattedDate}`;
         const response = await axios.get<EPICResponse>(url);

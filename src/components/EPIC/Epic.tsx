@@ -12,7 +12,7 @@ import {
   PhotoIcon
 } from '@heroicons/react/24/outline';
 import { EPICImage } from '@/types/epic';
-import CanvasEarthViewer from './CanvasEarthViewer';
+import Image from 'next/image';
 
 interface EPICData {
   images: EPICImage[];
@@ -92,12 +92,13 @@ const ThumbnailGallery: React.FC<{
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
-            <img
+            <Image
               src={url}
               alt={`Earth ${index + 1}`}
               className="w-full h-full object-cover"
               loading="lazy"
               width={80}
+              height={80}
             />
             
             {/* Image number overlay */}
@@ -220,7 +221,7 @@ const EPICImageInfo: React.FC<EPICImageInfoProps> = ({
       <div className="h-full flex items-center justify-center">
         <motion.div
           animate={{ rotate: 360 }}
-          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+          transition={{ duration: 1, repeat: Infinity }}
           className="w-8 h-8 border-2 border-blue-500/30 border-t-blue-500 rounded-full"
         />
         <span className="ml-3 text-slate-400">Loading Earth imagery...</span>
@@ -371,7 +372,7 @@ const EPICImageInfo: React.FC<EPICImageInfoProps> = ({
               <div className="absolute inset-0 flex items-center justify-center bg-slate-800/50 backdrop-blur-sm">
                 <motion.div
                   animate={{ rotate: 360 }}
-                  transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                  transition={{ duration: 1, repeat: Infinity }}
                   className="w-6 h-6 sm:w-8 sm:h-8 border-2 border-blue-500/30 border-t-blue-500 rounded-full"
                 />
               </div>
@@ -609,7 +610,7 @@ const EPICImageInfo: React.FC<EPICImageInfoProps> = ({
                 <div className="absolute inset-0 flex items-center justify-center bg-slate-800/50 backdrop-blur-sm">
                   <motion.div
                     animate={{ rotate: 360 }}
-                    transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                    transition={{ duration: 1, repeat: Infinity }}
                     className="w-8 h-8 border-2 border-blue-500/30 border-t-blue-500 rounded-full"
                   />
                 </div>

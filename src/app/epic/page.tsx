@@ -3,14 +3,21 @@
 import { useState, useEffect } from 'react';
 import EPICImageInfo from '@/components/EPIC/Epic';
 import { getEpicData } from '@/api_service/get_epic';
+import { EPICImage } from '@/types/epic'; // Import the correct type
 import Link from 'next/link';
 import { ArrowLeftIcon } from '@heroicons/react/24/outline';
 
+// Use the correct interface that matches your component expectations
+interface EPICData {
+  images: EPICImage[];
+  imageUrls: string[];
+}
+
 const EPICPage = () => {
-    const MAX_DATE = '2025-07-15';
-  const [epicData, setEpicData] = useState({ images: [], imageUrls: [] });
+  const MAX_DATE = '2025-07-15';
+  const [epicData, setEpicData] = useState<EPICData>({ images: [], imageUrls: [] });
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [selectedDate, setSelectedDate] = useState(MAX_DATE)
+  const [selectedDate, setSelectedDate] = useState(MAX_DATE);
   const [imageLoaded, setImageLoaded] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -42,15 +49,15 @@ const EPICPage = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 p-4">
-        <div className="fixed top-4 left-4 z-50">
-          <Link
-            href="/"
-            className="flex items-center space-x-2 px-3 py-2 bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 text-white rounded-lg hover:bg-slate-700/50 transition-all duration-300 hover:scale-105"
-          >
-            <ArrowLeftIcon className="h-4 w-4" />
-            <span className="text-sm">Back</span>
-          </Link>
-        </div>
+      <div className="fixed top-4 left-4 z-50">
+        <Link
+          href="/"
+          className="flex items-center space-x-2 px-3 py-2 bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 text-white rounded-lg hover:bg-slate-700/50 transition-all duration-300 hover:scale-105"
+        >
+          <ArrowLeftIcon className="h-4 w-4" />
+          <span className="text-sm">Back</span>
+        </Link>
+      </div>
       <div className="max-w-7xl mx-auto">
         <header className="text-center mb-8">
           <h1 className="text-4xl font-bold text-white mb-2">EPIC - Earth Images</h1>

@@ -1,6 +1,7 @@
 // components/HeroSection.tsx
 'use client'
 import { motion } from 'framer-motion';
+import type { TargetAndTransition } from 'framer-motion';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { SparklesIcon, GlobeAltIcon, RocketLaunchIcon } from '@heroicons/react/24/outline';
@@ -33,8 +34,7 @@ const HeroSection = () => {
       opacity: 1,
       y: 0,
       transition: {
-        duration: 0.8,
-        ease: "easeOut"
+        duration: 0.8
       }
     }
   };
@@ -50,12 +50,12 @@ const HeroSection = () => {
     }
   };
 
-  const floatingAnimation = {
+  const floatingAnimation: TargetAndTransition = {
     y: [-10, 10, -10],
     transition: {
       duration: 6,
       repeat: Infinity,
-      ease: "easeInOut"
+      repeatType: "mirror"
     }
   };
 
