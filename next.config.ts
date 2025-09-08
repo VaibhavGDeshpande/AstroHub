@@ -11,9 +11,11 @@ const nextConfig = {
         hostname: 'www.nasa.gov',
       },
       {
-        protocol:'https',
-        hostname:'epic.gsfc.nasa.gov'
-      }
+        protocol: 'https',
+        hostname: 'epic.gsfc.nasa.gov',
+        port: '',
+        pathname: '/archive/**',
+      },
     ],
   },
 };

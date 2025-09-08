@@ -1,7 +1,7 @@
 'use client'
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useCallback, useRef, useEffect } from 'react';
-import { 
+import {
   GlobeAltIcon,
   EyeIcon,
   ArrowsPointingOutIcon,
@@ -12,7 +12,6 @@ import {
   PhotoIcon
 } from '@heroicons/react/24/outline';
 import { EPICImage } from '@/types/epic';
-import Image from 'next/image';
 
 interface EPICData {
   images: EPICImage[];
@@ -47,7 +46,7 @@ const ThumbnailGallery: React.FC<{
       const thumbnailWidth = 80; // w-20 = 80px
       const gap = 8; // gap-2 = 8px
       const scrollPosition = currentIndex * (thumbnailWidth + gap);
-      
+
       container.scrollTo({
         left: scrollPosition - container.clientWidth / 2 + thumbnailWidth / 2,
         behavior: 'smooth'
@@ -68,12 +67,12 @@ const ThumbnailGallery: React.FC<{
           {images[0]?.date.split(' ')[0]}
         </span>
       </div>
-      
+
       {/* Scrollable thumbnail container */}
-      <div 
+      <div
         ref={scrollContainerRef}
         className="flex space-x-2 overflow-x-auto pb-2"
-        style={{ 
+        style={{
           scrollbarWidth: 'thin',
           scrollbarColor: '#475569 #1e293b'
         }}
@@ -84,15 +83,15 @@ const ThumbnailGallery: React.FC<{
             onClick={() => onImageSelect(index)}
             className={`
               relative flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-all duration-300
-              ${currentIndex === index 
-                ? 'border-blue-400 ring-2 ring-blue-400/50 shadow-lg' 
+              ${currentIndex === index
+                ? 'border-blue-400 ring-2 ring-blue-400/50 shadow-lg'
                 : 'border-slate-600 hover:border-slate-500'
               }
             `}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
-            <Image
+            <img
               src={url}
               alt={`Earth ${index + 1}`}
               className="w-full h-full object-cover"
@@ -100,12 +99,12 @@ const ThumbnailGallery: React.FC<{
               width={80}
               height={80}
             />
-            
+
             {/* Image number overlay */}
             <div className="absolute top-1 left-1 bg-black/70 text-white text-xs px-1.5 py-0.5 rounded">
               {index + 1}
             </div>
-            
+
             {/* Current image indicator */}
             {currentIndex === index && (
               <div className="absolute inset-0 bg-blue-400/20 border-2 border-blue-400 rounded-lg" />
@@ -113,7 +112,7 @@ const ThumbnailGallery: React.FC<{
           </motion.button>
         ))}
       </div>
-      
+
       {/* Navigation hint */}
       <div className="text-xs text-slate-400 mt-2 text-center">
         Click thumbnails to navigate • {currentIndex + 1} of {images.length} selected
@@ -336,7 +335,7 @@ const EPICImageInfo: React.FC<EPICImageInfoProps> = ({
           transition={{ duration: 0.4 }}
           className="relative group"
         >
-          <div 
+          <div
             ref={containerRef}
             className="relative overflow-hidden rounded-xl bg-slate-800/30 backdrop-blur-sm border border-slate-700/50 h-80 sm:h-96 cursor-grab active:cursor-grabbing"
             onMouseDown={handleMouseDown}
@@ -366,7 +365,7 @@ const EPICImageInfo: React.FC<EPICImageInfoProps> = ({
                 draggable={false}
               />
             </AnimatePresence>
-            
+
             {/* Loading overlay */}
             {!imageLoaded && (
               <div className="absolute inset-0 flex items-center justify-center bg-slate-800/50 backdrop-blur-sm">
@@ -574,7 +573,7 @@ const EPICImageInfo: React.FC<EPICImageInfoProps> = ({
             transition={{ duration: 0.4 }}
             className="relative group w-full h-full max-h-[calc(100vh-200px)] flex items-center justify-center"
           >
-            <div 
+            <div
               ref={containerRef}
               className="relative overflow-hidden rounded-xl bg-slate-800/30 backdrop-blur-sm border border-slate-700/50 w-full h-full flex items-center justify-center cursor-grab active:cursor-grabbing"
               onMouseDown={handleMouseDown}
@@ -604,7 +603,7 @@ const EPICImageInfo: React.FC<EPICImageInfoProps> = ({
                   draggable={false}
                 />
               </AnimatePresence>
-              
+
               {/* Loading overlay */}
               {!imageLoaded && (
                 <div className="absolute inset-0 flex items-center justify-center bg-slate-800/50 backdrop-blur-sm">
