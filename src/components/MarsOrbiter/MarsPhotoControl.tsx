@@ -10,7 +10,7 @@ interface MarsPhotoControlsProps {
     earthDate?: string;
     sol?: number;
     camera?: string;
-  }) => void;
+  }) => void | Promise<void>;
   loading: boolean;
   // New: list of full_name strings observed in current results
   camerasAvailable?: string[];

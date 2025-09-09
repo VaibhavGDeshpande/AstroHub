@@ -1,17 +1,11 @@
-interface MarsOrbiter {
-  id: number;
-  sol: number;
-  camera: { name: string; full_name: string };
-  img_src: string;
-  earth_date: string;
-}
+import { MarsOrbiter } from "@/types/mars_orbiter";
 
 interface MarsPhotosResponse {
   photos: MarsOrbiter[];
 }
 
 export async function getMarsPhotos(
-  rover: 'curiosity' ,
+  rover: string,
   earthDate?: string,
   startDate?: string,
   endDate?: string

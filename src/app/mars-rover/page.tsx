@@ -18,36 +18,33 @@ export default function MarsPhotosPage() {
   const [error, setError] = useState<string | null>(null);
   const [currentRover, setCurrentRover] = useState<MarsOrbiter['rover'] | null>(null);
 
-  // New: cameras available (full_name) derived from current results
+  // Cameras available (full_name) derived from current results
   const camerasAvailable = useMemo(
     () => Array.from(new Set(photos.map((p) => p.camera.full_name))).filter(Boolean),
     [photos]
   );
 
-  useEffect(() => {
-    handleSearch({ rover: 'curiosity', earthDate: '2015-06-03' });
-  }, []);
-
+  // Stable search handler
   const handleSearch = useCallback(async (params: {
     rover: string;
     earthDate?: string;
-    camera?: string; // short code (e.g., FHAZ)
+    camera?: string; // short code
   }) => {
     setLoading(true);
     setError(null);
     try {
-      // Call shape: rover, earth_date, camera
       const response = await getMarsPhotos(
-        params.rover as 'curiosity',
+        params.rover,
         params.earthDate,
         params.camera
       );
 
+      // response.photos should be MarsOrbiter[]; set directly
       setPhotos(response.photos);
 
-      // Correct rover assignment from first photo if available
+      // Use first photo's rover if available
       if (response.photos.length > 0) {
-        setCurrentRover(response.photos.rover);
+        setCurrentRover(response.photos[0].rover);
       } else {
         setCurrentRover(null);
       }
@@ -60,13 +57,18 @@ export default function MarsPhotosPage() {
     }
   }, []);
 
+  // Include handleSearch as dependency (stable due to useCallback)
+  useEffect(() => {
+    handleSearch({ rover: 'curiosity', earthDate: '2015-06-03' });
+  }, [handleSearch]); // FIX: satisfy exhaustive-deps
+
   const openInNewTab = useCallback((url: string) => {
     window.open(url, '_blank', 'noopener,noreferrer');
   }, []);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 p-4">
-      {/* Back button (consistent with EPIC) */}
+      {/* Back button */}
       <div className="fixed top-4 left-4 z-50">
         <Link
           href="/"
