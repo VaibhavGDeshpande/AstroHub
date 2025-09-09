@@ -39,7 +39,6 @@ const MediaGrid: React.FC<MediaGridProps> = ({ items, onItemClick, loading }) =>
         const mediaType = item.data[0]?.media_type;
         const isVideo = mediaType === 'video';
         const isImage = mediaType === 'image';
-        const isAudio = mediaType === 'audio';
         
         return (
           <motion.div

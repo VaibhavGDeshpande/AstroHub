@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { 
   NivlItem, 
   NivlSearchParams,
@@ -17,7 +17,6 @@ import { GlobeAltIcon } from '@heroicons/react/24/outline';
 export default function NasaMediaBrowser() {
   const [searchResults, setSearchResults] = useState<NivlItem[]>([]);
   const [selectedItem, setSelectedItem] = useState<NivlItem | null>(null);
-  const [selectedIndex, setSelectedIndex] = useState<number>(0);
   const [assetUrl, setAssetUrl] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
@@ -37,9 +36,9 @@ export default function NasaMediaBrowser() {
   });
 
   // Initial search on component mount
-  useEffect(() => {
-    handleSearch(1);
-  }, []);
+  // useEffect(() => {
+  //   handleSearch(1);
+  // }, []);
 
   const handleSearch = async (page: number = 1) => {
     setLoading(true);
@@ -65,8 +64,6 @@ export default function NasaMediaBrowser() {
   };
 
   const handleItemClick = async (item: NivlItem) => {
-    const index = searchResults.findIndex(i => i.data[0]?.nasa_id === item.data[0]?.nasa_id);
-    setSelectedIndex(index >= 0 ? index : 0);
     setSelectedItem(item);
     setLoading(true);
     setError('');
