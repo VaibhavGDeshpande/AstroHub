@@ -66,7 +66,7 @@ const SearchFilters: React.FC<SearchFiltersProps> = ({
           <div className="flex flex-col sm:flex-row gap-2 sm:items-end">
             <select
               value={filters.mediaType}
-              onChange={(e) => handleInputChange('mediaType', e.target.value as any)}
+              onChange={(e) => handleInputChange('mediaType', e.target.value as string)}
               className="bg-slate-700 border border-slate-600 text-white rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
             >
               <option value="all">All Media</option>
