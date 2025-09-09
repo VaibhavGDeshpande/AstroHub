@@ -28,8 +28,7 @@ export async function GET(
     }
 
     const { searchParams } = new URL(request.url);
-    const sol = searchParams.get('sol') || '1000'; // Default to sol 1000
-    const camera = searchParams.get('camera'); // Optional camera filter
+    const earth_date = searchParams.get('earth_date') || '2025-05-03';
     
     const apiKey = process.env.NASA_API_KEY;
     if (!apiKey) {
@@ -43,12 +42,8 @@ export async function GET(
     const baseUrl = `https://api.nasa.gov/mars-photos/api/v1/rovers/${rover.toLowerCase()}/photos`;
     const queryParams = new URLSearchParams({
       api_key: apiKey,
-      sol: sol
+      earth_date : earth_date,
     });
-    
-    if (camera) {
-      queryParams.append('camera', camera);
-    }
 
     const url = `${baseUrl}?${queryParams.toString()}`;
     const res = await fetch(url, { 
