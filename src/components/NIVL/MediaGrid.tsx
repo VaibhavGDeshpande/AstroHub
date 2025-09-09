@@ -1,107 +1,117 @@
-'use client'
+'use client';
+
+import { NivlItem } from '@/types/nivl';
 import { motion } from 'framer-motion';
-import {
-  PhotoIcon,
-  VideoCameraIcon,
-  SpeakerWaveIcon,
-  PlayIcon,
-} from '@heroicons/react/24/outline';
-import { MediaGridProps } from '../../types/nivl';
+import { PhotoIcon, VideoCameraIcon } from '@heroicons/react/24/outline';
+
+interface MediaGridProps {
+  items: NivlItem[];
+  onItemClick: (item: NivlItem) => void;
+  loading: boolean;
+}
 
 const MediaGrid: React.FC<MediaGridProps> = ({ items, onItemClick, loading }) => {
   if (loading) {
     return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
-        {Array.from({ length: 8 }).map((_, i) => (
-          <div key={i} className="bg-slate-800/50 rounded-xl overflow-hidden border border-slate-700/50 animate-pulse">
-            <div className="aspect-video bg-slate-700/50" />
-            <div className="p-3 space-y-2">
-              <div className="h-4 bg-slate-700/50 rounded" />
-              <div className="h-3 bg-slate-700/50 rounded w-3/4" />
-            </div>
-          </div>
-        ))}
+      <div className="flex justify-center items-center py-12">
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ duration: 1, repeat: Infinity }}
+          className="w-8 h-8 border-2 border-blue-500/30 border-t-blue-500 rounded-full"
+        />
+        <span className="ml-3 text-slate-400">Loading media...</span>
       </div>
     );
   }
 
   if (items.length === 0) {
-    return null;
+    return (
+      <div className="text-center py-12 bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-xl">
+        <p className="text-slate-400">No results found. Try adjusting your search filters.</p>
+      </div>
+    );
   }
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
       {items.map((item, index) => {
-        const data = item.data[0];
-        const previewLink = item.links?.find(link => link.rel === 'preview');
-        const isVideo = data.media_type === 'video';
-        const isAudio = data.media_type === 'audio';
-
+        const previewUrl = item.links.find(link => link.rel === 'preview')?.href;
+        const mediaType = item.data[0]?.media_type;
+        const isVideo = mediaType === 'video';
+        const isImage = mediaType === 'image';
+        const isAudio = mediaType === 'audio';
+        
         return (
           <motion.div
-            key={`${data.nasa_id}-${index}`}
+            key={item.data[0]?.nasa_id || index}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.05, duration: 0.3 }}
+            transition={{ delay: index * 0.1 }}
+            className="group cursor-pointer bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-xl overflow-hidden hover:shadow-lg transition-all duration-300 hover:scale-105 relative"
             onClick={() => onItemClick(item)}
-            className="bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-xl overflow-hidden cursor-pointer hover:border-blue-500/50 hover:shadow-lg hover:shadow-blue-500/10 transition-all duration-300 group"
           >
-            {/* Media Preview */}
-            <div className="relative aspect-video bg-slate-700/30 overflow-hidden">
-              {previewLink && !isAudio && (
-                <img
-                  src={previewLink.href}
-                  alt={data.title}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                  loading="lazy"
-                />
-              )}
-              
-              {isAudio && (
-                <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-purple-600/20 to-pink-600/20">
-                  <SpeakerWaveIcon className="h-16 w-16 text-purple-400" />
-                </div>
-              )}
-
-              {/* Media type indicator */}
-              <div className="absolute top-2 left-2 px-2 py-1 bg-black/70 backdrop-blur-sm rounded-full text-xs text-white flex items-center space-x-1">
-                {isVideo && <VideoCameraIcon className="h-3 w-3" />}
-                {isAudio && <SpeakerWaveIcon className="h-3 w-3" />}
-                {!isVideo && !isAudio && <PhotoIcon className="h-3 w-3" />}
-                <span className="capitalize">{data.media_type}</span>
-              </div>
-
-              {/* Play button for videos */}
-              {isVideo && (
-                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  <div className="w-12 h-12 bg-blue-500/80 backdrop-blur-sm rounded-full flex items-center justify-center">
-                    <PlayIcon className="h-6 w-6 text-white ml-1" />
-                  </div>
-                </div>
-              )}
-
-              {/* Date */}
-              <div className="absolute bottom-2 right-2 px-2 py-1 bg-black/70 backdrop-blur-sm rounded text-xs text-white">
-                {new Date(data.date_created).getFullYear()}
+            {/* Media Type Tag */}
+            <div className="absolute top-3 left-3 z-10">
+              <div className={`
+                flex items-center space-x-1 px-2 py-1 rounded-full text-xs font-medium backdrop-blur-sm border
+                ${isVideo 
+                  ? 'bg-blue-500/90 text-white border-blue-400/50' 
+                  : isImage 
+                    ? 'bg-green-500/90 text-white border-green-400/50'
+                    : 'bg-purple-500/90 text-white border-purple-400/50'
+                }
+              `}>
+                {isVideo ? (
+                  <>
+                    <VideoCameraIcon className="h-3 w-3" />
+                    <span>Video</span>
+                  </>
+                ) : isImage ? (
+                  <>
+                    <PhotoIcon className="h-3 w-3" />
+                    <span>Image</span>
+                  </>
+                ) : (
+                  <span>Audio</span>
+                )}
               </div>
             </div>
 
-            {/* Content */}
-            <div className="p-3">
-              <h3 className="text-white font-medium text-sm line-clamp-2 mb-1 leading-tight">
-                {data.title}
-              </h3>
-              <p className="text-slate-400 text-xs line-clamp-2 mb-2 leading-relaxed">
-                {data.description}
-              </p>
-              
-              <div className="flex items-center justify-between">
-                <span className="text-blue-400 text-xs font-medium">
-                  {data.center || 'NASA'}
-                </span>
-                <span className="text-slate-500 text-xs font-mono">
-                  {data.nasa_id}
-                </span>
+            <div className="aspect-square bg-slate-700 relative overflow-hidden">
+              {previewUrl ? (
+                <img
+                  src={previewUrl}
+                  alt={item.data[0]?.title}
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).style.display = 'none';
+                  }}
+                />
+              ) : (
+                <div className="absolute inset-0 flex items-center justify-center bg-slate-700">
+                  <span className="text-slate-400 font-medium uppercase text-sm">
+                    {item.data[0]?.media_type}
+                  </span>
+                </div>
+              )}
+
+              {/* Play icon overlay for videos */}
+              {isVideo && (
+                <div className="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  <div className="bg-white/20 backdrop-blur-sm rounded-full p-3">
+                    <VideoCameraIcon className="h-8 w-8 text-white" />
+                  </div>
+                </div>
+              )}
+            </div>
+            
+            <div className="p-4">
+              <h4 className="font-semibold text-white line-clamp-2 mb-2 text-sm">
+                {item.data[0]?.title || 'Untitled'}
+              </h4>
+              <div className="flex items-center justify-between text-xs text-slate-400">
+                <span className="capitalize">{item.data[0]?.media_type}</span>
+                <span>{item.data[0]?.date_created?.split('T')[0]}</span>
               </div>
             </div>
           </motion.div>

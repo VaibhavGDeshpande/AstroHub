@@ -26,7 +26,7 @@ export default function NasaMediaBrowser() {
   const [itemsPerPage] = useState<number>(20);
   
   const [filters, setFilters] = useState<SearchFilters>({
-    query:'earth',
+    query: 'earth',
     mediaType: 'all',
     center: '',
     yearStart: '',
@@ -95,6 +95,12 @@ export default function NasaMediaBrowser() {
       console.error('Asset loading error:', err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleThumbnailSelect = (index: number) => {
+    if (index >= 0 && index < searchResults.length) {
+      handleItemClick(searchResults[index]);
     }
   };
 
