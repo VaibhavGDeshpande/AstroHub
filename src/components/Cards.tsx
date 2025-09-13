@@ -4,13 +4,10 @@ import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { 
   CameraIcon, 
-  GlobeAltIcon, 
   StarIcon, 
-  SunIcon,
   RocketLaunchIcon,
   PhotoIcon,
   CloudIcon,
-  BeakerIcon 
 } from '@heroicons/react/24/outline';
 
 const Cards = () => {
@@ -46,16 +43,6 @@ const Cards = () => {
       ctaText: 'Explore Data'
     },
     {
-      title: 'Earth Imagery',
-      description: 'View satellite images of Earth from space with location-based searches.',
-      icon: GlobeAltIcon,
-      color: 'from-green-500 to-blue-500',
-      path: '/earth',
-      features: ['Satellite imagery', 'Location search', 'Date filtering'],
-      glow: 'green',
-      ctaText: 'Explore Data'
-    },
-    {
       title: 'EPIC Earth Images',
       description: 'See Earth from DSCOVR satellite with full disk images showing weather patterns.',
       icon: CloudIcon,
@@ -63,16 +50,6 @@ const Cards = () => {
       path: '/epic',
       features: ['Full disk images', 'Weather patterns', 'Daily updates'],
       glow: 'cyan',
-      ctaText: 'Explore Data'
-    },
-    {
-      title: 'Exoplanet Archive',
-      description: 'Explore confirmed exoplanets with detailed characteristics and discovery information.',
-      icon: BeakerIcon,
-      color: 'from-indigo-500 to-purple-500',
-      path: '/exoplanet',
-      features: ['Planet data', 'Star properties', 'Discovery methods'],
-      glow: 'indigo',
       ctaText: 'Explore Data'
     },
     {
@@ -85,16 +62,6 @@ const Cards = () => {
       glow: 'pink',
       ctaText: 'Explore Data'
     },
-    {
-      title: 'Solar Flare Data',
-      description: 'Monitor solar activity including flares, coronal mass ejections, and space weather.',
-      icon: SunIcon,
-      color: 'from-yellow-500 to-red-500',
-      path: '/solar',
-      features: ['Real-time data', 'Solar events', 'Space weather'],
-      glow: 'yellow',
-      ctaText: 'Explore Data'
-    }
   ];
 
   const cardVariants = {
@@ -178,7 +145,7 @@ const Cards = () => {
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: "-100px" }}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8"
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-8"
         >
           {apis.map((api, index) => (
             <motion.div
