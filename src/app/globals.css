@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import 'cesium/Build/Cesium/Widgets/widgets.css';
 
 :root {
   --background: #ffffff;
@@ -23,4 +24,17 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+.cesium-widget-credits {
+  display: none !important;
+}
+
+.fullSize {
+  position: absolute;
+  top: 0;
+  left: 0;
+  border: none;
+  width: 100%;
+  height: 100%;
 }

@@ -22,11 +22,16 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss": "^4",
+    "@types/cesium": "^1.67.14",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "cesium": "^1.133.1",
+    "copy-webpack-plugin": "^13.0.1",
     "eslint": "^9",
     "eslint-config-next": "15.5.2",
+    "install": "^0.13.0",
+    "npm": "^11.6.0",
     "tailwindcss": "^4",
     "typescript": "^5"
   }
