@@ -5,9 +5,10 @@ import { ViewerWithControls } from '@/types/moonviewer';
 
 interface MoonControlsProps {
   viewerRef: React.RefObject<ViewerWithControls | null>;
+  onLocationClick?: () => void;
 }
 
-export default function MoonControls({ viewerRef }: MoonControlsProps) {
+export default function MoonControls({ viewerRef, onLocationClick }: MoonControlsProps) {
   const handleLocationClick = (location: string) => {
     const flyToFunctions = viewerRef.current?.flyToLocations;
     if (!flyToFunctions) return;
@@ -29,6 +30,9 @@ export default function MoonControls({ viewerRef }: MoonControlsProps) {
         flyToFunctions.shackleton();
         break;
     }
+    
+    // Close hamburger menu after clicking (mobile only)
+    onLocationClick?.();
   };
 
   const handleBoundariesToggle = (checked: boolean) => {
@@ -63,13 +67,15 @@ export default function MoonControls({ viewerRef }: MoonControlsProps) {
 
       <style jsx>{`
         .moon-controls {
+          background: rgba(42, 42, 42, 0.8);
+          padding: 4px;
+          border-radius: 4px;
           position: absolute;
           top: 10px;
           left: 10px;
           z-index: 1000;
-          background: rgba(42, 42, 42, 0.8);
-          padding: 4px;
-          border-radius: 4px;
+          width: auto;
+          max-width: 300px;
         }
 
         .moon-controls input {
@@ -106,6 +112,43 @@ export default function MoonControls({ viewerRef }: MoonControlsProps) {
           margin: 2px;
           display: block;
           cursor: pointer;
+        }
+
+        /* Mobile - when inside hamburger menu */
+        @media (max-width: 767px) {
+          .moon-controls {
+            position: static;
+            background: transparent;
+            padding: 8px 0;
+            width: 100%;
+            max-width: none;
+          }
+
+          .moon-controls .header {
+            font-size: 18px;
+            margin: 4px 2px 12px 2px;
+            text-align: center;
+          }
+
+          .moon-controls button {
+            margin: 4px 0;
+            padding: 12px 16px;
+            font-size: 15px;
+            border-radius: 6px;
+            min-height: 48px;
+          }
+
+          .moon-controls label {
+            margin: 12px 0 4px 0;
+            font-size: 15px;
+            padding: 8px 4px;
+          }
+
+          .moon-controls input {
+            width: 18px;
+            height: 18px;
+            margin-right: 10px;
+          }
         }
       `}</style>
     </div>
