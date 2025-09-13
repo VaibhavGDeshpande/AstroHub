@@ -62,6 +62,16 @@ const Cards = () => {
       glow: 'pink',
       ctaText: 'Explore Data'
     },
+    {
+      title: '3D View of Moon',
+      description: 'See and observe the detailed surface of the Moon and it\'s landmarks ',
+      icon: StarIcon,
+      color: 'from-purple-500 to-pink-500',
+      path: '/3d-moon',
+      features: ['Moon','Moon Surface','Important Landmarks'],
+      glow: 'purple',
+      ctaText: 'Explore Data'
+    },
   ];
 
   const cardVariants = {
