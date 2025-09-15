@@ -7,26 +7,26 @@ export const pointsOfInterest: PointOfInterest[] = [
     latitude: 0.67416,
     longitude: 23.47315,
   },
-  {
-    text: "Apollo 14",
-    latitude: -3.64417,
-    longitude: 342.52135,
-  },
-  {
-    text: "Apollo 15",
-    latitude: 26.13341,
-    longitude: 3.6285,
-  },
-  {
-    text: "Lunokhod 1",
-    latitude: 38.2378,
-    longitude: -35.0017,
-  },
-  {
-    text: "Lunokhod 2",
-    latitude: 25.83232,
-    longitude: 30.92215,
-  },
+  // {
+  //   text: "Apollo 14",
+  //   latitude: -3.64417,
+  //   longitude: 342.52135,
+  // },
+  // {
+  //   text: "Apollo 15",
+  //   latitude: 26.13341,
+  //   longitude: 3.6285,
+  // },
+  // {
+  //   text: "Lunokhod 1",
+  //   latitude: 38.2378,
+  //   longitude: -35.0017,
+  // },
+  // {
+  //   text: "Lunokhod 2",
+  //   latitude: 25.83232,
+  //   longitude: 30.92215,
+  // },
 ];
 
 export const locationConfigs: Record<string, LocationConfig> = {

@@ -22,6 +22,7 @@ export const useMoonViewer = () => {
         animation: false,
         baseLayerPicker: false,
         geocoder: false,
+        sceneModePicker: false,
         shadows: true,
       }) as ViewerWithControls;
 
