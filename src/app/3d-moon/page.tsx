@@ -209,7 +209,7 @@ export default function MoonPage() {
 
           {/* Right Panel - 3D Moon Viewer */}
           <div className="w-3/4 h-full bg-black/20 backdrop-blur-sm border-l border-white/10">
-            <div className="w-full h-full p-4">
+            <div className="w-full h-full p-2">
               <div className="moon-viewer-container">
                 <div className="moon-viewer-wrapper">
                   <MoonViewer />

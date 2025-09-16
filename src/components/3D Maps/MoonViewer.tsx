@@ -41,7 +41,7 @@ export default function MoonViewer({ containerStyle }: MoonViewerProps) {
   }
 
   return (
-    <div className="w-full h-screen relative">
+    <div className="w-full h-full relative">
       <div 
         ref={cesiumContainerRef} 
         id="cesiumContainer"
