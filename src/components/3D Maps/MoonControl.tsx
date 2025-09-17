@@ -295,13 +295,13 @@ export default function MoonControls({ viewerRef, onLocationClick }: MoonControl
         }
 
         /* Mobile Styles */
-        @media (max-width: 767px) {
+        @media (max-width: 7px) {
           .moon-controls-dropdown {
             position: absolute;
             top: 10px;
             left: 10px;
             right: auto;
-            width: auto;
+            width: 10px;
           }
 
           .dropdown-trigger {
@@ -314,11 +314,11 @@ export default function MoonControls({ viewerRef, onLocationClick }: MoonControl
           .dropdown-menu {
             width: 42vw;
             max-width: 72vw;
-            max-height: 200px;
+            max-height: 100px;
           }
 
           .dropdown-item {
-            padding: 12px 10px;
+            padding: 12px 5px;
             font-size: 16px;
             min-height: 52px;
           }
