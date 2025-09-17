@@ -38,3 +38,66 @@ body {
   width: 100%;
   height: 100%;
 }
+.cesium-animation-rectButton.highlight-animation
+  .cesium-animation-buttonGlow {
+  display: block;
+  fill: #fff;
+  /* keep the built-in blur and add extra glow layers */
+  filter: url(#animation_blurred) drop-shadow(0 0 3px #aef)
+    drop-shadow(0 0 3px #fff);
+  animation: highlight-animation-button 1.2s ease-in-out infinite;
+}
+.cesium-animation-rectButton.highlight-animation
+  .cesium-animation-buttonMain {
+  stroke: #fff;
+  stroke-width: 3;
+}
+.cesium-animation-rectButton.highlight-animation
+  .cesium-animation-buttonPath {
+  fill: #fff;
+}
+
+.cesium-animation-shuttleRingG.highlight-animation
+  .cesium-animation-shuttleRingBack {
+  stroke: #fff;
+  stroke-width: 6;
+  filter: drop-shadow(0 0 3px #aef)
+    drop-shadow(0 0 3px rgba(174, 238, 255, 0.95));
+  animation: highlight-animation-ring 1.2s ease-in-out infinite;
+}
+.cesium-animation-shuttleRingG.highlight-animation
+  .cesium-animation-shuttleRingSwoosh
+  line {
+  stroke: #fff;
+  stroke-opacity: 0.8;
+}
+
+@keyframes highlight-animation-button {
+  0% {
+    opacity: 0.3;
+    stroke-width: 0;
+  }
+  50% {
+    opacity: 1;
+    stroke-width: 4;
+  }
+  100% {
+    opacity: 0.3;
+    stroke-width: 0;
+  }
+}
+@keyframes highlight-animation-ring {
+  0% {
+    stroke-opacity: 0.25;
+    stroke: #333;
+  }
+  50% {
+    stroke-opacity: 1;
+    stroke: #fff;
+  }
+  100% {
+    stroke-opacity: 0.25;
+    stroke: #333;
+  }
+}
+

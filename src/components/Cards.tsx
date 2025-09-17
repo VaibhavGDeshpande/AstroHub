@@ -72,6 +72,16 @@ const Cards = () => {
       glow: 'purple',
       ctaText: 'Explore Data'
     },
+    {
+      title: '3D View of Mars',
+      description: 'See and observe the detailed surface of the Mars and it\'s landmarks ',
+      icon: StarIcon,
+      color: 'from-purple-500 to-pink-500',
+      path: '/3d-mars',
+      features: ['Mars','Mars Surface','Important Landmarks','Important rovers'],
+      glow: 'purple',
+      ctaText: 'Explore Data'
+    }
   ];
 
   const cardVariants = {
