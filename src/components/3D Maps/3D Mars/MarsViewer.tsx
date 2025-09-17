@@ -30,13 +30,57 @@ const styles = `
     left: 0;
     height: 100%;
     width: 100%;
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(0, 0, 0, 0.8);
     display: flex;
     align-items: center;
     justify-content: center;
     color: white;
     font-family: sans-serif;
     z-index: 1000;
+    backdrop-filter: blur(5px);
+  }
+
+  .loading-container {
+    text-align: center;
+    background: rgba(42, 42, 42, 0.95);
+    padding: 40px;
+    border-radius: 12px;
+    border: 1px solid #555;
+    min-width: 320px;
+  }
+
+  .progress-bar {
+    width: 280px;
+    height: 8px;
+    background: #333;
+    border-radius: 4px;
+    overflow: hidden;
+    margin: 20px auto;
+    position: relative;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #ff4444, #ff6666);
+    border-radius: 4px;
+    transition: width 0.3s ease;
+    position: relative;
+  }
+
+  .progress-fill::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    animation: shimmer 2s infinite;
+  }
+
+  @keyframes shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
   }
   
   #toolbar {
@@ -217,9 +261,91 @@ const MarsRoverExplorer: React.FC = () => {
   // Store references to GLB model entities
   const roverModelsRef = useRef<Map<string, Cesium.Entity>>(new Map());
 
-  // State for menu entries
+  // State for menu entries and loading
   const [roverMenuEntries, setRoverMenuEntries] = useState<RoverMenuEntry[]>([]);
   const [landmarkMenuEntries, setLandmarkMenuEntries] = useState<LandmarkMenuEntry[]>([]);
+  const [loadingProgress, setLoadingProgress] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
+  const [loadingMessage, setLoadingMessage] = useState('Initializing Mars Explorer...');
+
+  // Preload assets function
+  const preloadAssets = async (): Promise<void> => {
+    if (!viewerRef.current) return;
+    
+    setLoadingMessage('Preloading rover models...');
+    
+    // Preload rover models
+    const roverPromises = Object.keys(ROVER_MODELS).map(async (roverName) => {
+      try {
+        const modelConfig = ROVER_MODELS[roverName];
+        
+        // Create a hidden entity to preload the model
+        const preloadEntity = viewerRef.current!.entities.add({
+          name: `${roverName}_preload`,
+          position: Cesium.Cartesian3.fromDegrees(0, 0, -10000), // Hidden underground
+          show: false, // Hide while preloading
+          model: {
+            uri: modelConfig.modelPath,
+            scale: modelConfig.scale,
+            minimumPixelSize: 1,
+          }
+        });
+        
+        return preloadEntity;
+      } catch (error) {
+        console.error(`Failed to preload ${roverName} model:`, error);
+        return null;
+      }
+    });
+    
+    await Promise.all(roverPromises);
+    console.log('All rover models preloaded');
+    
+    // Preload CZML data
+    setLoadingMessage('Preloading rover data...');
+    try {
+      const czmlResponse = await fetch("../../SampleData/Mars.czml");
+      const czmlData = await czmlResponse.json();
+      // Cache in sessionStorage
+      sessionStorage.setItem('Mars.czml', JSON.stringify(czmlData));
+      console.log('CZML data preloaded and cached');
+    } catch (error) {
+      console.error('Failed to preload CZML:', error);
+    }
+    
+    // Preload GeoJSON data
+    setLoadingMessage('Preloading landmark data...');
+    try {
+      const geoJsonResponse = await fetch("../../SampleData/MarsPointsofInterest.geojson");
+      const geoJsonData = await geoJsonResponse.json();
+      // Cache in sessionStorage
+      sessionStorage.setItem('MarsPointsofInterest.geojson', JSON.stringify(geoJsonData));
+      console.log('GeoJSON data preloaded and cached');
+    } catch (error) {
+      console.error('Failed to preload GeoJSON:', error);
+    }
+  };
+
+  // Cache assets function
+  const cacheAssets = async (): Promise<void> => {
+    setLoadingMessage('Caching assets for faster loading...');
+    
+    // Cache rover models
+    const modelUrls = Object.values(ROVER_MODELS).map(model => model.modelPath);
+    
+    const cachePromises = modelUrls.map(async (url) => {
+      try {
+        const response = await fetch(url);
+        if (response.ok) {
+          console.log(`Cached model: ${url}`);
+        }
+      } catch (error) {
+        console.error(`Failed to cache ${url}:`, error);
+      }
+    });
+    
+    await Promise.all(cachePromises);
+  };
 
   useEffect(() => {
     if (!cesiumContainer.current) return;
@@ -235,7 +361,15 @@ const MarsRoverExplorer: React.FC = () => {
       globe: new Cesium.Globe(Cesium.Ellipsoid.MARS),
       skyBox: Cesium.SkyBox.createEarthSkyBox(),
       skyAtmosphere: new Cesium.SkyAtmosphere(Cesium.Ellipsoid.MARS),
+      // Performance optimizations
+      requestRenderMode: true,
+      maximumRenderTimeChange: Infinity,
     });
+
+    // Performance settings
+    viewer.resolutionScale = 1;
+    viewer.scene.fog.enabled = false;
+    viewer.targetFrameRate = 60;
 
     viewer.scene.globe.show = false;
     viewerRef.current = viewer;
@@ -272,14 +406,40 @@ const MarsRoverExplorer: React.FC = () => {
     scene.highDynamicRange = true;
     viewer.scene.postProcessStages.exposure = 1.5;
 
-    // Main initialization function
-    const initialize = async (viewer: Cesium.Viewer): Promise<void> => {
+    // Main initialization function with preloading
+    const initializeWithPreloading = async (viewer: Cesium.Viewer): Promise<void> => {
+      setIsLoading(true);
+      setLoadingProgress(0);
+      
+      // Step 1: Cache assets (10% of progress)
+      await cacheAssets();
+      setLoadingProgress(10);
+      
+      // Step 2: Preload assets (20% of progress)  
+      await preloadAssets();
+      setLoadingProgress(30);
+      
+      // Step 3: Load tileset (40% of progress)
+      setLoadingMessage('Loading Mars terrain...');
       await loadTileset();
+      setLoadingProgress(70);
+      
+      // Step 4: Load rovers (20% of progress)
+      setLoadingMessage('Loading rover data...');
       await loadRovers();
+      setLoadingProgress(85);
+      
+      // Step 5: Load landmarks (10% of progress)
+      setLoadingMessage('Loading landmarks...');
       await loadLandmarks();
+      setLoadingProgress(95);
+      
+      // Step 6: Complete setup
+      setLoadingMessage('Finalizing setup...');
       setupRotation();
       addRoverInstructionsToNavMenu();
-
+      setLoadingProgress(100);
+      
       // Add a listener for when the home button is clicked.
       viewer.homeButton.viewModel.command.beforeExecute.addEventListener(
         function () {
@@ -288,7 +448,7 @@ const MarsRoverExplorer: React.FC = () => {
       );
 
       // Add event listener to update model positions during animation
-      viewer.clock.onTick.addEventListener(() => {
+      viewer.scene.preUpdate.addEventListener(() => {
         if (viewer.clock.shouldAnimate) {
           // Update Curiosity model position
           if (curiosityRef.current && roverModelsRef.current.has('Curiosity')) {
@@ -301,10 +461,15 @@ const MarsRoverExplorer: React.FC = () => {
           }
         }
       });
+
+      // Complete loading
+      setTimeout(() => {
+        setIsLoading(false);
+      }, 1000);
     };
 
     // Initialize the application
-    initialize(viewer).catch(console.error);
+    initializeWithPreloading(viewer).catch(console.error);
 
     // Cleanup function
     return () => {
@@ -455,7 +620,6 @@ const MarsRoverExplorer: React.FC = () => {
 
     return canvas;
   };
-
 
   // For drawing attention to the play button in the animation view model
   const highlightAnimationViewModel = (): void => {
@@ -610,15 +774,37 @@ const MarsRoverExplorer: React.FC = () => {
     }
   };
 
-  // Load Mars tileset
+  // Load Mars tileset with preloading optimizations
   const loadTileset = async (): Promise<void> => {
     if (!viewerRef.current) return;
     
     try {
       const tileset = await Cesium.Cesium3DTileset.fromIonAssetId(3644333, {
         enableCollision: true,
+        // Performance and preloading optimizations
+        maximumScreenSpaceError: 24,
+        cullRequestsWhileMoving: true,
+        preloadWhenHidden: true,
+        preloadFlightDestinations: true,
+        preferLeaves: true,
+        immediatelyLoadDesiredLevelOfDetail: true,
+        // maximumMemoryUsage: 1024,
+        progressiveResolutionHeightFraction: 0.5,
+        foveatedScreenSpaceError: true,
+        foveatedConeSize: 0.3,
+        foveatedMinimumScreenSpaceErrorRelaxation: 0.0,
       });
+      
       viewerRef.current.scene.primitives.add(tileset);
+      
+      // Wait for initial tiles to load
+      // await tileset.readyPromise;
+      
+      // Set up tile loading event listener
+      tileset.allTilesLoaded.addEventListener(() => {
+        console.log('All visible tiles loaded');
+      });
+      
     } catch (error) {
       console.log(error);
     }
@@ -629,9 +815,19 @@ const MarsRoverExplorer: React.FC = () => {
     if (!viewerRef.current) return;
     
     try {
-      const dataSource = await Cesium.CzmlDataSource.load(
-        "../../SampleData/Mars.czml",
-      );
+      // Try to load from cache first
+      let czmlData;
+      const cachedData = sessionStorage.getItem('Mars.czml');
+      
+      if (cachedData) {
+        czmlData = JSON.parse(cachedData);
+        console.log('Loading CZML from cache');
+      } else {
+        const response = await fetch("../../SampleData/Mars.czml");
+        czmlData = await response.json();
+      }
+      
+      const dataSource = await Cesium.CzmlDataSource.load(czmlData);
       viewerRef.current.dataSources.add(dataSource);
 
       const roverMenuTemp: RoverMenuEntry[] = [];
@@ -754,9 +950,19 @@ const MarsRoverExplorer: React.FC = () => {
     if (!viewerRef.current) return;
     
     try {
-      const dataSource = await Cesium.GeoJsonDataSource.load(
-        "../../SampleData/MarsPointsofInterest.geojson",
-      );
+      // Try to load from cache first
+      let geoJsonData;
+      const cachedData = sessionStorage.getItem('MarsPointsofInterest.geojson');
+      
+      if (cachedData) {
+        geoJsonData = JSON.parse(cachedData);
+        console.log('Loading GeoJSON from cache');
+      } else {
+        const response = await fetch("../../SampleData/MarsPointsofInterest.geojson");
+        geoJsonData = await response.json();
+      }
+      
+      const dataSource = await Cesium.GeoJsonDataSource.load(geoJsonData);
       viewerRef.current.dataSources.add(dataSource);
 
       const onSelectLandmark = (landmark: LandmarkFlyToOptions): void => {
@@ -799,7 +1005,6 @@ const MarsRoverExplorer: React.FC = () => {
         });
 
         entity.name = entity.properties.text.getValue() as string;
-        // entity.description = createPickedFeatureDescription(entity);
 
         const flyToDestination = Cesium.Cartesian3.fromArray(
           entity.properties.destination.getValue() as number[]
@@ -836,7 +1041,6 @@ const MarsRoverExplorer: React.FC = () => {
     }
   };
 
-
   // Handle rover selection
   const handleRoverSelection = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedIndex = parseInt(e.target.value);
@@ -861,7 +1065,31 @@ const MarsRoverExplorer: React.FC = () => {
     <div className="relative w-full h-screen">
       <style>{styles}</style>
       <div ref={cesiumContainer} className="fullSize" />
-      <div id="toolbar">
+      
+      {/* Loading Overlay */}
+      {isLoading && (
+        <div id="loadingOverlay">
+          <div className="loading-container">
+            <div className="text-2xl mb-4 font-bold">🚀 Mars Explorer</div>
+            <div className="text-lg mb-2">{loadingMessage}</div>
+            <div className="progress-bar">
+              <div 
+                className="progress-fill"
+                style={{ width: `${loadingProgress}%` }}
+              ></div>
+            </div>
+            <div className="text-sm mt-2 opacity-75">{loadingProgress}% Complete</div>
+            {loadingProgress < 100 && (
+              <div className="text-xs mt-3 opacity-60">
+                Preloading assets for optimal performance...
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+      
+      {/* Toolbar */}
+      <div id="toolbar" style={{ opacity: isLoading ? 0 : 1, transition: 'opacity 0.5s' }}>
         <div className="stratakit-mimic-select-root">
           <select 
             className="stratakit-mimic-button stratakit-mimic-select" 
@@ -869,6 +1097,7 @@ const MarsRoverExplorer: React.FC = () => {
             data-kiwi-tone="neutral"
             onChange={handleRoverSelection}
             value=""
+            disabled={isLoading}
           >
             <option value="">Fly to rover...</option>
             {roverMenuEntries.map((entry, index) => (
@@ -888,6 +1117,7 @@ const MarsRoverExplorer: React.FC = () => {
             data-kiwi-tone="neutral"
             onChange={handleLandmarkSelection}
             value=""
+            disabled={isLoading}
           >
             <option value="">Fly to landmark...</option>
             {landmarkMenuEntries.map((entry, index) => (
