@@ -191,12 +191,12 @@ interface LandmarkFlyToOptions {
 // Rover model configurations
 const ROVER_MODELS: { [key: string]: { modelPath: string; scale: number; heading?: number } } = {
   'Curiosity': {
-    modelPath: '/SampleData/Models/curiosity.glb',
+    modelPath: '../../SampleData/Models/curiosity.glb',
     scale: 1.0,
     heading: 0
   },
   'Perseverance': {
-    modelPath: '/SampleData/Models/perseverance.glb',
+    modelPath: '../../SampleData/Models/perseverance.glb',
     scale: 1.0,
     heading: 0
   }
@@ -755,7 +755,7 @@ const MarsRoverExplorer: React.FC = () => {
     
     try {
       const dataSource = await Cesium.GeoJsonDataSource.load(
-        "../../SampleData/MarsPointsOfInterest.geojson",
+        "../../SampleData/MarsPointsofInterest.geojson",
       );
       viewerRef.current.dataSources.add(dataSource);
 
