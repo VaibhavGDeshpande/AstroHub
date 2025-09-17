@@ -191,12 +191,12 @@ interface LandmarkFlyToOptions {
 // Rover model configurations
 const ROVER_MODELS: { [key: string]: { modelPath: string; scale: number; heading?: number } } = {
   'Curiosity': {
-    modelPath: '../../SampleData/Models/curiosity.glb',
+    modelPath: '../../SampleData/Models/Curiosity.glb',
     scale: 1.0,
     heading: 0
   },
   'Perseverance': {
-    modelPath: '../../SampleData/Models/perseverance.glb',
+    modelPath: '../../SampleData/Models/Perseverance.glb',
     scale: 1.0,
     heading: 0
   }
