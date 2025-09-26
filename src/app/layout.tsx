@@ -19,7 +19,7 @@ export const metadata: Metadata = {
   },
   icons: {
     icon:[
-      {url: "/favicon.png", sizes: "'16x16', type: 'image/png'"},
+      {url: "/AstroHub-remove-bg-preview", sizes: "'16x16', type: 'image/png'"},
     ]
   },
   description: "Explore the cosmos with NASA's public APIs including Astronomy Picture of the Day (APOD), Earth Polychromatic Imaging Camera (EPIC), and more stunning space imagery and data.",
