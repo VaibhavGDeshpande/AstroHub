@@ -1,14 +1,26 @@
-export const metadata = {
-  title: 'About'
-}
+// app/about/page.tsx
+'use client';
+import { useState, useEffect } from 'react';
+import About from "@/components/about/About";
+import LoaderWrapper from "@/components/Loader";
 
 export default function AboutPage() {
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 1200); 
+
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
-    <main className="p-8">
-      <h1 className="text-2xl font-semibold">About</h1>
-      <p className="mt-4 text-slate-300">This is the About page.</p>
-    </main>
-  )
+    <LoaderWrapper 
+      isVisible={isLoading} 
+      minDuration={1000}
+    >
+      <About />
+    </LoaderWrapper>
+  );
 }
-
-

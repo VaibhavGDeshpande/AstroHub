@@ -57,6 +57,15 @@ const Cards = () => {
       features: ['Full disk images', 'Weather patterns', 'Daily updates'],
       glow: 'cyan',
       ctaText: 'Explore Data'
+    },{
+      title: 'Near Earth Objects',
+      description: 'Track asteroids and comets that approach Earth with detailed orbital information.',
+      icon: RocketLaunchIcon,
+      color: 'from-blue-500 to-cyan-500',
+      path: '/neo',
+      features: ['Orbital data', 'Size estimates', 'Approach dates'],
+      glow: 'blue',
+      ctaText: 'Explore Data'
     },
     {
       title: 'NASA Image Library',

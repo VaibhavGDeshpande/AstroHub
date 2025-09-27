@@ -19,7 +19,7 @@ export const metadata: Metadata = {
   },
   icons: {
     icon:[
-      {url: "/AstroHub-remove-bg-preview", sizes: "'16x16', type: 'image/png'"},
+      {url: "/assets/AstroHub.png", sizes: "'16x16', type: 'image/png'"},
     ]
   },
   description: "Explore the cosmos with NASA's public APIs including Astronomy Picture of the Day (APOD), Earth Polychromatic Imaging Camera (EPIC), and more stunning space imagery and data.",
@@ -38,40 +38,40 @@ export const metadata: Metadata = {
     "cosmos",
     "universe"
   ],
-  authors: [{ name: "Your Name" }],
-  creator: "Your Name",
-  publisher: "NASA Explorer",
+  authors: [{ name: "Vaibhav Ganesh Deshpande" }],
+  creator: "Vaibhav Ganesh Deshpande",
+  publisher: "AstroHub",
   formatDetection: {
     email: false,
     address: false,
     telephone: false,
   },
-  metadataBase: new URL("https://your-domain.com"), // Replace with your actual domain
+  metadataBase: new URL("https://explorenasa.vercel.app"), // Replace with your actual domain
   alternates: {
     canonical: "/",
   },
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://your-domain.com", // Replace with your actual domain
-    siteName: "NASA Explorer",
-    title: "NASA Explorer - Space Data & Imagery",
+    url: "https://explorenasa.vercel.app", // Replace with your actual domain
+    siteName: "AstoHub",
+    title: "AstroHub - Astronomy Hub for Astrophiles and young astronomers",
     description: "Explore the cosmos with NASA's public APIs including APOD, EPIC, and more stunning space imagery and data.",
     images: [
       {
-        url: "/og-image.jpg", // You'll need to add this image to your public folder
+        url: "/assets/AstroHub.png", // You'll need to add this image to your public folder
         width: 1200,
         height: 630,
-        alt: "NASA Explorer - Space Data & Imagery",
+        alt: "AstroHub - Astronomy Hub for Astrophiles and young astronomers",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "NASA Explorer - Space Data & Imagery",
+    title: "AstroHub - Astronomy Hub for Astrophiles and young astronomers",
     description: "Explore the cosmos with NASA's public APIs including APOD, EPIC, and more stunning space imagery and data.",
-    images: ["/og-image.jpg"], // Same image as OpenGraph
-    creator: "@yourtwitterhandle", // Replace with your Twitter handle
+    images: ["/og-image.jpg"],
+    creator: "@yourtwitterhandle", 
   },
   robots: {
     index: true,

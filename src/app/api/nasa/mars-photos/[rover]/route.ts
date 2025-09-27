@@ -30,7 +30,7 @@ export async function GET(
     const { searchParams } = new URL(request.url);
     const earth_date = searchParams.get('earth_date') || '2025-05-03';
     
-    const apiKey = process.env.NASA_API_KEY;
+    const apiKey = process.env.NEXT_PUBLIC_NASA_API_KEY;
     if (!apiKey) {
       return NextResponse.json(
         { error: 'NASA_API_KEY is not configured on the server' }, 

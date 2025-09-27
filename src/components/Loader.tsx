@@ -65,7 +65,7 @@ function SpaceLoaderContent() {
         {/* Loading Text */}
         <div className="space-y-4">
           <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent animate-float">
-            NASA Explorer
+            AstroHub
           </h2>
           <p className="text-lg text-slate-300 animate-pulse" style={{ animationDuration: '2.5s' }}>
             Initializing Space Data Portal...

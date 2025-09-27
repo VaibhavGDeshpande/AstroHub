@@ -105,6 +105,16 @@ export default function APODPage() {
     }
   };
 
+  // Get current displayed date
+  const getCurrentDate = () => {
+    if (Array.isArray(data) && data.length > 0) {
+      return data[currentImageIndex]?.date || today;
+    } else if (data && !Array.isArray(data)) {
+      return data.date;
+    }
+    return today;
+  };
+
   // Error handling
   if (error && !loading) {
     return (
@@ -132,8 +142,8 @@ export default function APODPage() {
           <div className="absolute bottom-10 left-1/2 -translate-x-1/2 w-96 h-40 bg-pink-500/20 blur-[100px]" />
         </div>
 
-        {/* Header with Navigation and Date Button */}
-        <div className="fixed top-4 left-4 right-4 z-50 flex justify-between items-center">
+        {/* Header with Navigation only */}
+        <div className="fixed top-4 left-4 z-50">
           {/* Back Button */}
           <motion.div
             initial={{ opacity: 0, x: -20 }}
@@ -148,22 +158,6 @@ export default function APODPage() {
               <span className="text-sm">Back</span>
             </Link>
           </motion.div>
-
-          {/* Date Selection Button */}
-          <DateSelectionButton
-            selectedDate={selectedDate}
-            setSelectedDate={setSelectedDate}
-            startDate={startDate}
-            setStartDate={setStartDate}
-            endDate={endDate}
-            setEndDate={setEndDate}
-            isDateRange={isDateRange}
-            setIsDateRange={setIsDateRange}
-            onSearch={handleDateSearch}
-            onTodayClick={handleTodayClick}
-            minDate={minDate}
-            maxDate={maxDate}
-          />
         </div>
 
         <div className="container mx-auto px-4 sm:px-6 lg:px-10 py-10 flex flex-col gap-10">
@@ -195,7 +189,28 @@ export default function APODPage() {
                 setImageLoaded={setImageLoaded}
                 openImageInNewTab={openImageInNewTab}
                 navigateImages={navigateImages}
-                searchSection={null}
+                searchSection={
+                  /* Compact Date Selection with reduced width */
+                  <div className="inline-block">
+                    <DateSelectionButton
+                      selectedDate={selectedDate}
+                      setSelectedDate={setSelectedDate}
+                      startDate={startDate}
+                      setStartDate={setStartDate}
+                      endDate={endDate}
+                      setEndDate={setEndDate}
+                      isDateRange={isDateRange}
+                      setIsDateRange={setIsDateRange}
+                      onSearch={handleDateSearch}
+                      onTodayClick={handleTodayClick}
+                      minDate={minDate}
+                      maxDate={maxDate}
+                      currentDate={getCurrentDate()}
+                      compact={true}
+                      reducedWidth={true}
+                    />
+                  </div>
+                }
               />
             </motion.div>
           )}
