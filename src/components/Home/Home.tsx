@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import Header from '@/components/Home/Header';
 import HeroSection from '@/components/Home/HeroSection';
 import Cards from '@/components/Cards';
-import Demo from '../example/example'; // Adjust path as needed
+import FactsSection from '../Facts/FactsSection';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Stars, Maximize2 } from 'lucide-react';
@@ -69,7 +69,7 @@ export default function Home() {
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900">
       <Header />
       <HeroSection />
-      <Demo/>
+      <FactsSection/>
       <Cards />
       
       {/* Toast Container for react-toastify */}

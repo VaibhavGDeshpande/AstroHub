@@ -157,10 +157,10 @@ export default function APODPage() {
               <HomeIcon className="h-4 w-4 hidden sm:block" />
               <span className="text-sm">Back</span>
             </Link>
-          </motion.div>
+          </motion.div> 
         </div>
 
-        <div className="container mx-auto px-4 sm:px-6 lg:px-10 py-10 flex flex-col gap-10">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-10 pt-5 flex flex-col gap-10">
           <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -205,9 +205,6 @@ export default function APODPage() {
                       onTodayClick={handleTodayClick}
                       minDate={minDate}
                       maxDate={maxDate}
-                      currentDate={getCurrentDate()}
-                      compact={true}
-                      reducedWidth={true}
                     />
                   </div>
                 }

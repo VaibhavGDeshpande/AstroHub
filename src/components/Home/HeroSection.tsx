@@ -17,7 +17,7 @@ const HeroSection = () => {
       video.currentTime = 0;
       
       // Increase video playback speed
-      video.playbackRate = 2.5; // 1.5x speed - adjust as needed (1.2x, 1.5x, 2x, etc.)
+      video.playbackRate = 2.5; 
       
       // Play the video
       video.play().catch(error => {
@@ -32,7 +32,7 @@ const HeroSection = () => {
           setTimeout(() => {
             setVideoStopped(true);
             setIsVisible(true);
-          }, 500); // Small delay after video stops before text appears
+          }, 500); 
         }
       };
 

@@ -2,13 +2,12 @@
 'use client';
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion} from 'framer-motion';
 import Link from 'next/link';
 import { 
   ArrowLeftIcon, 
   HomeIcon,
-  PhotoIcon, 
-  ExclamationTriangleIcon 
+  PhotoIcon,  
 } from '@heroicons/react/24/outline';  
 import { getMarsPhotos } from '@/api_service/mars_orbiter';
 import { MarsOrbiter } from '@/types/mars_orbiter';
@@ -125,7 +124,7 @@ export default function MarsPhotosPage() {
           />
         </div>
 
-        <div className="container mx-auto px-4 sm:px-6 lg:px-10 py-10 flex flex-col gap-10">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-10 py-5 flex flex-col gap-10">
           {/* Header with gradient title - matching APOD style */}
           <motion.div
             initial={{ opacity: 0, y: -20 }}

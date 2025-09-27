@@ -103,7 +103,7 @@ const NEOExplorer = () => {
   // Loading Component
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br flex items-center justify-center">
         {/* Back Button */}
         <div className="fixed top-4 left-4 z-50">
           <Link
@@ -135,7 +135,7 @@ const NEOExplorer = () => {
   // Error Component
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-red-900/20 to-slate-900 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gradient-to-br flex items-center justify-center p-4">
         {/* Back Button */}
         <div className="fixed top-4 left-4 z-50">
           <Link
@@ -176,7 +176,7 @@ const NEOExplorer = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900">
+    <div className="min-h-screen bg-gradient-to-br">
       {/* Back Button */}
       <motion.div 
         initial={{ opacity: 0, x: -20 }}
@@ -189,34 +189,12 @@ const NEOExplorer = () => {
         >
           <ArrowLeftIcon className="h-4 w-4 group-hover:-translate-x-0.5 transition-transform duration-300" />
           <HomeIcon className="h-4 w-4 hidden sm:block" />
-          <span className="text-sm font-medium">Back to Home</span>
+          <span className="text-sm font-medium">Back</span>
         </Link>
       </motion.div>
 
-      {/* Background Effects */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        {[...Array(50)].map((_, i) => (
-          <motion.div
-            key={i}
-            className="absolute w-1 h-1 bg-blue-400/60 rounded-full"
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-            }}
-            animate={{
-              opacity: [0.2, 1, 0.2],
-              scale: [1, 1.5, 1],
-            }}
-            transition={{
-              duration: 3 + Math.random() * 4,
-              repeat: Infinity,
-              delay: Math.random() * 2,
-            }}
-          />
-        ))}
-      </div>
 
-      <div className="relative z-10 container mx-auto px-4 py-8 pt-20 max-w-7xl">
+      <div className="relative z-10 container mx-auto px-4 py-8 pt-5 max-w-7xl">
         {/* Header */}
         <motion.header
           initial={{ opacity: 0, y: -20 }}
@@ -224,7 +202,7 @@ const NEOExplorer = () => {
           className="text-center mb-8"
         >
           <h1 className="text-4xl md:text-6xl font-bold mb-4 bg-gradient-to-r from-blue-400 via-pink-500 to-red-500 bg-clip-text text-transparent">
-            Near Earth Objects
+            NASA&apos;s Near Earth Objects
           </h1>
           <p className="text-xl text-slate-300 max-w-2xl mx-auto">
             Track asteroids and comets that approach Earth with detailed orbital information
@@ -233,51 +211,125 @@ const NEOExplorer = () => {
 
         {/* Search Controls */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-2xl p-6 mb-8"
+  initial={{ opacity: 0, y: 20 }}
+  animate={{ opacity: 1, y: 0 }}
+  className="bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-2xl p-6 mb-8 shadow-xl"
+>
+  {/* Header Section */}
+  <div className="flex items-center justify-between mb-6">
+    <div className="flex items-center space-x-3">
+      <div className="p-2 bg-blue-500/10 rounded-lg">
+        <MagnifyingGlassIcon className="h-6 w-6 text-blue-400" />
+      </div>
+      <div>
+        <h2 className="text-xl font-bold text-white">Search Date Range</h2>
+        <p className="text-sm text-slate-400">Select dates to explore Near Earth Objects</p>
+      </div>
+    </div>
+    <div className="hidden sm:flex items-center space-x-2 px-3 py-1 bg-slate-700/50 rounded-full">
+      <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+      <span className="text-xs text-slate-300">NASA API Connected</span>
+    </div>
+  </div>
+
+  {/* Form Section */}
+  <div className="space-y-4">
+    {/* Date Inputs Row */}
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      {/* Start Date */}
+      <div className="space-y-2">
+        <label className="flex items-center space-x-2 text-sm font-medium text-slate-300">
+          <CalendarIcon className="h-4 w-4 text-blue-400" />
+          <span>Start Date</span>
+        </label>
+        <div className="relative">
+          <input
+            type="date"
+            value={startDate}
+            onChange={(e) => setStartDate(e.target.value)}
+            max={todayStr}
+            className="w-full px-4 py-3 bg-slate-700/70 border border-slate-600/50 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all duration-300 hover:bg-slate-700 hover:border-slate-500"
+          />
+          <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none">
+          </div>
+        </div>
+      </div>
+      
+      {/* End Date */}
+      <div className="space-y-2">
+        <label className="flex items-center space-x-2 text-sm font-medium text-slate-300">
+          <CalendarIcon className="h-4 w-4 text-blue-400" />
+          <span>End Date</span>
+        </label>
+        <div className="relative">
+          <input
+            type="date"
+            value={endDate}
+            onChange={(e) => setEndDate(e.target.value)}
+            max={todayStr}
+            className="w-full px-4 py-3 bg-slate-700/70 border border-slate-600/50 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all duration-300 hover:bg-slate-700 hover:border-slate-500"
+          />
+          <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none">
+          </div>
+        </div>
+      </div>
+      
+      {/* Search Button */}
+      <div className="space-y-2">
+        <label className="text-sm font-medium text-transparent select-none">Search</label>
+        <button
+          onClick={handleDateSearch}
+          className="w-full px-6 py-3 bg-gradient-to-r from-blue-500 to-pink-600 text-white rounded-xl hover:from-blue-600 hover:to-pink-700 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg shadow-blue-500/20 flex items-center justify-center space-x-2 font-medium"
         >
-          <div className="flex items-center space-x-2 mb-4">
-            <MagnifyingGlassIcon className="h-6 w-6 text-blue-400" />
-            <h2 className="text-xl font-bold text-white">Search Date Range</h2>
-          </div>
+          <MagnifyingGlassIcon className="h-5 w-5" />
+          <span>Search NEOs</span>
+        </button>
+      </div>
+    </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
-            <div className="space-y-2">
-              <label className="text-sm text-slate-400">Start Date</label>
-              <input
-                type="date"
-                value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
-                max={todayStr}
-                className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <label className="text-sm text-slate-400">End Date</label>
-              <input
-                type="date"
-                value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
-                max={todayStr}
-                className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-            
-            <button
-              onClick={handleDateSearch}
-              className="px-6 py-2 bg-gradient-to-r from-blue-500 to-pink-600 text-white rounded-lg hover:from-blue-600 hover:to-pink-700 transition-all duration-300 hover:scale-105 shadow-lg flex items-center justify-center space-x-2"
-            >
-              <MagnifyingGlassIcon className="h-5 w-5" />
-              <span>Search</span>
-            </button>
+    {/* Info Section */}
+    <div className="flex items-center justify-between pt-4 border-t border-slate-600/30">
+      <div className="flex items-center space-x-4">
+        <div className="flex items-center space-x-2 text-xs text-slate-400">
+          <ExclamationTriangleIcon className="h-4 w-4 text-yellow-400" />
+          <span>Maximum 7 days range allowed</span>
+        </div>
+        <div className="hidden sm:flex items-center space-x-2 text-xs text-slate-500">
+          <ClockIcon className="h-4 w-4" />
+          <span>Data updated daily by NASA</span>
+        </div>
+      </div>
+      
+      {/* Quick Date Shortcuts */}
+      <div className="flex items-center space-x-2">
+        <span className="text-xs text-slate-500 hidden sm:block">Quick:</span>
+        <button
+          onClick={() => {
+            const today = new Date().toISOString().split('T')[0];
+            const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+            setStartDate(yesterday);
+            setEndDate(today);
+          }}
+          className="px-3 py-1 text-xs bg-slate-700/50 hover:bg-slate-600/50 text-slate-300 rounded-lg transition-colors duration-200"
+        >
+          Yesterday-Today
+        </button>
+        <button
+          onClick={() => {
+            const today = new Date().toISOString().split('T')[0];
+            const weekAgo = new Date(Date.now() - 7 * 86400000).toISOString().split('T')[0];
+            setStartDate(weekAgo);
+            setEndDate(today);
+          }}
+          className="px-3 py-1 text-xs bg-slate-700/50 hover:bg-slate-600/50 text-slate-300 rounded-lg transition-colors duration-200"
+        >
+          Last 7 Days
+        </button>
+      </div>
+    </div>
+  </div>
+</motion.div>
 
-            <div className="text-xs text-slate-500">
-              * Maximum 7 days range
-            </div>
-          </div>
-        </motion.div>
 
         {/* Results */}
         {data && (
