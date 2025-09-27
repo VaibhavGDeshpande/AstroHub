@@ -18,6 +18,7 @@ import {
 } from '@heroicons/react/24/outline';
 import { getNEO } from "../../api_service/neo";
 import { NEOResponse } from "../../types/neo";
+import LoaderWrapper from "../Loader";
 
 const NEOExplorer = () => {
   const [data, setData] = useState<NEOResponse | null>(null);
@@ -103,32 +104,7 @@ const NEOExplorer = () => {
   // Loading Component
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br flex items-center justify-center">
-        {/* Back Button */}
-        <div className="fixed top-4 left-4 z-50">
-          <Link
-            href="/"
-            className="flex items-center space-x-2 px-3 py-2 bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 text-white rounded-lg hover:bg-slate-700/50 transition-all duration-300 hover:scale-105"
-          >
-            <ArrowLeftIcon className="h-4 w-4" />
-            <span className="text-sm">Back</span>
-          </Link>
-        </div>
-
-        <motion.div
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="text-center p-8"
-        >
-          <motion.div
-            animate={{ rotate: 360 }}
-            transition={{ duration: 2, repeat: Infinity }}
-            className="w-16 h-16 border-4 border-blue-500/30 border-t-blue-500 rounded-full mx-auto mb-6"
-          />
-          <h2 className="text-2xl font-bold text-white mb-2">Scanning for asteroids...</h2>
-          <p className="text-slate-400">Fetching Near Earth Objects data</p>
-        </motion.div>
-      </div>
+      <LoaderWrapper/>
     );
   }
 
