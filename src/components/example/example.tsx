@@ -1,393 +1,372 @@
-// components/Demo.tsx
-'use client';
-import { useState, useRef, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+"use client";
 
-const Demo = () => {
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const sectionRef = useRef<HTMLDivElement>(null);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [isMuted, setIsMuted] = useState(true);
-  const [videoLoaded, setVideoLoaded] = useState(false);
-  const [currentFactIndex, setCurrentFactIndex] = useState(0);
-  const [isInView, setIsInView] = useState(false);
-  const [factInterval, setFactInterval] = useState<NodeJS.Timeout | null>(null);
+import React, { useRef, useEffect, useState } from 'react';
+import * as THREE from 'three';
 
-  const astronomyFacts = [
-    {
-      emoji: "🔭",
-      text: "The Hubble Space Telescope has traveled over 4 billion miles in its orbit, equivalent to a round trip to Neptune."
-    },
-    {
-      emoji: "🌌",
-      text: "The Milky Way galaxy contains an estimated 100-400 billion stars and is approximately 13.6 billion years old."
-    },
-    {
-      emoji: "⚫",
-      text: "Sagittarius A*, the supermassive black hole at our galaxy's center, has a mass equivalent to 4 million suns."
-    },
-    {
-      emoji: "🪐",
-      text: "Saturn's rings are composed of billions of ice and rock particles, ranging from tiny grains to house-sized chunks."
-    },
-    {
-      emoji: "🌟",
-      text: "The nearest star system, Alpha Centauri, consists of three stars located 4.37 light-years from Earth."
-    },
-    {
-      emoji: "🔴",
-      text: "Mars experiences the largest dust storms in the solar system, some covering the entire planet for months."
-    },
-    {
-      emoji: "🛰️",
-      text: "The International Space Station orbits Earth at 17,500 mph, completing one orbit approximately every 90 minutes."
-    },
-    {
-      emoji: "💫",
-      text: "Pulsars are rotating neutron stars that emit beams of radiation, acting as cosmic lighthouses in space."
-    },
-    {
-      emoji: "🌍",
-      text: "Earth's magnetic field extends up to 65,000 kilometers into space, protecting us from harmful solar radiation."
-    },
-    {
-      emoji: "🚀",
-      text: "The Voyager 1 spacecraft, launched in 1977, is now over 14 billion miles from Earth in interstellar space."
-    },
-    {
-      emoji: "🌙",
-      text: "The Moon's gravitational influence causes Earth's tides and gradually slows our planet's rotation by 2.3 milliseconds per century."
-    },
-    {
-      emoji: "☀️",
-      text: "The Sun converts 600 million tons of hydrogen into helium every second through nuclear fusion in its core."
-    }
-  ];
+interface SimpleBlackHoleProps {
+  className?: string;
+  size?: number;
+  diskRadius?: number;
+  rotationSpeed?: number;
+  showStars?: boolean;
+}
 
-  // Video loading and setup
+const SimpleBlackHole: React.FC<SimpleBlackHoleProps> = ({
+  className = "",
+  size = 0.5,
+  diskRadius = 2.5,
+  rotationSpeed = 0.5,
+  showStars = true
+}) => {
+  const mountRef = useRef<HTMLDivElement>(null);
+  const sceneRef = useRef<THREE.Scene>();
+  const rendererRef = useRef<THREE.WebGLRenderer>();
+  const cameraRef = useRef<THREE.PerspectiveCamera>();
+  const frameRef = useRef<number>();
+  const blackHoleRef = useRef<THREE.Mesh>();
+  const accretionDiskRef = useRef<THREE.Points>();
+  const starsRef = useRef<THREE.Points>();
+  const [isLoaded, setIsLoaded] = useState(false);
+
   useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
+    if (!mountRef.current) return;
 
-    const handleCanPlay = () => {
-      setVideoLoaded(true);
-    };
+    const mount = mountRef.current;
+    const width = mount.clientWidth;
+    const height = mount.clientHeight;
 
-    const handleLoadedData = () => {
-      setVideoLoaded(true);
-    };
+    // Scene setup
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x000000);
+    sceneRef.current = scene;
 
-    video.addEventListener('canplay', handleCanPlay);
-    video.addEventListener('loadeddata', handleLoadedData);
-    
-    return () => {
-      video.removeEventListener('canplay', handleCanPlay);
-      video.removeEventListener('loadeddata', handleLoadedData);
-    };
-  }, []);
+    // Camera setup
+    const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
+    camera.position.set(0, 1, 6);
+    camera.lookAt(0, 0, 0);
+    cameraRef.current = camera;
 
-  // Intersection Observer for video and text control
-  useEffect(() => {
-    const video = videoRef.current;
-    const section = sectionRef.current;
-    
-    if (!video || !section) return;
+    // Renderer setup
+    const renderer = new THREE.WebGLRenderer({ 
+      antialias: true, 
+      alpha: true,
+      powerPreference: "high-performance"
+    });
+    renderer.setSize(width, height);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    rendererRef.current = renderer;
+    mount.appendChild(renderer.domElement);
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            // Section is in view
-            setIsInView(true);
-            
-            // Always restart video from beginning when section comes into view
-            video.currentTime = 0;
-            video.play().then(() => {
-              setIsPlaying(true);
-            }).catch((error) => {
-              console.log('Video play failed:', error);
-              setIsPlaying(false);
-            });
-          } else {
-            // Section is out of view
-            setIsInView(false);
-            video.pause();
-            setIsPlaying(false);
+    // Create black hole [web:1][web:47]
+    const createBlackHole = () => {
+      const geometry = new THREE.SphereGeometry(size, 32, 32);
+      const material = new THREE.ShaderMaterial({
+        uniforms: {
+          time: { value: 0.0 }
+        },
+        vertexShader: `
+          varying vec2 vUv;
+          varying vec3 vPosition;
+          void main() {
+            vUv = uv;
+            vPosition = position;
+            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
           }
-        });
-      },
-      {
-        root: null, // viewport
-        rootMargin: '0px',
-        threshold: 0.3, // Trigger when 30% of section is visible
-      }
-    );
-
-    observer.observe(section);
-
-    return () => {
-      observer.disconnect();
-    };
-  }, [videoLoaded]);
-
-  // Fact rotation - only when in view
-  useEffect(() => {
-    if (!isInView || !videoLoaded) {
-      // Clear any existing interval
-      if (factInterval) {
-        clearInterval(factInterval);
-        setFactInterval(null);
-      }
-      return;
-    }
-
-    // Reset to first fact when coming into view
-    setCurrentFactIndex(0);
-
-    // Start fact rotation
-    const interval = setInterval(() => {
-      setCurrentFactIndex((prevIndex) => 
-        (prevIndex + 1) % astronomyFacts.length
-      );
-    }, 4000);
-
-    setFactInterval(interval);
-
-    return () => {
-      if (interval) {
-        clearInterval(interval);
-      }
-    };
-  }, [isInView, videoLoaded, astronomyFacts.length]);
-
-  // Cleanup interval on unmount
-  useEffect(() => {
-    return () => {
-      if (factInterval) {
-        clearInterval(factInterval);
-      }
-    };
-  }, [factInterval]);
-
-  const currentFact = astronomyFacts[currentFactIndex];
-
-  const handleVideoClick = () => {
-    const video = videoRef.current;
-    if (!video) return;
-
-    if (isPlaying) {
-      video.pause();
-      setIsPlaying(false);
-    } else {
-      video.play().then(() => {
-        setIsPlaying(true);
-      }).catch(() => {
-        setIsPlaying(false);
+        `,
+        fragmentShader: `
+          uniform float time;
+          varying vec2 vUv;
+          varying vec3 vPosition;
+          
+          void main() {
+            vec2 center = vec2(0.5, 0.5);
+            float dist = distance(vUv, center);
+            
+            // Event horizon - pure black with subtle edge glow
+            float horizon = 0.45;
+            float edgeGlow = smoothstep(horizon, horizon + 0.1, dist);
+            
+            vec3 color = vec3(0.0);
+            if (dist > horizon) {
+              // Subtle gravitational lensing effect at the edge
+              color = vec3(0.15, 0.05, 0.25) * edgeGlow * 0.3;
+            }
+            
+            gl_FragColor = vec4(color, 1.0);
+          }
+        `,
+        side: THREE.DoubleSide
       });
-    }
-  };
+
+      const blackHole = new THREE.Mesh(geometry, material);
+      blackHoleRef.current = blackHole;
+      scene.add(blackHole);
+    };
+
+    // Create accretion disk [web:7][web:47][web:49]
+    const createAccretionDisk = () => {
+      const particleCount = 3000;
+      const geometry = new THREE.BufferGeometry();
+      const positions = new Float32Array(particleCount * 3);
+      const colors = new Float32Array(particleCount * 3);
+      const sizes = new Float32Array(particleCount);
+      const velocities = new Float32Array(particleCount);
+
+      for (let i = 0; i < particleCount; i++) {
+        const i3 = i * 3;
+        
+        // Create disk distribution with realistic density falloff
+        const innerRadius = size * 1.5;
+        const outerRadius = diskRadius;
+        const radius = innerRadius + Math.pow(Math.random(), 0.7) * (outerRadius - innerRadius);
+        const angle = Math.random() * Math.PI * 2;
+        const height = (Math.random() - 0.5) * 0.15 * Math.pow(radius / outerRadius, 2);
+
+        positions[i3] = Math.cos(angle) * radius;
+        positions[i3 + 1] = height;  
+        positions[i3 + 2] = Math.sin(angle) * radius;
+
+        // Temperature-based coloring (closer = hotter = bluer) [web:49]
+        const temp = 1.0 - Math.pow((radius - innerRadius) / (outerRadius - innerRadius), 0.5);
+        const r = 0.8 + temp * 0.2;
+        const g = 0.4 + temp * 0.4;
+        const b = 0.2 + temp * 0.8;
+        
+        colors[i3] = r;
+        colors[i3 + 1] = g;
+        colors[i3 + 2] = b;
+
+        // Particle size based on distance and temperature
+        sizes[i] = (0.02 + temp * 0.04) * Math.random();
+        
+        // Orbital velocity (Keplerian motion)
+        velocities[i] = Math.sqrt(1.0 / radius) * 0.3;
+      }
+
+      geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+      geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+      geometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
+      geometry.setAttribute('velocity', new THREE.BufferAttribute(velocities, 1));
+
+      const material = new THREE.ShaderMaterial({
+        uniforms: {
+          time: { value: 0.0 }
+        },
+        vertexShader: `
+          attribute float size;
+          attribute vec3 color;
+          attribute float velocity;
+          varying vec3 vColor;
+          varying float vAlpha;
+          uniform float time;
+          
+          void main() {
+            vColor = color;
+            
+            // Calculate orbital motion
+            float radius = length(position.xz);
+            float currentAngle = atan(position.z, position.x);
+            float newAngle = currentAngle + velocity * time;
+            
+            vec3 newPosition = position;
+            newPosition.x = cos(newAngle) * radius;
+            newPosition.z = sin(newAngle) * radius;
+            
+            vec4 mvPosition = modelViewMatrix * vec4(newPosition, 1.0);
+            
+            // Size attenuation and brightness based on distance from center
+            float distanceFromCenter = length(newPosition.xz);
+            vAlpha = 1.0 / (1.0 + distanceFromCenter * 0.3);
+            
+            gl_PointSize = size * (300.0 / -mvPosition.z) * vAlpha;
+            gl_Position = projectionMatrix * mvPosition;
+          }
+        `,
+        fragmentShader: `
+          varying vec3 vColor;
+          varying float vAlpha;
+          
+          void main() {
+            // Create circular particles
+            vec2 center = vec2(0.5, 0.5);
+            float dist = distance(gl_PointCoord, center);
+            if (dist > 0.5) discard;
+            
+            // Smooth falloff
+            float alpha = (1.0 - dist * 2.0) * vAlpha;
+            gl_FragColor = vec4(vColor, alpha);
+          }
+        `,
+        transparent: true,
+        blending: THREE.AdditiveBlending,
+        vertexColors: true,
+        depthWrite: false
+      });
+
+      const accretionDisk = new THREE.Points(geometry, material);
+      accretionDiskRef.current = accretionDisk;
+      scene.add(accretionDisk);
+    };
+
+    // Create background stars [web:22][web:48]
+    const createStars = () => {
+      if (!showStars) return;
+
+      const starCount = 1000;
+      const geometry = new THREE.BufferGeometry();
+      const positions = new Float32Array(starCount * 3);
+      const colors = new Float32Array(starCount * 3);
+      const sizes = new Float32Array(starCount);
+
+      for (let i = 0; i < starCount; i++) {
+        const i3 = i * 3;
+        
+        // Random positions in a sphere
+        const radius = 20 + Math.random() * 80;
+        const theta = Math.random() * Math.PI * 2;
+        const phi = Math.acos(2 * Math.random() - 1);
+        
+        positions[i3] = radius * Math.sin(phi) * Math.cos(theta);
+        positions[i3 + 1] = radius * Math.sin(phi) * Math.sin(theta);
+        positions[i3 + 2] = radius * Math.cos(phi);
+
+        // Star colors (realistic stellar colors)
+        const starType = Math.random();
+        if (starType < 0.7) {
+          // White/yellow stars
+          colors[i3] = 0.9 + Math.random() * 0.1;
+          colors[i3 + 1] = 0.8 + Math.random() * 0.2;
+          colors[i3 + 2] = 0.6 + Math.random() * 0.4;
+        } else if (starType < 0.9) {
+          // Blue stars
+          colors[i3] = 0.6 + Math.random() * 0.2;
+          colors[i3 + 1] = 0.8 + Math.random() * 0.2;
+          colors[i3 + 2] = 1.0;
+        } else {
+          // Red stars
+          colors[i3] = 1.0;
+          colors[i3 + 1] = 0.3 + Math.random() * 0.3;
+          colors[i3 + 2] = 0.1 + Math.random() * 0.2;
+        }
+
+        sizes[i] = Math.random() * 0.02 + 0.01;
+      }
+
+      geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+      geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+      geometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
+
+      const material = new THREE.PointsMaterial({
+        size: 0.02,
+        vertexColors: true,
+        transparent: true,
+        opacity: 0.8,
+        sizeAttenuation: true
+      });
+
+      const stars = new THREE.Points(geometry, material);
+      starsRef.current = stars;
+      scene.add(stars);
+    };
+
+    // Initialize all components
+    createBlackHole();
+    createAccretionDisk();
+    createStars();
+
+    // Animation loop
+    let time = 0;
+    const animate = () => {
+      frameRef.current = requestAnimationFrame(animate);
+      time += 0.016 * rotationSpeed;
+
+      // Update black hole shader
+      if (blackHoleRef.current?.material instanceof THREE.ShaderMaterial) {
+        blackHoleRef.current.material.uniforms.time.value = time;
+      }
+
+      // Update accretion disk rotation
+      if (accretionDiskRef.current?.material instanceof THREE.ShaderMaterial) {
+        accretionDiskRef.current.material.uniforms.time.value = time;
+      }
+
+      // Subtle camera movement for dynamic view
+      if (cameraRef.current) {
+        cameraRef.current.position.x = Math.sin(time * 0.1) * 0.2;
+        cameraRef.current.lookAt(0, 0, 0);
+      }
+
+      renderer.render(scene, camera);
+    };
+
+    animate();
+    setIsLoaded(true);
+
+    // Handle resize
+    const handleResize = () => {
+      if (!mount || !camera || !renderer) return;
+      
+      const newWidth = mount.clientWidth;
+      const newHeight = mount.clientHeight;
+      
+      camera.aspect = newWidth / newHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(newWidth, newHeight);
+    };
+
+    window.addEventListener('resize', handleResize);
+
+    // Cleanup function
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      if (frameRef.current) {
+        cancelAnimationFrame(frameRef.current);
+      }
+      if (mount && renderer.domElement && mount.contains(renderer.domElement)) {
+        mount.removeChild(renderer.domElement);
+      }
+      
+      // Dispose of resources
+      renderer.dispose();
+      
+      [blackHoleRef, accretionDiskRef, starsRef].forEach(ref => {
+        if (ref.current) {
+          ref.current.geometry.dispose();
+          if (ref.current.material instanceof THREE.Material) {
+            ref.current.material.dispose();
+          }
+        }
+      });
+    };
+  }, [size, diskRadius, rotationSpeed, showStars]);
 
   return (
-    <motion.section 
-      ref={sectionRef}
-      className="relative min-h-screen flex items-center justify-center overflow-hidden bg-slate-900"
-      initial={{ opacity: 0 }}
-      whileInView={{ opacity: 1 }}
-      viewport={{ 
-        once: false, // Animation triggers every time section enters view
-        amount: 0.3 // Trigger when 30% of section is visible
-      }}
-      transition={{ duration: 0.6 }}
-    >
-      {/* Background Video */}
-      <div className="absolute inset-0 w-full h-full">
-        <video
-          ref={videoRef}
-          className="w-full h-full object-cover cursor-pointer"
-          muted={isMuted}
-          loop
-          playsInline
-          preload="auto"
-          onClick={handleVideoClick}
-        >
-          <source src="/assets/mars1.mp4" type="video/mp4" />
-        </video>
-        
-        {/* Minimal overlay for text readability */}
-        <div className="absolute inset-0 bg-black/20" />
-        
-        {/* Subtle gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/40" />
-      </div>
-
-
-      {/* Professional Facts Section - Only show when in view */}
-      <AnimatePresence>
-        {isInView && videoLoaded && (
-          <motion.div
-            key={`facts-container-${isInView}`}
-            initial={{ opacity: 0, y: 50, scale: 0.9 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -50, scale: 0.9 }}
-            transition={{ 
-              duration: 0.8, 
-              ease: "easeOut",
-              staggerChildren: 0.2
-            }}
-            className="absolute top-12 left-1/2 transform -translate-x-1/2 z-20 max-w-4xl mx-auto px-6"
-          >
-            {/* Clean Header */}
-            <motion.div 
-              className="text-center mb-12"
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-            >
-              <div className="flex items-center justify-center mb-4">
-                <div className="h-px w-16 bg-gradient-to-r from-transparent to-slate-400"></div>
-                <h2 className="mx-6 text-slate-300 font-medium text-sm tracking-[0.2em] uppercase">
-                  Astronomical Insights
-                </h2>
-                <div className="h-px w-16 bg-gradient-to-l from-transparent to-slate-400"></div>
-              </div>
-            </motion.div>
-
-            {/* Fully Transparent Content Card */}
-            <div className="relative">
-              <div className="relative px-8 py-10 md:px-12 md:py-14">
-                <AnimatePresence mode="wait">
-                  <motion.div
-                    key={`fact-${currentFactIndex}-${isInView}`}
-                    initial={{ opacity: 0, y: 30, rotateX: -15 }}
-                    animate={{ opacity: 1, y: 0, rotateX: 0 }}
-                    exit={{ opacity: 0, y: -30, rotateX: 15 }}
-                    transition={{ 
-                      duration: 0.7, 
-                      ease: "easeOut",
-                      opacity: { duration: 0.4 },
-                      y: { duration: 0.6 },
-                      rotateX: { duration: 0.6 }
-                    }}
-                    className="text-center space-y-6"
-                  >
-                    {/* Minimalist Icon */}
-                    <motion.div
-                      initial={{ scale: 0.5, rotate: -180 }}
-                      animate={{ scale: 1, rotate: 0 }}
-                      transition={{ 
-                        duration: 0.6, 
-                        delay: 0.1,
-                        type: "spring",
-                        stiffness: 200,
-                        damping: 15
-                      }}
-                      className="flex justify-center"
-                    >
-                      <div className="w-16 h-16 rounded-full bg-black/20 backdrop-blur-sm border border-white/10 flex items-center justify-center hover:bg-black/30 transition-all duration-300">
-                        <span className="text-2xl">{currentFact.emoji}</span>
-                      </div>
-                    </motion.div>
-
-                    {/* Professional Typography with enhanced animations */}
-                    <motion.p
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ 
-                        duration: 0.6, 
-                        delay: 0.3,
-                        ease: "easeOut"
-                      }}
-                      className="text-xl md:text-2xl text-white font-light leading-relaxed max-w-3xl mx-auto"
-                      style={{ 
-                        textShadow: '0 2px 8px rgba(0, 0, 0, 0.8), 0 4px 16px rgba(0, 0, 0, 0.6)' 
-                      }}
-                    >
-                      {currentFact.text}
-                    </motion.p>
-                  </motion.div>
-                </AnimatePresence>
-
-                {/* Professional Progress Bar */}
-                <motion.div 
-                  className="mt-10 flex justify-center"
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.5, delay: 0.4 }}
-                >
-                  <div className="flex space-x-1 bg-black/20 rounded-full p-1 backdrop-blur-sm">
-                    {astronomyFacts.map((_, index) => (
-                      <motion.div
-                        key={index}
-                        className={`h-1.5 rounded-full transition-all duration-500 ${
-                          index === currentFactIndex 
-                            ? 'w-6 bg-white/80' 
-                            : 'w-1.5 bg-white/30'
-                        }`}
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        transition={{ 
-                          duration: 0.3, 
-                          delay: 0.5 + index * 0.05 
-                        }}
-                      />
-                    ))}
-                  </div>
-                </motion.div>
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Enhanced scroll indicator */}
-      <motion.div 
-        className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-20"
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 1 }}
-        viewport={{ once: false }}
-      >
-        <motion.div
-          animate={{ y: [0, 8, 0] }}
-          transition={{ 
-            duration: 2, 
-            repeat: Infinity, 
-            ease: "easeInOut" 
-          }}
-          className="flex flex-col items-center text-white/60"
-        >
-          <span className="text-xs mb-2 tracking-wider">SCROLL</span>
-          <div className="w-px h-8 bg-gradient-to-b from-white/60 to-transparent"></div>
-        </motion.div>
-      </motion.div>
-
-      {/* Transparent bottom fade */}
-      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-black/60 to-transparent z-5" />
+    <div className={`relative w-full h-full ${className}`}>
+      {/* Three.js canvas container */}
+      <div 
+        ref={mountRef} 
+        className="w-full h-full bg-black"
+        style={{ minHeight: '400px' }}
+      />
       
-      {/* Minimal corner accents with animations */}
-      <motion.div 
-        className="absolute top-6 left-6 w-8 h-8 border-l border-t border-slate-400/20 z-10"
-        initial={{ opacity: 0, scale: 0 }}
-        whileInView={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.5, delay: 0.8 }}
-        viewport={{ once: false }}
-      />
-      <motion.div 
-        className="absolute bottom-6 left-6 w-8 h-8 border-l border-b border-slate-400/20 z-10"
-        initial={{ opacity: 0, scale: 0 }}
-        whileInView={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.5, delay: 1.0 }}
-        viewport={{ once: false }}
-      />
-      <motion.div 
-        className="absolute bottom-6 right-6 w-8 h-8 border-r border-b border-slate-400/20 z-10"
-        initial={{ opacity: 0, scale: 0 }}
-        whileInView={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.5, delay: 1.1 }}
-        viewport={{ once: false }}
-      />
-    </motion.section>
+      {/* Loading indicator */}
+      {!isLoaded && (
+        <div className="absolute inset-0 flex items-center justify-center bg-black">
+          <div className="text-white text-lg animate-pulse">
+            Loading Black Hole...
+          </div>
+        </div>
+      )}
+      
+      {/* Info overlay */}
+      <div className="absolute bottom-4 left-4 text-white/70 text-sm">
+        <div>Black Hole Visualization</div>
+        <div className="text-xs mt-1">
+          Event Horizon: {(size * 2).toFixed(1)}units • Disk Radius: {diskRadius}units
+        </div>
+      </div>
+    </div>
   );
 };
 
-export default Demo;
+export default SimpleBlackHole;

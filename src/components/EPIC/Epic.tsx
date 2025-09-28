@@ -3,13 +3,14 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useCallback, useRef, useEffect } from 'react';
 import {
   GlobeAltIcon,
-  EyeIcon,
   ArrowsPointingOutIcon,
-  MagnifyingGlassPlusIcon,
-  MagnifyingGlassMinusIcon,
-  ArrowsRightLeftIcon,
   CalendarDaysIcon,
-  PhotoIcon
+  PhotoIcon,
+  SunIcon,
+  MapIcon,
+  PlayIcon,
+  PauseIcon,
+  XMarkIcon
 } from '@heroicons/react/24/outline';
 import { EPICImage } from '@/types/epic';
 
@@ -30,98 +31,472 @@ interface EPICImageInfoProps {
   loading?: boolean;
 }
 
-// Thumbnail Gallery Component
-const ThumbnailGallery: React.FC<{
+// Date Selection Modal Component
+const DateSelectionModal: React.FC<{
+  isOpen: boolean;
+  onClose: () => void;
+  selectedDate: string;
+  onDateChange: (date: string) => void;
+  maxDate: string;
+}> = ({ isOpen, onClose, selectedDate, onDateChange, maxDate }) => {
+  const [tempDate, setTempDate] = useState(selectedDate);
+
+  const handleSave = () => {
+    onDateChange(tempDate);
+    onClose();
+  };
+
+  const handleCancel = () => {
+    setTempDate(selectedDate);
+    onClose();
+  };
+
+  const handleTodayClick = () => {
+    const today = new Date().toISOString().split('T')[0];
+    if (today <= maxDate) {
+      setTempDate(today);
+    }
+  };
+
+  return (
+    <AnimatePresence>
+      {isOpen && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+          onClick={handleCancel}
+        >
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.9, y: 20 }}
+            transition={{ type: "spring", damping: 25, stiffness: 300 }}
+            className="bg-gradient-to-br from-slate-800/95 to-slate-900/95 backdrop-blur-md border border-slate-600/50 rounded-3xl p-6 shadow-2xl max-w-md w-full"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center space-x-3">
+                <div className="p-2 bg-blue-500/20 rounded-xl">
+                  <CalendarDaysIcon className="h-6 w-6 text-blue-400" />
+                </div>
+                <h2 className="text-xl font-bold text-white">Select Date</h2>
+              </div>
+              <button
+                onClick={handleCancel}
+                className="p-2 hover:bg-slate-700/50 rounded-full transition-colors duration-200"
+              >
+                <XMarkIcon className="h-5 w-5 text-slate-400" />
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-slate-300 mb-2">
+                  Choose EPIC Image Date
+                </label>
+                <input
+                  type="date"
+                  value={tempDate}
+                  onChange={(e) => setTempDate(e.target.value)}
+                  max={maxDate}
+                  className="w-full bg-slate-700/80 border border-slate-600/50 text-white rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 backdrop-blur-sm text-lg"
+                />
+                <p className="text-xs text-slate-400 mt-2">
+                  Available from June 2015 to {maxDate}
+                </p>
+              </div>
+
+              <div className="flex items-center justify-between">
+                <button
+                  onClick={handleTodayClick}
+                  className="px-4 py-2 bg-slate-700/60 hover:bg-slate-600/60 text-white rounded-lg transition-colors duration-200 text-sm"
+                >
+                  Today
+                </button>
+                <div className="text-xs text-slate-400">
+                  Current: {selectedDate}
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-center space-x-3 mt-8">
+              <button
+                onClick={handleCancel}
+                className="flex-1 px-4 py-3 bg-slate-700/60 hover:bg-slate-600/60 text-white rounded-xl transition-colors duration-200 font-medium"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSave}
+                className="flex-1 px-4 py-3 bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white rounded-xl transition-all duration-200 font-medium shadow-lg"
+              >
+                Apply Date
+              </button>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+};
+
+// Enhanced Thumbnail Sidebar with Better Scrolling
+const ThumbnailSidebar: React.FC<{
   images: EPICImage[];
   imageUrls: string[];
   currentIndex: number;
   onImageSelect: (index: number) => void;
-}> = ({ images, imageUrls, currentIndex, onImageSelect }) => {
+  onAutoPlay: () => void;
+  isAutoPlaying: boolean;
+  onDateModalOpen: () => void;
+}> = ({ images, imageUrls, currentIndex, onImageSelect, onAutoPlay, isAutoPlaying, onDateModalOpen }) => {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
-  // Auto-scroll to current image
+  // Auto-scroll to current image with improved logic
   useEffect(() => {
     if (scrollContainerRef.current && imageUrls.length > 0) {
       const container = scrollContainerRef.current;
-      const thumbnailWidth = 80; // w-20 = 80px
-      const gap = 8; // gap-2 = 8px
-      const scrollPosition = currentIndex * (thumbnailWidth + gap);
+      const thumbnailHeight = 85; // Slightly smaller thumbnails for better fit
+      const gap = 8; // Reduced gap
+      const rowHeight = thumbnailHeight + gap;
+      const columns = 2;
+      const currentRow = Math.floor(currentIndex / columns);
+      const containerHeight = container.clientHeight;
+      const scrollPosition = currentRow * rowHeight - containerHeight / 2 + thumbnailHeight / 2;
 
       container.scrollTo({
-        left: scrollPosition - container.clientWidth / 2 + thumbnailWidth / 2,
+        top: Math.max(0, scrollPosition),
         behavior: 'smooth'
       });
     }
   }, [currentIndex, imageUrls.length]);
 
-  if (!images || images.length <= 1) return null;
+  if (!images || images.length === 0) return null;
 
   return (
-    <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-xl p-4 mb-4">
-      <div className="flex items-center space-x-2 mb-3">
-        <PhotoIcon className="h-4 w-4 text-blue-400" />
-        <h3 className="text-sm font-semibold text-white">
-          All Images ({images.length})
-        </h3>
-        <span className="text-slate-400 text-xs">
-          {images[0]?.date.split(' ')[0]}
-        </span>
-      </div>
-
-      {/* Scrollable thumbnail container */}
-      <div
-        ref={scrollContainerRef}
-        className="flex space-x-2 overflow-x-auto pb-2"
-        style={{
-          scrollbarWidth: 'thin',
-          scrollbarColor: '#475569 #1e293b'
-        }}
-      >
-        {imageUrls.map((url, index) => (
-          <motion.button
-            key={`${images[index]?.image}-${index}`}
-            onClick={() => onImageSelect(index)}
+    <motion.div 
+      initial={{ opacity: 0, x: -30 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ delay: 0.2 }}
+      className="w-full h-full bg-gradient-to-b from-slate-800/90 to-slate-900/90 backdrop-blur-xl border border-slate-600/40 rounded-2xl p-3 shadow-2xl flex flex-col"
+    >
+      {/* Compact Header */}
+      <div className="flex flex-col space-y-2 mb-3 flex-shrink-0">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-2">
+            <div className="p-1.5 bg-blue-500/20 rounded-lg">
+              <PhotoIcon className="h-4 w-4 text-blue-400" />
+            </div>
+            <div>
+              <h3 className="text-sm font-bold text-white">Earth Gallery</h3>
+              <p className="text-xs text-slate-400">{images.length} images</p>
+            </div>
+          </div>
+        </div>
+        
+        {/* Compact Control buttons */}
+        <div className="grid grid-cols-2 gap-2">
+          <button
+            onClick={onDateModalOpen}
+            className="flex items-center justify-center space-x-1 px-2 py-1.5 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 rounded-lg transition-colors duration-200 border border-blue-500/30 text-xs"
+          >
+            <CalendarDaysIcon className="h-3 w-3" />
+            <span>Date</span>
+          </button>
+          
+          <button
+            onClick={onAutoPlay}
             className={`
-              relative flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-all duration-300
-              ${currentIndex === index
-                ? 'border-blue-400 ring-2 ring-blue-400/50 shadow-lg'
-                : 'border-slate-600 hover:border-slate-500'
+              flex items-center justify-center space-x-1 px-2 py-1.5 rounded-lg text-xs font-medium transition-all duration-300
+              ${isAutoPlaying 
+                ? 'bg-red-500/20 text-red-400 border border-red-500/30 hover:bg-red-500/30' 
+                : 'bg-green-500/20 text-green-400 border border-green-500/30 hover:bg-green-500/30'
               }
             `}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
           >
-            <img
-              src={url}
-              alt={`Earth ${index + 1}`}
-              className="w-full h-full object-cover"
-              loading="lazy"
-              width={80}
-              height={80}
-            />
+            {isAutoPlaying ? <PauseIcon className="h-3 w-3" /> : <PlayIcon className="h-3 w-3" />}
+            <span>{isAutoPlaying ? 'Stop' : 'Play'}</span>
+          </button>
+        </div>
 
-            {/* Image number overlay */}
-            <div className="absolute top-1 left-1 bg-black/70 text-white text-xs px-1.5 py-0.5 rounded">
-              {index + 1}
+        {/* Compact progress indicator */}
+        <div className="flex items-center justify-between text-xs text-slate-400">
+          <span>{currentIndex + 1}/{images.length}</span>
+          <span>{images[0]?.date.split(' ')[0]}</span>
+        </div>
+        
+        {/* Progress bar */}
+        <div className="w-full h-0.5 bg-slate-700 rounded-full overflow-hidden">
+          <motion.div 
+            className="h-full bg-gradient-to-r from-blue-400 to-cyan-400 rounded-full"
+            initial={{ width: 0 }}
+            animate={{ width: `${((currentIndex + 1) / images.length) * 100}%` }}
+            transition={{ duration: 0.3 }}
+          />
+        </div>
+      </div>
+
+      {/* Enhanced scrollable thumbnail grid */}
+      <div
+        ref={scrollContainerRef}
+        className="flex-1 min-h-0 overflow-y-auto pr-1 scrollbar-hide"
+        style={{
+          maxHeight: '400px',
+          scrollbarWidth: 'none',
+          msOverflowStyle: 'none'
+        }}
+      >
+        <div className="grid grid-cols-2 gap-2">
+          {imageUrls.map((url, index) => (
+            <motion.button
+              key={`${images[index]?.image}-${index}`}
+              onClick={() => onImageSelect(index)}
+              className={`
+                relative w-full aspect-square rounded-lg overflow-hidden transition-all duration-300 group
+                ${currentIndex === index
+                  ? 'ring-2 ring-blue-400 ring-offset-1 ring-offset-slate-900 shadow-xl scale-105' 
+                  : 'ring-1 ring-slate-600/50 hover:ring-slate-500/70 hover:scale-102'
+                }
+              `}
+              whileHover={{ y: -1 }}
+              whileTap={{ scale: 0.98 }}
+              layout
+            >
+              <img
+                src={url}
+                alt={`Earth ${index + 1}`}
+                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                loading="lazy"
+              />
+
+              {/* Enhanced overlays */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+              
+              {/* Compact image number */}
+              <div className="absolute bottom-1 left-1 bg-black/80 backdrop-blur-sm text-white text-xs px-1.5 py-0.5 rounded font-bold">
+                {index + 1}
+              </div>
+
+              {/* Time indicator for current image */}
+              {currentIndex === index && (
+                <div className="absolute top-1 right-1 bg-blue-500/90 backdrop-blur-sm text-white text-xs px-1 py-0.5 rounded font-medium">
+                  {images[index]?.date.split(' ')[1]?.slice(0, 5)}
+                </div>
+              )}
+
+              {/* Play indicator for auto-playing */}
+              {isAutoPlaying && currentIndex === index && (
+                <div className="absolute top-1 left-1 bg-green-500/90 backdrop-blur-sm text-white rounded-full p-0.5">
+                  <PlayIcon className="h-2.5 w-2.5" />
+                </div>
+              )}
+
+              {/* Selection indicator */}
+              {currentIndex === index && (
+                <motion.div 
+                  className="absolute inset-0 bg-blue-400/20 border border-blue-400/60 rounded-lg" 
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.3 }}
+                />
+              )}
+
+              {/* Hover overlay with metadata */}
+              <div className="absolute inset-0 bg-black/50 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                <div className="text-center text-white">
+                  <p className="text-xs font-medium mb-0.5">
+                    {images[index]?.date.split(' ')[1]?.slice(0, 8)}
+                  </p>
+                  <p className="text-xs text-slate-300">
+                    View
+                  </p>
+                </div>
+              </div>
+            </motion.button>
+          ))}
+        </div>
+      </div>
+    </motion.div>
+  );
+};
+
+// Reduced Height Image Viewer
+const ReducedHeightImageViewer: React.FC<{
+  imageUrl: string;
+  currentEPIC: EPICImage;
+  zoom: number;
+  pan: { x: number; y: number };
+  imageLoaded: boolean;
+  onZoomIn: () => void;
+  onZoomOut: () => void;
+  onResetView: () => void;
+  onOpenFullSize: () => void;
+  onMouseHandlers: {
+    onMouseDown: (e: React.MouseEvent) => void;
+    onMouseMove: (e: React.MouseEvent) => void;
+    onMouseUp: () => void;
+    onWheel: (e: React.WheelEvent) => void;
+  };
+  setImageLoaded: (loaded: boolean) => void;
+  containerRef: React.RefObject<HTMLDivElement | null>;
+  imageRef: React.RefObject<HTMLImageElement | null>;
+  currentImageIndex: number;
+  totalImages: number;
+  onNavigate: (direction: 'prev' | 'next') => void;
+}> = ({ 
+  imageUrl, 
+  currentEPIC, 
+  zoom, 
+  pan, 
+  imageLoaded, 
+  onZoomIn, 
+  onResetView, 
+  onOpenFullSize,
+  onMouseHandlers,
+  setImageLoaded,
+  containerRef,
+  imageRef,
+  currentImageIndex,
+}) => {
+  const formatCoordinate = (coord: number, type: 'lat' | 'lon'): string => {
+    const direction = type === 'lat' ? (coord >= 0 ? 'N' : 'S') : (coord >= 0 ? 'E' : 'W');
+    return `${Math.abs(coord).toFixed(2)}° ${direction}`;
+  };
+
+  return (
+    <div className="h-full flex flex-col space-y-3">
+      {/* Compact metadata header */}
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="bg-gradient-to-r from-slate-800/70 to-slate-900/70 backdrop-blur-md border border-slate-600/40 rounded-xl p-3 shadow-xl"
+      >
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-3">
+            <div className="p-1.5 bg-green-500/20 rounded-lg">
+              <GlobeAltIcon className="h-5 w-5 text-green-400" />
             </div>
+            <div>
+              <motion.h2
+                key={currentEPIC.image}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="text-lg font-bold text-white"
+              >
+                Earth from L1 Lagrange Point
+              </motion.h2>
+              <div className="flex items-center space-x-4 text-sm text-slate-400">
+                <div className="flex items-center space-x-1">
+                  <SunIcon className="h-3 w-3 text-yellow-400" />
+                  <span className="text-xs">{currentEPIC.date}</span>
+                </div>
+                <div className="flex items-center space-x-1">
+                  <MapIcon className="h-3 w-3 text-cyan-400" />
+                  <span className="text-xs">
+                    {formatCoordinate(currentEPIC.centroid_coordinates.lat, 'lat')}, {formatCoordinate(currentEPIC.centroid_coordinates.lon, 'lon')}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div className="flex items-center space-x-2 text-sm">
+            <div className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse" />
+            <span className="text-slate-300 font-medium text-xs">Live Data</span>
+          </div>
+        </div>
+      </motion.div>
 
-            {/* Current image indicator */}
-            {currentIndex === index && (
-              <div className="absolute inset-0 bg-blue-400/20 border-2 border-blue-400 rounded-lg" />
-            )}
-          </motion.button>
-        ))}
-      </div>
+      {/* Reduced height main image viewer */}
+      <motion.div
+        key={currentEPIC.image}
+        initial={{ opacity: 0, scale: 0.98 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] }}
+        className="relative group flex-1 flex items-center justify-center"
+        style={{ maxHeight: '65vh', minHeight: '400px' }} // Reduced height constraint
+      >
+        <div
+          ref={containerRef}
+          className="relative overflow-hidden rounded-xl bg-gradient-to-br from-slate-900/60 to-black/80 backdrop-blur-md border border-slate-600/30 w-full h-full flex items-center justify-center cursor-grab active:cursor-grabbing shadow-2xl"
+          onMouseDown={onMouseHandlers.onMouseDown}
+          onMouseMove={onMouseHandlers.onMouseMove}
+          onMouseUp={onMouseHandlers.onMouseUp}
+          onMouseLeave={onMouseHandlers.onMouseUp}
+          onWheel={onMouseHandlers.onWheel}
+        >
+          <AnimatePresence mode="wait">
+            <motion.img
+              ref={imageRef}
+              key={imageUrl + currentImageIndex}
+              src={imageUrl}
+              alt={`Earth from DSCOVR satellite on ${currentEPIC.date}`}
+              className="w-full h-full object-contain rounded-lg"
+              style={{
+                transform: `scale(${zoom}) translate(${pan.x / zoom}px, ${pan.y / zoom}px)`,
+                transformOrigin: 'center center',
+                maxWidth: 'none',
+                maxHeight: 'none'
+              }}
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: imageLoaded ? 1 : 0.7, scale: 1 }}
+              exit={{ opacity: 0, scale: 1.05 }}
+              transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
+              onLoad={() => setImageLoaded(true)}
+              onLoadStart={() => setImageLoaded(false)}
+              onDoubleClick={() => zoom === 1 ? onZoomIn() : onResetView()}
+              draggable={false}
+            />
+          </AnimatePresence>
 
-      {/* Navigation hint */}
-      <div className="text-xs text-slate-400 mt-2 text-center">
-        Click thumbnails to navigate • {currentIndex + 1} of {images.length} selected
-      </div>
+          {/* Enhanced loading overlay */}
+          {!imageLoaded && (
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 flex items-center justify-center bg-slate-900/70 backdrop-blur-md"
+            >
+              <div className="text-center">
+                <motion.div
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                  className="w-10 h-10 border-2 border-green-500/30 border-t-green-400 rounded-full mb-3 mx-auto"
+                />
+                <p className="text-slate-300 text-sm font-medium">Processing Earth imagery...</p>
+              </div>
+            </motion.div>
+          )}
+
+          {/* Floating Controls - Adjusted for smaller space */}
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            className="absolute top-3 left-3 right-3 flex items-start justify-between pointer-events-none z-10"
+          >
+
+            {/* Right: Compact zoom and action controls */}
+            <div className="flex items-center space-x-1.5 pointer-events-auto">
+              {/* Compact action buttons */}
+              <button
+                onClick={onOpenFullSize}
+                className="p-2 bg-black/70 backdrop-blur-md text-white rounded-full hover:bg-black/80 transition-all duration-300 border border-slate-600/50 shadow-lg"
+                title="Open full size"
+              >
+                <ArrowsPointingOutIcon className="h-4 w-4" />
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      </motion.div>
     </div>
   );
 };
 
-// Main EPIC Component
+// Main EPIC Component with optimized layout
 const EPICImageInfo: React.FC<EPICImageInfoProps> = ({
   data,
   currentImageIndex,
@@ -137,10 +512,11 @@ const EPICImageInfo: React.FC<EPICImageInfoProps> = ({
   const [pan, setPan] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  const [isAutoPlaying, setIsAutoPlaying] = useState(false);
+  const [isDateModalOpen, setIsDateModalOpen] = useState(false);
   const imageRef = useRef<HTMLImageElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Set max date to 2025-07-15
   const MAX_DATE = '2025-07-15';
 
   const getCurrentEPIC = (): EPICImage | null => {
@@ -156,18 +532,32 @@ const EPICImageInfo: React.FC<EPICImageInfoProps> = ({
   const currentEPIC = getCurrentEPIC();
   const currentImageUrl = getCurrentImageUrl();
 
+  // Auto-play functionality
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (isAutoPlaying && data.images.length > 1) {
+      interval = setInterval(() => {
+        setCurrentImageIndex(
+          currentImageIndex === data.images.length - 1 ? 0 : currentImageIndex + 1
+        );
+      }, 1000);
+    }
+    return () => clearInterval(interval);
+  }, [isAutoPlaying, data.images.length, currentImageIndex, setCurrentImageIndex]);
+
   // Reset zoom and pan when image changes
   useEffect(() => {
     setZoom(1);
     setPan({ x: 0, y: 0 });
+    setIsAutoPlaying(false);
   }, [currentImageIndex, selectedDate]);
 
   const handleZoomIn = useCallback(() => {
-    setZoom(prev => Math.min(prev * 1.2, 5));
+    setZoom(prev => Math.min(prev * 1.3, 5));
   }, []);
 
   const handleZoomOut = useCallback(() => {
-    setZoom(prev => Math.max(prev / 1.2, 0.5));
+    setZoom(prev => Math.max(prev / 1.3, 0.5));
   }, []);
 
   const handleResetView = useCallback(() => {
@@ -207,433 +597,110 @@ const EPICImageInfo: React.FC<EPICImageInfoProps> = ({
   const handleThumbnailSelect = useCallback((index: number) => {
     if (index !== currentImageIndex) {
       setCurrentImageIndex(index);
+      setIsAutoPlaying(false);
     }
   }, [currentImageIndex, setCurrentImageIndex]);
 
-  const formatCoordinate = (coord: number, type: 'lat' | 'lon'): string => {
-    const direction = type === 'lat' ? (coord >= 0 ? 'N' : 'S') : (coord >= 0 ? 'E' : 'W');
-    return `${Math.abs(coord).toFixed(2)}° ${direction}`;
+  const handleNavigate = useCallback((direction: 'prev' | 'next') => {
+    if (direction === 'prev' && currentImageIndex > 0) {
+      setCurrentImageIndex(currentImageIndex - 1);
+    } else if (direction === 'next' && currentImageIndex < data.images.length - 1) {
+      setCurrentImageIndex(currentImageIndex + 1);
+    }
+    setIsAutoPlaying(false);
+  }, [currentImageIndex, data.images.length, setCurrentImageIndex]);
+
+  const handleAutoPlay = useCallback(() => {
+    setIsAutoPlaying(!isAutoPlaying);
+  }, [isAutoPlaying]);
+
+  const mouseHandlers = {
+    onMouseDown: handleMouseDown,
+    onMouseMove: handleMouseMove,
+    onMouseUp: handleMouseUp,
+    onWheel: handleWheel
   };
 
   if (loading) {
     return (
       <div className="h-full flex items-center justify-center">
-        <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ duration: 1, repeat: Infinity }}
-          className="w-8 h-8 border-2 border-blue-500/30 border-t-blue-500 rounded-full"
-        />
-        <span className="ml-3 text-slate-400">Loading Earth imagery...</span>
+        <motion.div className="text-center">
+          <motion.div
+            animate={{ rotate: 360 }}
+            transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+            className="w-16 h-16 border-4 border-blue-500/30 border-t-blue-500 rounded-full mb-4 mx-auto"
+          />
+          <span className="text-slate-300 text-lg font-medium">Loading Earth imagery...</span>
+        </motion.div>
       </div>
     );
   }
 
   if (!currentEPIC || !currentImageUrl) {
     return (
-      <div className="h-full flex items-center justify-center text-center">
-        <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-xl p-8">
-          <GlobeAltIcon className="h-16 w-16 text-blue-400 mx-auto mb-4" />
-          <h3 className="text-xl font-semibold text-white mb-2">No Images Available</h3>
-          <p className="text-slate-400">No EPIC images found for {selectedDate}</p>
+      <motion.div 
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="h-full flex items-center justify-center text-center"
+      >
+        <div className="bg-gradient-to-br from-slate-800/60 to-slate-900/60 backdrop-blur-md border border-slate-600/40 rounded-2xl p-10 shadow-2xl">
+          <GlobeAltIcon className="h-20 w-20 text-blue-400 mx-auto mb-6" />
+          <h3 className="text-2xl font-bold text-white mb-3">No Images Available</h3>
+          <p className="text-slate-400 text-lg">No EPIC images found for {selectedDate}</p>
         </div>
-      </div>
+      </motion.div>
     );
   }
 
   return (
-    <div className="h-full flex flex-col">
-      {/* Date Picker Section */}
-      <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-xl p-4 mb-4">
-        <div className="flex items-center space-x-4">
-          <CalendarDaysIcon className="h-5 w-5 text-blue-400" />
-          <label className="text-white font-medium">Select Date:</label>
-          <input
-            type="date"
-            value={selectedDate}
-            onChange={(e) => onDateChange(e.target.value)}
-            max={MAX_DATE}
-            className="bg-slate-700 border border-slate-600 text-white rounded-md px-3 py-1 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          />
-          <span className="text-slate-400 text-xs">
-            (Available until {MAX_DATE})
-          </span>
-        </div>
-      </div>
-
-      {/* Thumbnail Gallery */}
-      <ThumbnailGallery
-        images={data.images}
-        imageUrls={data.imageUrls}
-        currentIndex={currentImageIndex}
-        onImageSelect={handleThumbnailSelect}
+    <>
+      {/* Date Selection Modal */}
+      <DateSelectionModal
+        isOpen={isDateModalOpen}
+        onClose={() => setIsDateModalOpen(false)}
+        selectedDate={selectedDate}
+        onDateChange={onDateChange}
+        maxDate={MAX_DATE}
       />
 
-      {/* Mobile Layout */}
-      <div className="block lg:hidden space-y-4 flex-1 overflow-y-auto">
-        {/* Title Card */}
-        <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-xl p-4">
-          <motion.h2
-            key={currentEPIC.image}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="text-lg sm:text-xl font-bold text-white mb-3 leading-tight"
-          >
-            Earth from Space - {currentEPIC.date.split(' ')[0]}
-          </motion.h2>
-
-          {/* Controls Row */}
-          <div className="flex flex-wrap items-center gap-2 mb-3">
-            <button
-              onClick={handleZoomIn}
-              disabled={zoom >= 5}
-              className="flex items-center space-x-1 px-2 sm:px-3 py-1.5 bg-gradient-to-r from-green-500 to-teal-600 text-white rounded-md hover:from-green-600 hover:to-teal-700 transition-all duration-300 hover:scale-105 shadow-lg text-xs sm:text-sm disabled:opacity-50"
-            >
-              <MagnifyingGlassPlusIcon className="h-3 w-3 sm:h-4 sm:w-4" />
-              <span>Zoom In</span>
-            </button>
-
-            <button
-              onClick={handleZoomOut}
-              disabled={zoom <= 0.5}
-              className="flex items-center space-x-1 px-2 sm:px-3 py-1.5 bg-gradient-to-r from-orange-500 to-red-600 text-white rounded-md hover:from-orange-600 hover:to-red-700 transition-all duration-300 hover:scale-105 shadow-lg text-xs sm:text-sm disabled:opacity-50"
-            >
-              <MagnifyingGlassMinusIcon className="h-3 w-3 sm:h-4 sm:w-4" />
-              <span>Zoom Out</span>
-            </button>
-
-            <button
-              onClick={handleResetView}
-              className="flex items-center space-x-1 px-2 sm:px-3 py-1.5 bg-gradient-to-r from-purple-500 to-pink-600 text-white rounded-md hover:from-purple-600 hover:to-pink-700 transition-all duration-300 hover:scale-105 shadow-lg text-xs sm:text-sm"
-            >
-              <ArrowsRightLeftIcon className="h-3 w-3 sm:h-4 sm:w-4" />
-              <span>Reset</span>
-            </button>
-
-            <button
-              onClick={() => openImageInNewTab(currentImageUrl)}
-              className="flex items-center space-x-1 px-2 sm:px-3 py-1.5 bg-blue-500 hover:bg-blue-600 text-white rounded-md transition-all duration-300 hover:scale-105 shadow-lg text-xs sm:text-sm"
-            >
-              <ArrowsPointingOutIcon className="h-3 w-3 sm:h-4 sm:w-4" />
-              <span>Full Size</span>
-            </button>
-          </div>
-
-          {/* Zoom Indicator */}
-          <div className="flex items-center space-x-2 text-xs sm:text-sm">
-            <div className={`w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full ${zoom > 1 ? 'bg-green-400' : 'bg-blue-400'} animate-pulse`} />
-            <span className="text-slate-400">
-              Zoom: <span className={zoom > 1 ? 'text-green-400' : 'text-blue-400'}>{(zoom * 100).toFixed(0)}%</span>
-            </span>
-          </div>
+      {/* Main Layout - Left sidebar + Right content with optimized heights */}
+      <div className="h-full flex space-x-4">
+        {/* Left Sidebar - Enhanced scrollable thumbnails */}
+        <div className="w-72 flex-shrink-0">
+          <ThumbnailSidebar
+            images={data.images}
+            imageUrls={data.imageUrls}
+            currentIndex={currentImageIndex}
+            onImageSelect={handleThumbnailSelect}
+            onAutoPlay={handleAutoPlay}
+            isAutoPlaying={isAutoPlaying}
+            onDateModalOpen={() => setIsDateModalOpen(true)}
+          />
         </div>
 
-        {/* Image */}
-        <motion.div
-          key={currentEPIC.image}
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.4 }}
-          className="relative group"
-        >
-          <div
-            ref={containerRef}
-            className="relative overflow-hidden rounded-xl bg-slate-800/30 backdrop-blur-sm border border-slate-700/50 h-80 sm:h-96 cursor-grab active:cursor-grabbing"
-            onMouseDown={handleMouseDown}
-            onMouseMove={handleMouseMove}
-            onMouseUp={handleMouseUp}
-            onMouseLeave={handleMouseUp}
-            onWheel={handleWheel}
-          >
-            <AnimatePresence mode="wait">
-              <motion.img
-                ref={imageRef}
-                key={currentImageUrl + currentImageIndex}
-                src={currentImageUrl}
-                alt={`Earth from DSCOVR satellite on ${currentEPIC.date}`}
-                className="w-full h-full object-contain rounded-xl"
-                style={{
-                  transform: `scale(${zoom}) translate(${pan.x / zoom}px, ${pan.y / zoom}px)`,
-                  transformOrigin: 'center center'
-                }}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: imageLoaded ? 1 : 0.5 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.4 }}
-                onLoad={() => setImageLoaded(true)}
-                onLoadStart={() => setImageLoaded(false)}
-                onDoubleClick={() => zoom === 1 ? handleZoomIn() : handleResetView()}
-                draggable={false}
-              />
-            </AnimatePresence>
-
-            {/* Loading overlay */}
-            {!imageLoaded && (
-              <div className="absolute inset-0 flex items-center justify-center bg-slate-800/50 backdrop-blur-sm">
-                <motion.div
-                  animate={{ rotate: 360 }}
-                  transition={{ duration: 1, repeat: Infinity }}
-                  className="w-6 h-6 sm:w-8 sm:h-8 border-2 border-blue-500/30 border-t-blue-500 rounded-full"
-                />
-              </div>
-            )}
-
-            {/* Zoom indicator overlay */}
-            {zoom > 1 && (
-              <div className="absolute top-3 left-3 px-2 py-1 bg-green-500/90 backdrop-blur-sm text-white text-xs font-medium rounded-full border border-green-400/50">
-                <div className="flex items-center space-x-1">
-                  <EyeIcon className="h-3 w-3" />
-                  <span>{(zoom * 100).toFixed(0)}%</span>
-                </div>
-              </div>
-            )}
-
-            {/* Instructions overlay */}
-            <div className="absolute bottom-3 right-3 px-2 py-1 bg-black/50 backdrop-blur-sm text-white text-xs rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-              <span>Scroll to zoom • Double-click to reset</span>
-            </div>
-          </div>
-        </motion.div>
-
-        {/* Description and Details */}
-        <div className="grid gap-4">
-          {/* Caption Card */}
-          <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-xl p-4">
-            <div className="flex items-center space-x-2 mb-3">
-              <GlobeAltIcon className="h-4 w-4 text-blue-400" />
-              <h3 className="text-base font-semibold text-white">Image Details</h3>
-            </div>
-            <motion.p
-              key={currentEPIC.caption}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="text-slate-300 leading-relaxed text-sm"
-            >
-              {currentEPIC.caption || "Earth observation from the DSCOVR satellite, positioned at the L1 Lagrange point approximately 1.5 million kilometers from Earth."}
-            </motion.p>
-          </div>
-
-          {/* Coordinates Card */}
-          <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-xl p-4">
-            <h3 className="text-base font-semibold text-white mb-3">Earth Center Coordinates</h3>
-            <div className="grid grid-cols-2 gap-2">
-              <div className="flex justify-between items-center py-1 border-b border-slate-700/30">
-                <span className="text-slate-400 text-sm">Latitude</span>
-                <span className="text-white font-medium text-sm">
-                  {formatCoordinate(currentEPIC.centroid_coordinates.lat, 'lat')}
-                </span>
-              </div>
-              <div className="flex justify-between items-center py-1 border-b border-slate-700/30">
-                <span className="text-slate-400 text-sm">Longitude</span>
-                <span className="text-white font-medium text-sm">
-                  {formatCoordinate(currentEPIC.centroid_coordinates.lon, 'lon')}
-                </span>
-              </div>
-            </div>
-          </div>
-
-          {/* Metadata Card */}
-          <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-xl p-4">
-            <h3 className="text-base font-semibold text-white mb-3">Technical Details</h3>
-            <div className="space-y-2">
-              <div className="flex justify-between items-center py-1 border-b border-slate-700/30">
-                <span className="text-slate-400 text-sm">Date & Time</span>
-                <span className="text-white font-medium text-sm">{currentEPIC.date}</span>
-              </div>
-              <div className="flex justify-between items-center py-1 border-b border-slate-700/30">
-                <span className="text-slate-400 text-sm">Image ID</span>
-                <span className="text-white font-medium text-sm">{currentEPIC.image}</span>
-              </div>
-              <div className="flex justify-between items-center py-1">
-                <span className="text-slate-400 text-sm">Version</span>
-                <span className="text-white font-medium text-sm">{currentEPIC.version}</span>
-              </div>
-            </div>
-          </div>
+        {/* Right Content - Reduced height image viewer */}
+        <div className="flex-1 min-w-0">
+          <ReducedHeightImageViewer
+            imageUrl={currentImageUrl}
+            currentEPIC={currentEPIC}
+            zoom={zoom}
+            pan={pan}
+            imageLoaded={imageLoaded}
+            onZoomIn={handleZoomIn}
+            onZoomOut={handleZoomOut}
+            onResetView={handleResetView}
+            onOpenFullSize={() => openImageInNewTab(currentImageUrl)}
+            onMouseHandlers={mouseHandlers}
+            setImageLoaded={setImageLoaded}
+            containerRef={containerRef}
+            imageRef={imageRef}
+            currentImageIndex={currentImageIndex}
+            totalImages={data.images.length}
+            onNavigate={handleNavigate}
+          />
         </div>
       </div>
-
-      {/* Desktop Layout */}
-      <div className="hidden lg:flex lg:flex-row gap-6 flex-1 min-h-0">
-        {/* Left Info Panel */}
-        <motion.div
-          initial={{ opacity: 0, x: -50 }}
-          animate={{ opacity: 1, x: 0 }}
-          className="w-1/3 flex flex-col space-y-4 overflow-hidden"
-        >
-          {/* Title Card */}
-          <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-xl p-4 flex-shrink-0">
-            <motion.h2
-              key={currentEPIC.image}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="text-xl font-bold text-white mb-3 leading-tight"
-            >
-              Earth from Space
-            </motion.h2>
-            <p className="text-slate-400 text-sm mb-4">{currentEPIC.date}</p>
-
-            {/* Zoom Controls */}
-            <div className="flex flex-wrap items-center gap-2 mb-4">
-              <button
-                onClick={handleZoomIn}
-                disabled={zoom >= 5}
-                className="flex items-center space-x-2 px-3 py-1.5 bg-gradient-to-r from-green-500 to-teal-600 text-white rounded-md hover:from-green-600 hover:to-teal-700 transition-all duration-300 hover:scale-105 shadow-lg text-sm disabled:opacity-50"
-              >
-                <MagnifyingGlassPlusIcon className="h-4 w-4" />
-                <span>Zoom In</span>
-              </button>
-
-              <button
-                onClick={handleZoomOut}
-                disabled={zoom <= 0.5}
-                className="flex items-center space-x-2 px-3 py-1.5 bg-gradient-to-r from-orange-500 to-red-600 text-white rounded-md hover:from-orange-600 hover:to-red-700 transition-all duration-300 hover:scale-105 shadow-lg text-sm disabled:opacity-50"
-              >
-                <MagnifyingGlassMinusIcon className="h-4 w-4" />
-                <span>Zoom Out</span>
-              </button>
-
-              <button
-                onClick={handleResetView}
-                className="flex items-center space-x-2 px-3 py-1.5 bg-gradient-to-r from-purple-500 to-pink-600 text-white rounded-md hover:from-purple-600 hover:to-pink-700 transition-all duration-300 hover:scale-105 shadow-lg text-sm"
-              >
-                <ArrowsRightLeftIcon className="h-4 w-4" />
-                <span>Reset</span>
-              </button>
-
-              <button
-                onClick={() => openImageInNewTab(currentImageUrl)}
-                className="flex items-center space-x-2 px-3 py-1.5 bg-blue-500 hover:bg-blue-600 text-white rounded-md transition-all duration-300 hover:scale-105 shadow-lg text-sm"
-              >
-                <ArrowsPointingOutIcon className="h-4 w-4" />
-                <span>Full Size</span>
-              </button>
-            </div>
-
-            {/* Zoom Indicator */}
-            <div className="flex items-center space-x-2 text-sm">
-              <div className={`w-2 h-2 rounded-full ${zoom > 1 ? 'bg-green-400' : 'bg-blue-400'} animate-pulse`} />
-              <span className="text-slate-400">
-                Zoom: <span className={zoom > 1 ? 'text-green-400' : 'text-blue-400'}>{(zoom * 100).toFixed(0)}%</span>
-              </span>
-            </div>
-          </div>
-
-          {/* Caption Card */}
-          <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-xl p-4 flex-1 min-h-0">
-            <div className="flex items-center space-x-2 mb-3">
-              <GlobeAltIcon className="h-4 w-4 text-blue-400" />
-              <h3 className="text-base font-semibold text-white">Image Details</h3>
-            </div>
-            <motion.div
-              key={currentEPIC.caption}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="overflow-y-auto h-full"
-            >
-              <p className="text-slate-300 leading-relaxed text-sm pr-2">
-                {currentEPIC.caption || "Earth observation from the DSCOVR satellite, positioned at the L1 Lagrange point approximately 1.5 million kilometers from Earth. This natural color image shows our planet as seen from deep space, capturing the full sunlit hemisphere."}
-              </p>
-            </motion.div>
-          </div>
-
-          {/* Coordinates Card */}
-          <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-xl p-4 flex-shrink-0">
-            <h3 className="text-base font-semibold text-white mb-3">Earth Center Coordinates</h3>
-            <div className="space-y-2">
-              <div className="flex justify-between items-center py-1 border-b border-slate-700/30">
-                <span className="text-slate-400 text-sm">Latitude</span>
-                <span className="text-white font-medium text-sm">
-                  {formatCoordinate(currentEPIC.centroid_coordinates.lat, 'lat')}
-                </span>
-              </div>
-              <div className="flex justify-between items-center py-1 border-b border-slate-700/30">
-                <span className="text-slate-400 text-sm">Longitude</span>
-                <span className="text-white font-medium text-sm">
-                  {formatCoordinate(currentEPIC.centroid_coordinates.lon, 'lon')}
-                </span>
-              </div>
-              <div className="flex justify-between items-center py-1">
-                <span className="text-slate-400 text-sm">Image ID</span>
-                <span className="text-white font-medium text-sm">{currentEPIC.image}</span>
-              </div>
-            </div>
-          </div>
-        </motion.div>
-
-        {/* Right Image Panel */}
-        <motion.div
-          initial={{ opacity: 0, x: 50 }}
-          animate={{ opacity: 1, x: 0 }}
-          className="w-2/3 flex items-center justify-center"
-        >
-          <motion.div
-            key={currentEPIC.image}
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.4 }}
-            className="relative group w-full h-full max-h-[calc(100vh-200px)] flex items-center justify-center"
-          >
-            <div
-              ref={containerRef}
-              className="relative overflow-hidden rounded-xl bg-slate-800/30 backdrop-blur-sm border border-slate-700/50 w-full h-full flex items-center justify-center cursor-grab active:cursor-grabbing"
-              onMouseDown={handleMouseDown}
-              onMouseMove={handleMouseMove}
-              onMouseUp={handleMouseUp}
-              onMouseLeave={handleMouseUp}
-              onWheel={handleWheel}
-            >
-              <AnimatePresence mode="wait">
-                <motion.img
-                  ref={imageRef}
-                  key={currentImageUrl + currentImageIndex}
-                  src={currentImageUrl}
-                  alt={`Earth from DSCOVR satellite on ${currentEPIC.date}`}
-                  className="max-w-full max-h-full object-contain rounded-xl"
-                  style={{
-                    transform: `scale(${zoom}) translate(${pan.x / zoom}px, ${pan.y / zoom}px)`,
-                    transformOrigin: 'center center'
-                  }}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: imageLoaded ? 1 : 0.5 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.4 }}
-                  onLoad={() => setImageLoaded(true)}
-                  onLoadStart={() => setImageLoaded(false)}
-                  onDoubleClick={() => zoom === 1 ? handleZoomIn() : handleResetView()}
-                  draggable={false}
-                />
-              </AnimatePresence>
-
-              {/* Loading overlay */}
-              {!imageLoaded && (
-                <div className="absolute inset-0 flex items-center justify-center bg-slate-800/50 backdrop-blur-sm">
-                  <motion.div
-                    animate={{ rotate: 360 }}
-                    transition={{ duration: 1, repeat: Infinity }}
-                    className="w-8 h-8 border-2 border-blue-500/30 border-t-blue-500 rounded-full"
-                  />
-                </div>
-              )}
-
-              {/* Zoom indicator */}
-              {zoom > 1 && (
-                <div className="absolute top-4 left-4 px-3 py-1 bg-green-500/90 backdrop-blur-sm text-white text-sm font-medium rounded-full border border-green-400/50">
-                  <div className="flex items-center space-x-1">
-                    <EyeIcon className="h-4 w-4" />
-                    <span>{(zoom * 100).toFixed(0)}%</span>
-                  </div>
-                </div>
-              )}
-
-              {/* Instructions overlay */}
-              <div className="absolute bottom-4 right-4 px-3 py-1 bg-black/50 backdrop-blur-sm text-white text-sm rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                <span>Scroll to zoom • Drag to pan • Double-click to reset</span>
-              </div>
-            </div>
-          </motion.div>
-        </motion.div>
-      </div>
-    </div>
+    </>
   );
 };
 

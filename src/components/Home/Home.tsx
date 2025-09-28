@@ -54,7 +54,6 @@ export default function Home() {
         hideProgressBar: true,
         closeOnClick: false,
         pauseOnHover: true,
-        draggable: true,
         closeButton: true,
         theme: "dark",
         className: "!bg-slate-800/95 !border !border-blue-500/20 !backdrop-blur-md",
