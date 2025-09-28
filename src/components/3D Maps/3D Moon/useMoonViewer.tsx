@@ -3,7 +3,7 @@
 import { useState, useCallback } from 'react';
 import * as Cesium from 'cesium';
 import { ViewerWithControls } from '@/types/moonviewer';
-import { pointsOfInterest, locationConfigs } from '../../app/3d-moon/config/moonConfig';
+import { pointsOfInterest, locationConfigs } from '@/app/3d-moon/config/moonConfig';
 
 export const useMoonViewer = () => {
   const [isLoading, setIsLoading] = useState(true);
