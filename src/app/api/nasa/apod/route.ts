@@ -1,7 +1,7 @@
 // app/api/nasa/apod/route.ts
 import { NextResponse } from 'next/server';
 
-export const dynamic = 'force-dynamic';
+export const dynamic = 'force-static';
 export const runtime = 'nodejs';
 
 export async function GET(request: Request) {
