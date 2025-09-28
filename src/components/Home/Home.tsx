@@ -21,7 +21,7 @@ export default function Home() {
             autoClose: 3000,
             theme: "dark",
           });
-        } catch (error) {
+        } catch {
           toast.error('Unable to enter fullscreen mode', {
             position: "top-center",
             autoClose: 3000,

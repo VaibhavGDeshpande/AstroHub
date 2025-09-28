@@ -92,7 +92,7 @@ const About = () => {
                 Bringing the Universe to Your Screen
               </h2>
               <p className="text-lg text-cyan-200 max-w-3xl mx-auto leading-relaxed">
-                AstroHub is your gateway to NASA's vast cosmos of data, images, and discoveries. 
+                AstroHub is your gateway to NASA&apos;s vast cosmos of data, images, and discoveries. 
                 We make space exploration accessible to everyone through cutting-edge web technology 
                 and real-time astronomical data.
               </p>
@@ -104,7 +104,7 @@ const About = () => {
                 <h3 className="text-xl font-semibold text-white mb-3">Our Vision</h3>
                 <p className="text-cyan-200">
                   To democratize space exploration by providing free, accessible tools that inspire 
-                  curiosity and foster understanding of our universe through NASA's incredible data resources.
+                  curiosity and foster understanding of our universe through NASA&apos;s incredible data resources.
                 </p>
               </div>
 
@@ -296,7 +296,7 @@ const About = () => {
             About AstroHub
           </h1>
           <p className="text-xl text-slate-300 max-w-3xl mx-auto">
-            Your comprehensive platform for exploring NASA's universe of data, images, and cosmic discoveries.
+            Your comprehensive platform for exploring NASA&apos;s universe of data, images, and cosmic discoveries.
           </p>
         </motion.div>
 

@@ -78,9 +78,6 @@ export default function MarsPhotoControls({
     setEarthDate(today);
     setCameraCode('');
   };
-
-  const selectedCamera = filteredOptions.find(opt => opt.code === cameraCode) || filteredOptions[0];
-
   return (
     <motion.div
       initial={{ opacity: 0, x: 20 }}

@@ -43,7 +43,7 @@ export default function MoonPage() {
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8 }}
-        className="text-center pt-8 pb-6 mt-12"
+        className="text-center pb-1 mt-4"
       >
         <motion.h1
           initial={{ opacity: 0, scale: 0.9 }}

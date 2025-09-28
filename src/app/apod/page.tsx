@@ -105,16 +105,6 @@ export default function APODPage() {
     }
   };
 
-  // Get current displayed date
-  const getCurrentDate = () => {
-    if (Array.isArray(data) && data.length > 0) {
-      return data[currentImageIndex]?.date || today;
-    } else if (data && !Array.isArray(data)) {
-      return data.date;
-    }
-    return today;
-  };
-
   // Error handling
   if (error && !loading) {
     return (

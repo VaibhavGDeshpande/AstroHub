@@ -1,15 +1,9 @@
 // app/neo/page.tsx
 'use client'
-import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
-import Link from "next/link";
+import { useState, useEffect, useCallback } from "react";
 import { getNEO } from "../../api_service/neo";
 import { NEOResponse } from "../../types/neo";
 import NEOExplorer from "@/components/NEO/NEO";
-import {
-  ArrowLeftIcon,
-  HomeIcon,
-} from "@heroicons/react/24/outline";
 import ErrorMessage from "@/components/Error";
 import LoaderWrapper from "@/components/Loader";
 
@@ -19,10 +13,8 @@ export default function NEOPage() {
   const [error, setError] = useState<string | null>(null);
 
   // Date functionality states
-  const [selectedDate, setSelectedDate] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
-  const [isDateRange, setIsDateRange] = useState(true);
 
   // Get today's date and yesterday as default range
   const today = new Date();
@@ -39,7 +31,7 @@ export default function NEOPage() {
     }
   }, [yesterdayStr, todayStr, startDate, endDate]);
 
-  const fetchData = async (start?: string, end?: string, date?: string) => {
+  const fetchData = useCallback(async (start?: string, end?: string, date?: string) => {
     try {
       setLoading(true);
       setError(null);
@@ -64,28 +56,19 @@ export default function NEOPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [startDate, endDate]);
 
   useEffect(() => {
     if (startDate && endDate) {
       fetchData();
     }
-  }, [startDate, endDate]);
+  }, [startDate, endDate, fetchData]);
 
 
   const handleTodayClick = () => {
-    setSelectedDate("");
     setStartDate(yesterdayStr);
     setEndDate(todayStr);
-    setIsDateRange(true);
     fetchData(yesterdayStr, todayStr);
-  };
-
-  const getCurrentDate = () => {
-    if (data && Object.keys(data.near_earth_objects).length > 0) {
-      return Object.keys(data.near_earth_objects)[0];
-    }
-    return todayStr;
   };
 
   // Error handling

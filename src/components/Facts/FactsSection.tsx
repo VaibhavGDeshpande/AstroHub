@@ -6,12 +6,11 @@ import { motion, AnimatePresence } from 'framer-motion';
 const FactsSection = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const sectionRef = useRef<HTMLDivElement>(null);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null); // Use ref instead of state
   const [isPlaying, setIsPlaying] = useState(false);
-  const [isMuted, setIsMuted] = useState(true);
   const [videoLoaded, setVideoLoaded] = useState(false);
   const [currentFactIndex, setCurrentFactIndex] = useState(0);
   const [isInView, setIsInView] = useState(false);
-  const [factInterval, setFactInterval] = useState<NodeJS.Timeout | null>(null);
 
   const astronomyFacts = [
     {
@@ -97,10 +96,7 @@ const FactsSection = () => {
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            // Section is in view
             setIsInView(true);
-            
-            // Always restart video from beginning when section comes into view
             video.currentTime = 0;
             video.play().then(() => {
               setIsPlaying(true);
@@ -109,7 +105,6 @@ const FactsSection = () => {
               setIsPlaying(false);
             });
           } else {
-            // Section is out of view
             setIsInView(false);
             video.pause();
             setIsPlaying(false);
@@ -117,9 +112,9 @@ const FactsSection = () => {
         });
       },
       {
-        root: null, // viewport
+        root: null,
         rootMargin: '0px',
-        threshold: 0.3, // Trigger when 30% of section is visible
+        threshold: 0.3,
       }
     );
 
@@ -132,12 +127,13 @@ const FactsSection = () => {
 
   // Fact rotation - only when in view
   useEffect(() => {
+    // Clear any existing interval
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+
     if (!isInView || !videoLoaded) {
-      // Clear any existing interval
-      if (factInterval) {
-        clearInterval(factInterval);
-        setFactInterval(null);
-      }
       return;
     }
 
@@ -145,29 +141,30 @@ const FactsSection = () => {
     setCurrentFactIndex(0);
 
     // Start fact rotation
-    const interval = setInterval(() => {
+    intervalRef.current = setInterval(() => {
       setCurrentFactIndex((prevIndex) => 
         (prevIndex + 1) % astronomyFacts.length
       );
     }, 4000);
 
-    setFactInterval(interval);
-
+    // Cleanup function
     return () => {
-      if (interval) {
-        clearInterval(interval);
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
       }
     };
-  }, [isInView, videoLoaded, astronomyFacts.length]);
+  }, [isInView, videoLoaded, astronomyFacts.length]); // Remove factInterval from dependencies
 
   // Cleanup interval on unmount
   useEffect(() => {
     return () => {
-      if (factInterval) {
-        clearInterval(factInterval);
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
       }
     };
-  }, [factInterval]);
+  }, []);
 
   const currentFact = astronomyFacts[currentFactIndex];
 
@@ -194,8 +191,8 @@ const FactsSection = () => {
       initial={{ opacity: 0 }}
       whileInView={{ opacity: 1 }}
       viewport={{ 
-        once: false, // Animation triggers every time section enters view
-        amount: 0.3 // Trigger when 30% of section is visible
+        once: false,
+        amount: 0.3
       }}
       transition={{ duration: 0.6 }}
     >
@@ -204,7 +201,7 @@ const FactsSection = () => {
         <video
           ref={videoRef}
           className="w-full h-full object-cover cursor-pointer"
-          muted={isMuted}
+          muted={true}
           loop
           playsInline
           preload="auto"
@@ -213,13 +210,9 @@ const FactsSection = () => {
           <source src="/assets/mars1.mp4" type="video/mp4" />
         </video>
         
-        {/* Minimal overlay for text readability */}
         <div className="absolute inset-0 bg-black/20" />
-        
-        {/* Subtle gradient overlay */}
         <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/40" />
       </div>
-
 
       {/* Professional Facts Section - Only show when in view */}
       <AnimatePresence>

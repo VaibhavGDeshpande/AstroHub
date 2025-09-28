@@ -42,10 +42,7 @@ export default function MarsPhotoCard({ photo, onOpenFull }: MarsPhotoCardProps)
       initial={{ opacity: 0, y: 20, scale: 0.95 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       whileHover={{ y: -5, scale: 1.02 }}
-      transition={{ 
-        duration: 0.4,
-        hover: { duration: 0.2 }
-      }}
+      transition={{ duration: 0.4 }}
       className="group bg-slate-800/50 hover:bg-slate-700/50 backdrop-blur-sm border border-slate-600/40 hover:border-slate-500/60 rounded-xl overflow-hidden transition-all duration-300 shadow-lg hover:shadow-2xl"
     >
       {/* Image Section */}
