@@ -1,165 +1,163 @@
 // components/HeroSection.tsx
 'use client'
-import { motion } from 'framer-motion';
-import type { TargetAndTransition } from 'framer-motion';
-import { useEffect, useState } from 'react';
-import Link from 'next/link';
-import { SparklesIcon, GlobeAltIcon, RocketLaunchIcon } from '@heroicons/react/24/outline';
+import { useEffect, useState, useRef } from 'react';
+import { Orbitron, Inter } from 'next/font/google';
+
+// Configure fonts with optimization
+const orbitron = Orbitron({
+  subsets: ['latin'],
+  weight: ['400', '700', '900'],
+  display: 'swap',
+});
+
+const inter = Inter({
+  subsets: ['latin'],
+  weight: ['300', '400', '500', '600'],
+  display: 'swap',
+});
 
 const HeroSection = () => {
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-  const [currentTime, setCurrentTime] = useState(new Date());
+  const [isVisible, setIsVisible] = useState(false);
+  const [videoStopped, setVideoStopped] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
+    // Video control logic (unchanged)
+    if (videoRef.current) {
+      const video = videoRef.current;
+      
+      video.currentTime = 0;
+      video.playbackRate = 2.5; 
+      
+      video.play().catch(error => {
+        console.log('Video autoplay failed:', error);
+      });
 
-    
-    const updateMousePosition = (e: MouseEvent) => {
-      setMousePosition({ x: e.clientX, y: e.clientY });
-    };
+      const handleTimeUpdate = () => {
+        if (video.currentTime >= 14.30) {
+          video.pause();
+          setTimeout(() => {
+            setVideoStopped(true);
+            setIsVisible(true);
+          }, 500); 
+        }
+      };
 
-    const timer = setInterval(() => {
-      setCurrentTime(new Date());
-    }, 1000);
+      video.addEventListener('timeupdate', handleTimeUpdate);
 
-    window.addEventListener('mousemove', updateMousePosition);
-    return () => {
-      window.removeEventListener('mousemove', updateMousePosition);
-      clearInterval(timer);
-    };
-  }, [mousePosition]);
-
-  const textVariants = {
-    hidden: { opacity: 0, y: 50 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        duration: 0.8
-      }
+      return () => {
+        video.removeEventListener('timeupdate', handleTimeUpdate);
+      };
     }
-  };
-
-  const staggerContainer = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.3,
-        delayChildren: 0.2
-      }
-    }
-  };
-
-  const floatingAnimation: TargetAndTransition = {
-    y: [-10, 10, -10],
-    transition: {
-      duration: 6,
-      repeat: Infinity,
-      repeatType: "mirror"
-    }
-  };
-
-  const stats = [
-    { label: 'APIs Available', value: '8+', icon: SparklesIcon },
-    { label: 'Space Images', value: '1M+', icon: GlobeAltIcon },
-    { label: 'Data Sources', value: '24/7', icon: RocketLaunchIcon },
-  ];
+  }, []);
 
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-16">
-      {/* Hero Content */}
-      <div className="relative z-10 text-center px-4 max-w-6xl mx-auto">
-        <motion.div
-          variants={staggerContainer}
-          initial="hidden"
-          animate="visible"
-          className="space-y-8"
+    <section className="relative min-h-screen flex items-center overflow-hidden pt-16">
+      {/* Background Video */}
+      <div className="absolute inset-0">
+        <video
+          ref={videoRef}
+          className="w-full h-full object-cover"
+          muted
+          playsInline
+          preload="metadata"
         >
-          {/* Main Title */}
-          <motion.h1
-            variants={textVariants}
-            className="text-6xl md:text-8xl font-bold text-white mb-6"
-          >
-            <span className="block">NASA</span>
-            <motion.span
-              className="block bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent"
-              animate={floatingAnimation}
-            >
-              Explorer
-            </motion.span>
-          </motion.h1>
-
-          {/* Subtitle with enhanced styling */}
-          <motion.div
-            variants={textVariants}
-            className="space-y-4"
-          >
-            <p className="text-xl md:text-2xl text-slate-300 max-w-3xl mx-auto leading-relaxed">
-              Discover the wonders of space through NASA&apos;s vast data universe.
-            </p>
-            <p className="text-lg text-slate-400 max-w-2xl mx-auto">
-              Access real-time astronomy data, Mars rover images, Earth imagery, and explore the cosmos like never before.
-            </p>
-          </motion.div>
-
-          {/* Call-to-Action Buttons */}
-          <motion.div
-            variants={textVariants}
-            className="flex flex-col sm:flex-row gap-4 justify-center items-center mt-8"
-          >
-            <Link
-              href="#explore"
-              className="group relative px-8 py-4 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full text-white font-semibold hover:shadow-lg hover:shadow-blue-500/25 transition-all duration-300 hover:scale-105"
-            >
-              <span className="flex items-center space-x-2">
-                <RocketLaunchIcon className="h-5 w-5 group-hover:animate-bounce" />
-                <span>Start Exploring</span>
-              </span>
-            </Link>
-            
-            <Link
-              href="/documentation"
-              className="group px-8 py-4 border border-slate-600 rounded-full text-white hover:border-blue-400 hover:text-blue-400 transition-all duration-300 backdrop-blur-sm"
-            >
-              <span className="flex items-center space-x-2">
-                <SparklesIcon className="h-5 w-5" />
-                <span>View Documentation</span>
-              </span>
-            </Link>
-          </motion.div>
-
-          {/* Stats Section */}
-          <motion.div
-            variants={textVariants}
-            className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-16 max-w-3xl mx-auto"
-          >
-            {stats.map((stat, index) => (
-              <motion.div
-                key={index}
-                className="group relative p-6 bg-slate-800/30 backdrop-blur-sm border border-slate-700/50 rounded-xl hover:bg-slate-800/50 transition-all duration-300"
-                whileHover={{ y: -5, scale: 1.02 }}
-              >
-                <div className="flex flex-col items-center space-y-2">
-                  <stat.icon className="h-8 w-8 text-blue-400 group-hover:text-purple-400 transition-colors" />
-                  <div className="text-2xl font-bold text-white">{stat.value}</div>
-                  <div className="text-sm text-slate-400">{stat.label}</div>
-                </div>
-              </motion.div>
-            ))}
-          </motion.div>
-
-          {/* Live Time Display */}
-          <motion.div
-            variants={textVariants}
-            className="mt-12 p-4 bg-slate-900/40 backdrop-blur-sm border border-slate-700/30 rounded-lg max-w-md mx-auto"
-          >
-            <div className="text-sm text-slate-400 mb-1">Mission Time (UTC)</div>
-            <div className="font-mono text-lg text-blue-400">
-              {currentTime.toISOString().replace('T', ' ').slice(0, 19)}
-            </div>
-          </motion.div>
-        </motion.div>
+          <source src="/assets/eclipse.mp4" type="video/mp4" />
+        </video>
+        <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent" />
       </div>
+
+      {/* Hero Content */}
+      <div className="relative z-10 px-6 lg:px-12 max-w-7xl mx-auto w-full">
+        <div className="max-w-4xl">
+          <div className="space-y-6">
+            <h1 className={`text-5xl md:text-7xl lg:text-8xl font-bold mb-6 transition-all duration-1000 ease-out ${
+              videoStopped && isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'
+            }`}>
+              <span className={`block text-white ${orbitron.className} astro-hub-text transition-all duration-1000 ease-out ${
+                videoStopped && isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-8'
+              }`} style={{ transitionDelay: '200ms' }}>
+                AstroHub
+              </span>
+            </h1>
+
+            <div className={`space-y-3 ml-4 transition-all duration-1000 ease-out ${
+              videoStopped && isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+            }`} style={{ transitionDelay: '600ms' }}>
+              <p className={`text-lg md:text-xl lg:text-2xl text-cyan-100 leading-relaxed font-light ${inter.className} subtitle-text`}>
+                Your gateway to the cosmos
+              </p>
+              <p className={`text-sm md:text-base lg:text-lg text-slate-300 leading-relaxed max-w-2xl ${inter.className} description-text transition-all duration-1000 ease-out ${
+                videoStopped && isVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
+              }`} style={{ transitionDelay: '800ms' }}>
+                Explore the universe with astronomical tools, NASA imagery, 
+                and interactive sky maps. Discover cosmic phenomena from your screen.
+              </p>
+            </div>
+
+            {/* Key Features Tags */}
+            <div className={`flex flex-wrap gap-2 mt-6 ml-4 transition-all duration-1000 ease-out ${
+              videoStopped && isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+            }`} style={{ transitionDelay: '1000ms' }}>
+              <span className="px-3 py-1.5 bg-blue-500/20 text-blue-300 rounded-full text-xs font-medium backdrop-blur-sm border border-blue-400/30 hover:bg-blue-500/30 transition-colors duration-300">
+                NASA APIs
+              </span>
+              <span className="px-3 py-1.5 bg-purple-500/20 text-purple-300 rounded-full text-xs font-medium backdrop-blur-sm border border-purple-400/30 hover:bg-purple-500/30 transition-colors duration-300">
+                Sky Maps
+              </span>
+              <span className="px-3 py-1.5 bg-green-500/20 text-green-300 rounded-full text-xs font-medium backdrop-blur-sm border border-green-400/30 hover:bg-green-500/30 transition-colors duration-300">
+                Planets
+              </span>
+              <span className="px-3 py-1.5 bg-orange-500/20 text-orange-300 rounded-full text-xs font-medium backdrop-blur-sm border border-orange-400/30 hover:bg-orange-500/30 transition-colors duration-300">
+                Mars Rovers
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Updated Custom CSS without font-family declarations */}
+      <style jsx>{`
+        .astro-hub-text {
+          font-weight: 900;
+          letter-spacing: 0.05em;
+          text-shadow: 0 0 30px rgba(255, 255, 255, 0.3),
+                       0 0 60px rgba(129, 212, 250, 0.2);
+        }
+
+        .subtitle-text {
+          font-weight: 300;
+          letter-spacing: 0.02em;
+          text-shadow: 0 0 20px rgba(129, 212, 250, 0.3);
+        }
+
+        .description-text {
+          font-weight: 400;
+          line-height: 1.7;
+          text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        @media (max-width: 768px) {
+          .astro-hub-text {
+            letter-spacing: 0.03em;
+          }
+          
+          .subtitle-text {
+            font-size: 1.25rem;
+          }
+          
+          .description-text {
+            font-size: 0.95rem;
+            line-height: 1.6;
+          }
+        }
+
+        @media (max-width: 480px) {
+          .description-text {
+            font-size: 0.9rem;
+          }
+        }
+      `}</style>
     </section>
   );
 };

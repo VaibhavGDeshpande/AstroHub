@@ -2,15 +2,20 @@
 'use client';
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion} from 'framer-motion';
 import Link from 'next/link';
-import { ArrowLeftIcon, PhotoIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline';
-
+import { 
+  ArrowLeftIcon, 
+  HomeIcon,
+  PhotoIcon,  
+} from '@heroicons/react/24/outline';  
 import { getMarsPhotos } from '@/api_service/mars_orbiter';
 import { MarsOrbiter } from '@/types/mars_orbiter';
 import MarsPhotoCard from '@/components/MarsOrbiter/MarsPhotoCard';
-import RoverInfo from '@/components/MarsOrbiter/RoverInfo';
+// import RoverInfo from '@/components/MarsOrbiter/RoverInfo';
 import MarsPhotoControls from '@/components/MarsOrbiter/MarsPhotoControl';
+import ErrorMessage from "@/components/Error";
+import LoaderWrapper from "@/components/Loader";
 
 export default function MarsPhotosPage() {
   const [photos, setPhotos] = useState<MarsOrbiter[]>([]);
@@ -60,126 +65,167 @@ export default function MarsPhotosPage() {
   // Include handleSearch as dependency (stable due to useCallback)
   useEffect(() => {
     handleSearch({ rover: 'curiosity', earthDate: '2015-06-03' });
-  }, [handleSearch]); // FIX: satisfy exhaustive-deps
+  }, [handleSearch]);
 
   const openInNewTab = useCallback((url: string) => {
     window.open(url, '_blank', 'noopener,noreferrer');
   }, []);
 
+  const handleRetry = () => {
+    setError(null);
+    handleSearch({ rover: 'curiosity', earthDate: '2015-06-03' });
+  };
+
+  // Error handling with APOD-style ErrorMessage component
+  if (error && !loading) {
+    return (
+      <ErrorMessage
+        error={error}
+        onRetry={handleRetry}
+      />
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 p-4">
-      {/* Back button */}
-      <div className="fixed top-4 left-4 z-50">
-        <Link
-          href="/"
-          className="flex items-center space-x-2 px-3 py-2 bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 text-white rounded-lg hover:bg-slate-700/50 transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-400"
-          aria-label="Go back to home page"
-        >
-          <ArrowLeftIcon className="h-4 w-4" />
-          <span className="text-sm">Back</span>
-        </Link>
-      </div>
+    <LoaderWrapper 
+      isVisible={loading} 
+      minDuration={1000}
+    >
+      <div className="min-h-screen bg-black text-white relative overflow-hidden">
+        {/* Background gradients - matching APOD style */}
+        <div className="absolute inset-0 -z-10">
+          <div className="absolute top-10 left-20 w-80 h-80 bg-purple-500/20 blur-[120px]" />
+          <div className="absolute top-40 right-20 w-72 h-72 bg-blue-500/20 blur-[100px]" />
+          <div className="absolute bottom-10 left-1/2 -translate-x-1/2 w-96 h-40 bg-pink-500/20 blur-[100px]" />
+        </div>
 
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <motion.header
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.35 }}
-          className="text-center mb-8"
-        >
-          <h1 className="text-4xl font-bold text-white mb-2">
-            Mars Rover Photos
-          </h1>
-          <p className="text-slate-300">
-            Explore images captured by NASA&apos;s rovers on the Martian surface
-          </p>
-        </motion.header>
-
-        {/* Controls with dynamic cameras */}
-        <MarsPhotoControls
-          onSearch={handleSearch}
-          loading={loading}
-          camerasAvailable={camerasAvailable}
-        />
-
-        {/* Rover Info */}
-        {currentRover && <RoverInfo rover={currentRover} />}
-
-        {/* Error card */}
-        <AnimatePresence>
-          {error && (
-            <motion.div
-              initial={{ opacity: 0, y: 6 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 6 }}
-              transition={{ duration: 0.25 }}
-              className="bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 text-red-300 rounded-xl p-4 mb-6"
+        {/* Header with Navigation and Controls - matching APOD layout */}
+        <div className="fixed top-4 left-4 right-4 z-50 flex justify-between items-center">
+          {/* Back Button - APOD style */}
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+          >
+            <Link
+              href="/"
+              className="flex items-center gap-2 px-3 py-2 rounded-lg bg-slate-800/50 hover:bg-slate-700/50 border border-slate-600/40 backdrop-blur-sm transition duration-300"
             >
-              <div className="flex items-start gap-3">
-                <ExclamationTriangleIcon className="h-5 w-5 text-red-400 flex-shrink-0" />
-                <div>
-                  <p className="font-semibold text-white mb-1">Error loading photos</p>
-                  <p className="text-sm text-slate-300">{error}</p>
-                </div>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+              <ArrowLeftIcon className="h-4 w-4" />
+              <HomeIcon className="h-4 w-4 hidden sm:block" />
+              <span className="text-sm">Back</span>
+            </Link>
+          </motion.div>
 
-        {/* Loading card */}
-        <AnimatePresence>
-          {loading && (
-            <motion.div
-              initial={{ opacity: 0, y: 6 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 6 }}
-              transition={{ duration: 0.25 }}
-              className="bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-xl p-8 mb-6 flex items-center justify-center"
-            >
-              <div className="flex items-center gap-3">
-                <motion.div
-                  animate={{ rotate: 360 }}
-                  transition={{ duration: 1, repeat: Infinity }}
-                  className="w-8 h-8 border-2 border-blue-500/30 rounded-full"
-                  style={{ borderTopColor: 'rgb(59 130 246)' }}
-                />
-                <p className="text-slate-300">Loading Mars photos...</p>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+          {/* Mars Photo Controls - positioned like APOD date selector */}
+          <MarsPhotoControls
+            onSearch={handleSearch}
+            loading={loading}
+            camerasAvailable={camerasAvailable}
+          />
+        </div>
 
-        {/* Photos */}
-        {!loading && photos.length > 0 && (
-          <section>
-            <div className="flex items-center justify-between mb-6">
-              <div className="flex items-center gap-2">
-                <PhotoIcon className="h-5 w-5 text-blue-400" />
-                <h2 className="text-2xl font-semibold text-white">
-                  Photos Found: {photos.length}
-                </h2>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {photos.map((photo) => (
-                <MarsPhotoCard key={photo.id} photo={photo} onOpenFull={openInNewTab} />
-              ))}
-            </div>
-          </section>
-        )}
-
-        {/* Empty state */}
-        {!loading && photos.length === 0 && !error && (
-          <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-xl p-8 text-center">
-            <h3 className="text-xl font-semibold text-white mb-2">No photos found</h3>
-            <p className="text-slate-300">
-              Try adjusting search parameters or selecting a different date.
+        <div className="container mx-auto px-4 sm:px-6 lg:px-10 py-5 flex flex-col gap-10">
+          {/* Header with gradient title - matching APOD style */}
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            className="text-center mt-12"
+          >
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent animate-pulse">
+              Mars Rover Photos
+            </h1>
+            <p className="text-slate-300 mt-2">
+              Explore images captured by NASA&apos;s rovers on the Martian surface
             </p>
-          </div>
-        )}
+          </motion.div>
+
+          {/* Rover Info with animation delay */}
+          {currentRover && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5 }}
+              className="max-w-3xl mx-auto w-full"
+            >
+              {/* <RoverInfo rover={currentRover} /> */}
+            </motion.div>
+          )}
+
+          {/* Main Content */}
+          {!loading && photos.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.7 }}
+              className="flex justify-center"
+            >
+              <div className="w-full max-w-7xl">
+                {/* Photos count section */}
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.8 }}
+                  className="flex items-center justify-between mb-6"
+                >
+                  <div className="flex items-center gap-2">
+                    <PhotoIcon className="h-5 w-5 text-blue-400" />
+                    <h2 className="text-2xl font-semibold text-white">
+                      Photos Found: {photos.length}
+                    </h2>
+                  </div>
+                </motion.div>
+
+                {/* Photos grid with staggered animations */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.9 }}
+                  className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+                >
+                  {photos.map((photo, index) => (
+                    <motion.div
+                      key={photo.id}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 1.1 + (index * 0.05) }}
+                    >
+                      <MarsPhotoCard photo={photo} onOpenFull={openInNewTab} />
+                    </motion.div>
+                  ))}
+                </motion.div>
+              </div>
+            </motion.div>
+          )}
+
+          {/* Empty state with APOD-style design */}
+          {!loading && photos.length === 0 && !error && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.7 }}
+              className="flex justify-center"
+            >
+              <div className="bg-slate-800/50 hover:bg-slate-700/50 border border-slate-600/40 backdrop-blur-sm rounded-xl p-8 text-center max-w-md">
+                <PhotoIcon className="h-12 w-12 text-slate-400 mx-auto mb-4" />
+                <h3 className="text-xl font-semibold text-white mb-2">No photos found</h3>
+                <p className="text-slate-300">
+                  Try adjusting search parameters or selecting a different date.
+                </p>
+              </div>
+            </motion.div>
+          )}
+
+          {/* Empty section for future use - matching APOD pattern */}
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5 }}
+            className="max-w-3xl mx-auto w-full"
+          >
+          </motion.div>
+        </div>
       </div>
-    </div>
+    </LoaderWrapper>
   );
 }

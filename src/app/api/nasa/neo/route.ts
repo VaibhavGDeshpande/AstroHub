@@ -9,7 +9,7 @@ export async function GET(request: Request) {
     const startDate = searchParams.get('start_date') || undefined;
     const endDate = searchParams.get('end_date') || undefined;
 
-    const apiKey = process.env.NASA_API_KEY;
+    const apiKey = process.env.NEXT_PUBLIC_NASA_API_KEY;
     if (!apiKey) {
       return NextResponse.json(
         { error: 'NASA_API_KEY is not configured on the server' },

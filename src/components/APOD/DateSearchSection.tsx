@@ -1,202 +1,60 @@
-// components/APOD/DateSearchSection.tsx
+// components/DateSelectionButton.tsx
 'use client'
-import { motion } from 'framer-motion';
-import { 
-  CalendarIcon, 
-  MagnifyingGlassIcon,
-} from '@heroicons/react/24/outline';
+import { useState } from 'react'
+import { CalendarIcon } from '@heroicons/react/24/outline'
+import { motion } from 'framer-motion'
+import DateSelectionModal from './DateSelectionModal'
 
-interface DateSearchProps {
-  selectedDate: string;
-  setSelectedDate: (date: string) => void;
-  startDate: string;
-  setStartDate: (date: string) => void;
-  endDate: string;
-  setEndDate: (date: string) => void;
-  isDateRange: boolean;
-  setIsDateRange: (range: boolean) => void;
-  onSearch: () => void;
-  onTodayClick: () => void;
-  minDate: string;
-  maxDate: string;
+interface DateSelectionButtonProps {
+  selectedDate: string
+  setSelectedDate: (date: string) => void
+  startDate: string
+  setStartDate: (date: string) => void
+  endDate: string
+  setEndDate: (date: string) => void
+  isDateRange: boolean
+  setIsDateRange: (range: boolean) => void
+  onSearch: () => Promise<void>
+  onTodayClick: () => void
+  minDate: string
+  maxDate: string
 }
 
-const DateSearchSection: React.FC<DateSearchProps> = ({
-  selectedDate,
-  setSelectedDate,
-  startDate,
-  setStartDate,
-  endDate,
-  setEndDate,
-  isDateRange,
-  setIsDateRange,
-  onSearch,
-  onTodayClick,
-  minDate,
-  maxDate
-}) => {
+export default function DateSelectionButton(props: DateSelectionButtonProps) {
+  const [isModalOpen, setIsModalOpen] = useState(false)
+
   return (
-    <motion.div
-      initial={{ opacity: 0, y: -20 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-xl p-3 sm:p-4"
-    >
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-3 sm:mb-4 space-y-2 sm:space-y-0">
-        <h2 className="text-base sm:text-lg font-bold text-white flex items-center">
-          <MagnifyingGlassIcon className="h-4 w-4 sm:h-5 sm:w-5 mr-2 text-blue-400" />
-          <span className="hidden sm:inline">Explore Dates</span>
-          <span className="sm:hidden">Search</span>
-        </h2>
+    <>
+      {/* Calendar Button */}
+      <motion.button
+        onClick={() => setIsModalOpen(true)}
+        className="relative group p-3 rounded-xl bg-gradient-to-br from-blue-500/20 to-purple-500/20 hover:from-blue-500/30 hover:to-purple-500/30 border border-slate-600/40 hover:border-slate-500/60 backdrop-blur-sm transition-all duration-300"
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+        initial={{ opacity: 0, x: 20 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ delay: 0.4 }}
+      >
+        <CalendarIcon className="h-6 w-6 text-blue-400 group-hover:text-blue-300 transition-colors" />
         
-        <div className="flex gap-2">
-          <button
-            onClick={() => setIsDateRange(false)}
-            className={`px-2 sm:px-3 py-1 sm:py-1.5 text-xs sm:text-sm rounded-md transition-colors duration-300 ${
-              !isDateRange 
-                ? 'bg-blue-500 text-white' 
-                : 'border border-slate-600 text-slate-400 hover:border-blue-400 hover:text-blue-400'
-            }`}
-          >
-            Single Date
-          </button>
-          <button
-            onClick={() => setIsDateRange(true)}
-            className={`px-2 sm:px-3 py-1 sm:py-1.5 text-xs sm:text-sm rounded-md transition-colors duration-300 ${
-              isDateRange 
-                ? 'bg-blue-500 text-white' 
-                : 'border border-slate-600 text-slate-400 hover:border-blue-400 hover:text-blue-400'
-            }`}
-          >
-            Date Range
-          </button>
+        {/* Tooltip */}
+        <div className="absolute -top-12 left-1/2 transform -translate-x-1/2 px-3 py-1 bg-slate-800 text-white text-sm rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap">
+          Select Date
+          <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-slate-800" />
         </div>
-      </div>
 
-      {/* Mobile Layout */}
-      <div className="block sm:hidden space-y-3">
-        {!isDateRange ? (
-          <div className="space-y-1">
-            <label className="text-xs text-slate-400">Select Date</label>
-            <input
-              type="date"
-              value={selectedDate}
-              onChange={(e) => setSelectedDate(e.target.value)}
-              min={minDate}
-              max={maxDate}
-              className="w-full px-3 py-2 text-sm bg-slate-700 border border-slate-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-        ) : (
-          <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-1">
-              <label className="text-xs text-slate-400">Start Date</label>
-              <input
-                type="date"
-                value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
-                min={minDate}
-                max={maxDate}
-                className="w-full px-2 py-2 text-xs bg-slate-700 border border-slate-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-            <div className="space-y-1">
-              <label className="text-xs text-slate-400">End Date</label>
-              <input
-                type="date"
-                value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
-                min={minDate}
-                max={maxDate}
-                className="w-full px-2 py-2 text-xs bg-slate-700 border border-slate-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-          </div>
+        {/* Active indicator */}
+        {(props.selectedDate || props.startDate || props.endDate) && (
+          <div className="absolute -top-1 -right-1 w-3 h-3 bg-blue-500 rounded-full animate-pulse" />
         )}
-        
-        <div className="grid grid-cols-2 gap-2">
-          <button
-            onClick={onSearch}
-            className="px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-md hover:from-blue-600 hover:to-purple-700 transition-all duration-300 hover:scale-105 shadow-lg flex items-center justify-center space-x-1 text-sm"
-          >
-            <MagnifyingGlassIcon className="h-4 w-4" />
-            <span>Search</span>
-          </button>
-          
-          <button
-            onClick={onTodayClick}
-            className="px-4 py-2 border border-slate-600 text-white hover:border-blue-400 hover:text-blue-400 rounded-md transition-colors duration-300 flex items-center justify-center space-x-1 text-sm"
-          >
-            <CalendarIcon className="h-4 w-4" />
-            <span>Today</span>
-          </button>
-        </div>
-      </div>
+      </motion.button>
 
-      {/* Desktop Layout */}
-      <div className="hidden sm:block">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3 items-end">
-          {!isDateRange ? (
-            <div className="space-y-1 md:col-span-2 lg:col-span-2">
-              <label className="text-xs text-slate-400">Select Date</label>
-              <input
-                type="date"
-                value={selectedDate}
-                onChange={(e) => setSelectedDate(e.target.value)}
-                min={minDate}
-                max={maxDate}
-                className="w-full px-3 py-2 text-sm bg-slate-700 border border-slate-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-          ) : (
-            <>
-              <div className="space-y-1">
-                <label className="text-xs text-slate-400">Start Date</label>
-                <input
-                  type="date"
-                  value={startDate}
-                  onChange={(e) => setStartDate(e.target.value)}
-                  min={minDate}
-                  max={maxDate}
-                  className="w-full px-3 py-2 text-sm bg-slate-700 border border-slate-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-              <div className="space-y-1">
-                <label className="text-xs text-slate-400">End Date</label>
-                <input
-                  type="date"
-                  value={endDate}
-                  onChange={(e) => setEndDate(e.target.value)}
-                  min={minDate}
-                  max={maxDate}
-                  className="w-full px-3 py-2 text-sm bg-slate-700 border border-slate-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-            </>
-          )}
-          
-          <button
-            onClick={onSearch}
-            className="px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-md hover:from-blue-600 hover:to-purple-700 transition-all duration-300 hover:scale-105 shadow-lg flex items-center justify-center space-x-1 text-sm"
-          >
-            <MagnifyingGlassIcon className="h-4 w-4" />
-            <span>Search</span>
-          </button>
-          
-          <button
-            onClick={onTodayClick}
-            className="px-4 py-2 border border-slate-600 text-white hover:border-blue-400 hover:text-blue-400 rounded-md transition-colors duration-300 flex items-center justify-center space-x-1 text-sm"
-          >
-            <CalendarIcon className="h-4 w-4" />
-            <span>Today</span>
-          </button>
-        </div>
-      </div>
-
-      <p className="text-xs text-slate-500 mt-2">
-        * APOD data available from June 16, 1995 to present
-      </p>
-    </motion.div>
-  );
-};
-
-export default DateSearchSection;
+      {/* Modal */}
+      <DateSelectionModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        {...props}
+      />
+    </>
+  )
+}
