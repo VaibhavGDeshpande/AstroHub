@@ -27,7 +27,7 @@ const HeroSection = () => {
       const video = videoRef.current;
       
       video.currentTime = 0;
-      video.playbackRate = 2.5; 
+      video.playbackRate = 5; 
       
       video.play().catch(error => {
         console.log('Video autoplay failed:', error);
