@@ -136,7 +136,17 @@ const Cards = () => {
     return glowClasses[glow as keyof typeof glowClasses] || 'hover:shadow-blue-500/25';
   };
 
-  const renderCard = (api: any, index: number, delayOffset: number = 0) => (
+  const renderCard = (api: {
+  title: string;
+  description: string;
+  icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
+  color: string;
+  path: string;
+  features: string[];
+  glow: string;
+  ctaText: string;
+}, index: number, delayOffset: number = 0) => (
+
     <div
       key={index}
       className={`group relative transition-all duration-1000 ease-out ${

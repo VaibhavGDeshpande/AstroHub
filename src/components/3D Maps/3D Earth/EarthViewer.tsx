@@ -43,10 +43,10 @@ const CesiumViewer: React.FC = () => {
 
         // Set initial camera position - zoomed out to show full Earth
         viewerRef.current.camera.setView({
-          destination: Cesium.Cartesian3.fromDegrees(0.0, 0.0, 20000000.0), // 20,000 km altitude for full Earth view
+          destination: Cesium.Cartesian3.fromDegrees(0.0, 0.0, 20000000.0), 
           orientation: {
             heading: 0.0,
-            pitch: Cesium.Math.toRadians(-90.0), // Looking straight down
+            pitch: Cesium.Math.toRadians(-90.0), 
             roll: 0.0
           }
         });

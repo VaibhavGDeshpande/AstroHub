@@ -1,15 +1,15 @@
 // components/StellariumViewer.tsx
 'use client';
 
-import { useState, useRef } from 'react';
+import { useRef } from 'react';
 import LoaderWrapper from '@/components/Loader'; // Adjust path as needed
 
 const StellariumViewer: React.FC = () => {
-  const [isLoading, setIsLoading] = useState(true);
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
   const handleLoad = () => {
-    setIsLoading(false);
+    // You can add any post-load logic here if needed
+    console.log('Stellarium loaded successfully');
   };
 
   return (
