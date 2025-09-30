@@ -7,7 +7,7 @@ import Cards from '@/components/Cards';
 import FactsSection from '../Facts/FactsSection';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { Stars, Maximize2 } from 'lucide-react';
+import { Maximize2 } from 'lucide-react';
 
 export default function Home() {
   useEffect(() => {
@@ -32,7 +32,6 @@ export default function Home() {
 
       const ToastContent = () => (
         <div className="flex items-center gap-3 p-2">
-          <Stars className="w-6 h-6 text-blue-400 flex-shrink-0" />
           <div className="flex-1">
             <div className="text-sm text-gray-300 mb-3">
               View this cosmic journey in fullscreen for the ultimate stargazing experience
@@ -50,14 +49,14 @@ export default function Home() {
 
       toast(<ToastContent />, {
         position: "top-center",
-        autoClose: 2000,
+        autoClose: 1000,
         hideProgressBar: true,
         closeOnClick: false,
-        pauseOnHover: true,
+        pauseOnHover: false, // Disable pause on hover to prevent movement
         closeButton: true,
         theme: "dark",
         className: "!bg-slate-800/95 !border !border-blue-500/20 !backdrop-blur-md",
-        toastId: "fullscreen-toast", // Prevent duplicate toasts
+        toastId: "fullscreen-toast", 
       });
     }, 1000);
 
@@ -65,27 +64,86 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900">
-      <Header />
-      <HeroSection />
-      <FactsSection/>
-      <Cards />
-      
-      {/* Toast Container for react-toastify */}
-      <ToastContainer
-        position="top-center"
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="dark"
-        toastClassName="bg-slate-800/95 border border-blue-500/20 backdrop-blur-md"
-        style={{
-          '--toastify-color-dark': 'rgba(30, 41, 59, 0.95)',
-        } as React.CSSProperties}
-      />
-    </div>
+    <>
+      {/* Custom CSS to fix toast positioning */}
+      <style jsx global>{`
+        /* Fix toast container positioning and prevent movement on hover */
+        .Toastify__toast-container {
+          position: fixed !important;
+          top: 20px !important;
+          left: 50% !important;
+          transform: translateX(-50%) !important;
+          width: auto !important;
+          max-width: 500px !important;
+          z-index: 9999 !important;
+        }
+        
+        .Toastify__toast-container--top-center {
+          top: 20px !important;
+          left: 50% !important;
+          transform: translateX(-50%) !important;
+        }
+        
+        /* Prevent toast movement on hover */
+        .Toastify__toast {
+          position: relative !important;
+          transform: none !important;
+          transition: none !important;
+          margin-bottom: 0.5rem !important;
+        }
+        
+        .Toastify__toast:hover {
+          transform: none !important;
+        }
+        
+        /* Disable any hover animations */
+        .Toastify__toast--default:hover,
+        .Toastify__toast--info:hover,
+        .Toastify__toast--success:hover,
+        .Toastify__toast--warning:hover,
+        .Toastify__toast--error:hover {
+          transform: none !important;
+          box-shadow: none !important;
+        }
+        
+        /* Custom toast styling */
+        .Toastify__toast {
+          background: rgba(30, 41, 59, 0.95) !important;
+          border: 1px solid rgba(59, 130, 246, 0.2) !important;
+          backdrop-filter: blur(12px) !important;
+          border-radius: 8px !important;
+          color: white !important;
+        }
+      `}</style>
+
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-900">
+        <Header />
+        <HeroSection />
+        <FactsSection/>
+        <Cards />
+        
+        {/* Toast Container for react-toastify */}
+        <ToastContainer
+          position="top-center"
+          newestOnTop={false}
+          closeOnClick={false}
+          pauseOnHover={false} 
+          pauseOnFocusLoss={false} 
+          draggable={false} 
+          theme="dark"
+          limit={1} 
+          toastClassName="bg-slate-800/95 border border-blue-500/20 backdrop-blur-md"
+          style={{
+            position: 'fixed',
+            top: '20px',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            width: 'auto',
+            maxWidth: '500px',
+            zIndex: 9999
+          }}
+        />
+      </div>
+    </>
   );
 }
