@@ -5,30 +5,60 @@ import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls, useGLTF } from "@react-three/drei";
 import * as THREE from "three";
 
-// Fixed stationary model (e.g. Sun)
-// Fixed stationary model (Sun) with geometry centered
-function FixedModel({ url, position, onClick, scale = [1, 1, 1] }) {
+// Background component
+function Background({ url }: { url: string }) {
+  const { scene } = useThree();
+  useEffect(() => {
+    const loader = new THREE.TextureLoader();
+    loader.load(url, (texture) => {
+      texture.mapping = THREE.EquirectangularReflectionMapping;
+      scene.background = texture;
+    });
+  }, [scene, url]);
+  return null;
+}
+
+// Fixed Model (e.g. Sun)
+function FixedModel({ url, position, scale = [1, 1, 1], name, onFocus }) {
   const gltf = useGLTF(url);
   const groupRef = useRef<THREE.Group>(null);
 
   useEffect(() => {
-    // Center all meshes inside the GLB so pivot is in the middle
     gltf.scene.traverse((child: any) => {
       if (child.isMesh) {
         child.geometry.center();
+        child.userData.clickable = true;
+
+        // Fix material rendering issues
+        if (child.material) {
+          child.material.needsUpdate = true;
+          // Enable shadows if needed
+          child.castShadow = true;
+          child.receiveShadow = true;
+        }
       }
     });
-  }, [gltf]);
+
+    console.log(`Loaded ${name} model:`, gltf.scene);
+  }, [gltf, name]);
 
   return (
-    <group ref={groupRef} position={position} onClick={onClick} scale={scale}>
+    <group
+      ref={groupRef}
+      position={position}
+      scale={scale}
+      onClick={(e) => {
+        e.stopPropagation();
+        if (e.delta <= 2 && groupRef.current) {
+          onFocus(groupRef.current, name);
+        }
+      }}
+    >
       <primitive object={gltf.scene} />
     </group>
   );
 }
 
-
-// Orbit path (yellow circle)
 function OrbitPath({ center, radius }: { center: THREE.Vector3; radius: number }) {
   const points = useMemo(() => {
     const segments = 128;
@@ -49,7 +79,7 @@ function OrbitPath({ center, radius }: { center: THREE.Vector3; radius: number }
 
   return (
     <line geometry={geometry}>
-      <lineBasicMaterial attach="material" color="yellow" linewidth={2} />
+      <lineBasicMaterial attach="material" color="white" linewidth={2} />
     </line>
   );
 }
@@ -59,99 +89,251 @@ function RevolvingModel({
   center,
   radius,
   speed,
-  onClick,
-  refCallback,
+  scale = [1, 1, 1],
+  name,
+  onFocus,
 }) {
   const gltf = useGLTF(url);
-  const ref = useRef<THREE.Object3D>(null);
+  const groupRef = useRef<THREE.Group>(null);
   const angle = useRef(0);
 
   useFrame(() => {
-    if (!ref.current) return;
-
-    // Keep angle bounded [0, 2π]
+    if (!groupRef.current) return;
+    // Orbit around center
     angle.current = (angle.current + speed) % (Math.PI * 2);
-
-    // Orbit around center in XZ plane
     const x = center.x + radius * Math.cos(angle.current);
     const z = center.z + radius * Math.sin(angle.current);
-    ref.current.position.set(x, center.y, z);
+    groupRef.current.position.set(x, center.y, z);
 
-    // Self-rotation
-    ref.current.rotation.y += 0.002;
+    // Rotate around own axis
+    gltf.scene.rotation.y += 0.00001;
   });
 
   useEffect(() => {
-    if (ref.current && refCallback) refCallback(ref.current);
-  }, [refCallback]);
+    // Make all meshes in the model clickable and fix rendering
+    gltf.scene.traverse((child: any) => {
+      if (child.isMesh) {
+        child.userData.clickable = true;
 
-  return <primitive object={gltf.scene} ref={ref} onClick={onClick} />;
+        // Fix material rendering issues
+        if (child.material) {
+          child.material.needsUpdate = true;
+          // Enable shadows if needed
+          child.castShadow = true;
+          child.receiveShadow = true;
+
+          // Fix common texture/material issues
+          if (child.material.map) {
+            child.material.map.needsUpdate = true;
+          }
+        }
+      }
+    });
+
+    console.log(`Loaded ${name} model at radius ${radius}:`, gltf.scene);
+  }, [gltf, name, radius]);
+
+  return (
+    <group
+      ref={groupRef}
+      scale={scale}
+      onClick={(e) => {
+        e.stopPropagation();
+        if (e.delta <= 2 && groupRef.current) {
+          onFocus(groupRef.current, name);
+        }
+      }}
+    >
+      <primitive object={gltf.scene} />
+    </group>
+  );
 }
 
-// Dynamic OrbitControls (focuses on active object)
-function Controls({ targetObject }) {
+// Dynamic OrbitControls that follows the focused planet
+function Controls({ focusedObject }) {
   const controls = useRef<any>();
-  const { camera, gl } = useThree();
+  const { camera } = useThree();
+  const isUserInteracting = useRef(false);
+
+  useEffect(() => {
+    if (focusedObject && controls.current) {
+      // Calculate bounding box to get the actual center of the model
+      const boundingBox = new THREE.Box3().setFromObject(focusedObject);
+      const center = boundingBox.getCenter(new THREE.Vector3());
+      const size = boundingBox.getSize(new THREE.Vector3());
+
+      // Get the maximum dimension of the object
+      const maxDim = Math.max(size.x, size.y, size.z);
+      const fov = camera.fov * (Math.PI / 180);
+
+      // Calculate camera distance to fit the object in view
+      const cameraDistance = Math.abs(maxDim / Math.sin(fov / 2)) * 0.6;
+
+      // Get current camera direction or use default
+      const currentDirection = new THREE.Vector3()
+        .subVectors(camera.position, center)
+        .normalize();
+
+      // If camera is too close to target, use a default direction
+      if (currentDirection.length() < 0.1) {
+        currentDirection.set(0, 0.5, 1).normalize();
+      }
+
+      // Calculate new camera position
+      const newCameraPos = new THREE.Vector3()
+        .copy(center)
+        .add(currentDirection.multiplyScalar(cameraDistance));
+
+      // Smoothly move camera to new position
+      const startPos = camera.position.clone();
+      const startTarget = controls.current.target.clone();
+      let progress = 0;
+
+      const animateCamera = () => {
+        progress += 0.05;
+        if (progress < 1) {
+          camera.position.lerpVectors(startPos, newCameraPos, progress);
+          controls.current.target.lerpVectors(startTarget, center, progress);
+          controls.current.update();
+          requestAnimationFrame(animateCamera);
+        } else {
+          camera.position.copy(newCameraPos);
+          controls.current.target.copy(center);
+          controls.current.update();
+        }
+      };
+
+      animateCamera();
+
+      console.log(`Focusing on object at:`, center);
+      console.log(`Camera distance:`, cameraDistance);
+    }
+  }, [focusedObject, camera]);
 
   useFrame(() => {
-    if (targetObject && controls.current) {
-      controls.current.target.copy(targetObject.position);
-      controls.current.update();
-    }
+    if (!focusedObject || !controls.current || isUserInteracting.current) return;
+
+    // Only update target to follow the object's center, don't move the camera
+    const boundingBox = new THREE.Box3().setFromObject(focusedObject);
+    const currentCenter = boundingBox.getCenter(new THREE.Vector3());
+
+    // Calculate the delta (how much the object moved)
+    const delta = new THREE.Vector3().subVectors(
+      currentCenter,
+      controls.current.target
+    );
+
+    // Move both target and camera by the same delta to maintain relative position
+    controls.current.target.add(delta);
+    camera.position.add(delta);
+
+    controls.current.update();
   });
 
-  return <OrbitControls ref={controls} args={[camera, gl.domElement]} />;
+  // Track when user is interacting with controls
+  useEffect(() => {
+    if (!controls.current) return;
+
+    const handleStart = () => {
+      isUserInteracting.current = true;
+    };
+
+    const handleEnd = () => {
+      isUserInteracting.current = false;
+    };
+
+    controls.current.addEventListener("start", handleStart);
+    controls.current.addEventListener("end", handleEnd);
+
+    return () => {
+      controls.current?.removeEventListener("start", handleStart);
+      controls.current?.removeEventListener("end", handleEnd);
+    };
+  }, []);
+
+  return (
+    <OrbitControls
+      ref={controls}
+      enablePan={true}
+      enableZoom={true}
+      enableDamping={true}
+      dampingFactor={0.05}
+    />
+  );
 }
 
 export default function RevolveRotateFocus() {
-  const [activeModel, setActiveModel] = useState<string>("fixed");
+  const [focusedObject, setFocusedObject] = useState<THREE.Object3D | null>(null);
   const fixedPosition = new THREE.Vector3(0, 0, 0);
-  const revolvingRef = useRef<THREE.Object3D | null>(null);
 
-  const getTargetObject = () => {
-    if (activeModel === "fixed") {
-      const dummy = new THREE.Object3D();
-      dummy.position.copy(fixedPosition);
-      return dummy;
-    } else if (activeModel === "revolve") {
-      return revolvingRef.current;
-    }
-    return null;
+  const handleFocus = (object: THREE.Object3D, name: string) => {
+    setFocusedObject(object);
+    console.log(`Focused on: ${name}`);
   };
 
   return (
     <div style={{ width: "100vw", height: "100vh" }}>
-      <Canvas camera={{ position: [0, 5, 15], fov: 60 }}>
-        <ambientLight intensity={0.5} />
-        <directionalLight position={[5, 5, 5]} />
+      <Canvas
+        camera={{ position: [0, 50, 200], fov: 60 }}
+        gl={{
+          antialias: true,
+          toneMapping: THREE.ACESFilmicToneMapping,
+          toneMappingExposure: 1.0,
+          outputColorSpace: THREE.SRGBColorSpace
+        }}
+      >
+        {/* Enhanced lighting for better model visibility */}
+        <ambientLight intensity={0.8} />
+        <directionalLight position={[10, 10, 5]} intensity={1.5} castShadow />
+        <directionalLight position={[-10, -10, -5]} intensity={0.5} />
+        <hemisphereLight
+          skyColor={new THREE.Color(0xffffff)}
+          groundColor={new THREE.Color(0x444444)}
+          intensity={0.6}
+        />
 
         <Suspense fallback={null}>
-          {/* Sun (Fixed Model) */}
+          {/* 🌌 Background */}
+          <Background url="/SampleData/PlanetModels/milkyway.jpg" />
+
+          {/* Sun */}
           <FixedModel
             url="/SampleData/PlanetModels/the_sun.glb"
             position={[0, 0, 0]}
-            scale={[2, 2, 2]}   // big sun
-            onClick={() => setActiveModel("fixed")}
+            scale={[10, 10, 10]}
+            name="Sun"
+            onFocus={handleFocus}
           />
 
-          {/* Mercury (Revolving Model) */}
+          {/* Mercury */}
           <RevolvingModel
             url="/SampleData/PlanetModels/mercury.glb"
             center={fixedPosition}
-            radius={50} // ✅ must match OrbitPath
-            speed={0.001}
-            onClick={() => setActiveModel("revolve")}
-            refCallback={(ref) => {
-              revolvingRef.current = ref;
-            }}
+            radius={50}
+            speed={0}
+            scale={[2, 2, 2]}
+            name="Mercury"
+            onFocus={handleFocus}
           />
 
-          {/* Orbit Path */}
-          <OrbitPath center={fixedPosition} radius={50} />
-        </Suspense>
+          {/* Venus */}
+          <RevolvingModel
+            url="/SampleData/PlanetModels/venus.glb"
+            center={fixedPosition}
+            radius={90}
+            speed={0}
+            scale={[3, 3, 3]}
+            name="Venus"
+            onFocus={handleFocus}
+          />
 
-        {/* Camera Controls */}
-        <Controls targetObject={getTargetObject()} />
+        
+          {/* Orbits */}
+          <OrbitPath center={fixedPosition} radius={50} />
+          <OrbitPath center={fixedPosition} radius={90} />
+
+          <Controls focusedObject={focusedObject} />
+        </Suspense>
       </Canvas>
     </div>
   );

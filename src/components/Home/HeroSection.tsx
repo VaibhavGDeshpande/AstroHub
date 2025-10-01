@@ -28,7 +28,7 @@ const HeroSection = () => {
 
       // Set video properties
       video.currentTime = 0;
-      video.playbackRate = 3;
+      video.playbackRate = 4.5;
 
       // Handle video ended event
       const handleVideoEnded = () => {
