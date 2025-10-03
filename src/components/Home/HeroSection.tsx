@@ -19,7 +19,7 @@ const HeroSection = () => {
   const [isVisible, setIsVisible] = useState(false);
   const [videoStopped, setVideoStopped] = useState(false);
   const [videoPlayed, setVideoPlayed] = useState(false);
-  const [requiresInteraction, setRequiresInteraction] = useState(false);
+  const [, setRequiresInteraction] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {

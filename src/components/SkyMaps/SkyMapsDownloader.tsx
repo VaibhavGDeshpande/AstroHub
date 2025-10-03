@@ -37,7 +37,7 @@ export default function SkyMapsDownloader() {
       } else {
         setError(result.error || 'Failed to load sky maps');
       }
-    } catch (err) {
+    } catch {
       setError('Network error - please try again');
     } finally {
       setLoading(false);

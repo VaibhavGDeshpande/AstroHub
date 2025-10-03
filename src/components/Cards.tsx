@@ -1,7 +1,6 @@
 // EnhancedCards.tsx (or .jsx/.tsx depending on your setup)
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation'; // or 'next/router' depending on your Next.js version
 import { 
   Camera, 
   Star, 
@@ -13,6 +12,18 @@ import {
   ArrowRight,
   Sparkles
 } from 'lucide-react';
+
+interface CardAPI {
+  icon: React.ComponentType<{ className?: string }>;
+  title: string;
+  description: string;
+  color: string;
+  path: string;
+  features: string[];
+  glow: string;
+  ctaText: string;
+  external?: boolean;
+}
 
 const EnhancedCards = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -65,7 +76,7 @@ const EnhancedCards = () => {
     },
     {
       title: 'NASA Image Library',
-      description: 'Search through NASA\'s vast collection of images, videos, and audio files.',
+      description: 'Search through NASA&apos;s vast collection of images, videos, and audio files.',
       icon: Image,
       color: 'from-pink-500 to-purple-500',
       path: '/images',
@@ -148,7 +159,7 @@ const EnhancedCards = () => {
     }
   ];
 
-  const renderCard = (api: any, index: number, delayOffset: number = 0) => {
+  const renderCard = (api: CardAPI, index: number, delayOffset: number = 0) => {
     const Icon = api.icon;
     const cardIndex = index + delayOffset;
 
@@ -307,7 +318,7 @@ const EnhancedCards = () => {
               NASA Data Explorer
             </h2>
             <p className="text-lg text-slate-400 max-w-2xl mx-auto">
-              Real-time access to NASA's comprehensive space data APIs
+              Real-time access to NASA&apos;s comprehensive space data APIs
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
@@ -352,7 +363,7 @@ const EnhancedCards = () => {
               NASA Eyes
             </h2>
             <p className="text-lg text-slate-400 max-w-2xl mx-auto">
-              Explore the universe through NASA's official interactive platform
+              Explore the universe through NASA&apos;s official interactive platform
             </p>
           </div>
           <div className="grid grid-cols-1 gap-6 max-w-2xl mx-auto">

@@ -42,7 +42,14 @@ function FixedModel({ url, position, scale = [1, 1, 1], name, onFocus }: FixedMo
 
         // Fix material rendering issues
         if (mesh.material) {
-          mesh.material.needsUpdate = true;
+          // Handle both single material and material array
+          if (Array.isArray(mesh.material)) {
+            mesh.material.forEach(material => {
+              material.needsUpdate = true;
+            });
+          } else {
+            mesh.material.needsUpdate = true;
+          }
           // Enable shadows if needed
           mesh.castShadow = true;
           mesh.receiveShadow = true;
@@ -100,9 +107,7 @@ function OrbitPath({ center, radius, pointOffsets }: OrbitPathProps) {
   );
 
   return (
-    <line geometry={geometry}>
-      <lineBasicMaterial attach="material" color="white" linewidth={2} />
-    </line>
+    <primitive object={new THREE.Line(geometry, new THREE.LineBasicMaterial({ color: 'white', linewidth: 2 }))} />
   );
 }
 
@@ -150,16 +155,27 @@ function RevolvingModel({
 
         // Fix material rendering issues
         if (mesh.material) {
-          mesh.material.needsUpdate = true;
+          // Handle both single material and material array
+          if (Array.isArray(mesh.material)) {
+            mesh.material.forEach(material => {
+              material.needsUpdate = true;
+              // Fix common texture/material issues
+              const standardMaterial = material as THREE.MeshStandardMaterial;
+              if (standardMaterial.map) {
+                standardMaterial.map.needsUpdate = true;
+              }
+            });
+          } else {
+            mesh.material.needsUpdate = true;
+            // Fix common texture/material issues
+            const material = mesh.material as THREE.MeshStandardMaterial;
+            if (material.map) {
+              material.map.needsUpdate = true;
+            }
+          }
           // Enable shadows if needed
           mesh.castShadow = true;
           mesh.receiveShadow = true;
-
-          // Fix common texture/material issues
-          const material = mesh.material as THREE.MeshStandardMaterial;
-          if (material.map) {
-            material.map.needsUpdate = true;
-          }
         }
       }
     });
@@ -188,8 +204,15 @@ interface ControlsProps {
   focusedObject: THREE.Object3D | null;
 }
 
+interface OrbitControlsInstance {
+  target: THREE.Vector3;
+  update: () => void;
+  addEventListener: (event: string, handler: () => void) => void;
+  removeEventListener: (event: string, handler: () => void) => void;
+}
+
 function Controls({ focusedObject }: ControlsProps) {
-  const controls = useRef<any>();
+  const controls = useRef<OrbitControlsInstance | null>(null);
   const { camera } = useThree();
   const isUserInteracting = useRef(false);
 
@@ -202,7 +225,7 @@ function Controls({ focusedObject }: ControlsProps) {
 
       // Get the maximum dimension of the object
       const maxDim = Math.max(size.x, size.y, size.z);
-      const fov = camera.fov * (Math.PI / 180);
+      const fov = (camera as THREE.PerspectiveCamera).fov * (Math.PI / 180);
 
       // Calculate camera distance to fit the object in view
       const cameraDistance = Math.abs(maxDim / Math.sin(fov / 2)) * 0.6;
@@ -224,20 +247,24 @@ function Controls({ focusedObject }: ControlsProps) {
 
       // Smoothly move camera to new position
       const startPos = camera.position.clone();
-      const startTarget = controls.current.target.clone();
+      const startTarget = controls.current?.target.clone() || new THREE.Vector3();
       let progress = 0;
 
       const animateCamera = () => {
         progress += 0.05;
         if (progress < 1) {
           camera.position.lerpVectors(startPos, newCameraPos, progress);
-          controls.current.target.lerpVectors(startTarget, center, progress);
-          controls.current.update();
+          if (controls.current) {
+            controls.current.target.lerpVectors(startTarget, center, progress);
+            controls.current.update();
+          }
           requestAnimationFrame(animateCamera);
         } else {
           camera.position.copy(newCameraPos);
-          controls.current.target.copy(center);
-          controls.current.update();
+          if (controls.current) {
+            controls.current.target.copy(center);
+            controls.current.update();
+          }
         }
       };
 
@@ -258,14 +285,15 @@ function Controls({ focusedObject }: ControlsProps) {
     // Calculate the delta (how much the object moved)
     const delta = new THREE.Vector3().subVectors(
       currentCenter,
-      controls.current.target
+      controls.current?.target || new THREE.Vector3()
     );
 
     // Move both target and camera by the same delta to maintain relative position
-    controls.current.target.add(delta);
+    if (controls.current) {
+      controls.current.target.add(delta);
+      controls.current.update();
+    }
     camera.position.add(delta);
-
-    controls.current.update();
   });
 
   // Track when user is interacting with controls
@@ -292,7 +320,7 @@ function Controls({ focusedObject }: ControlsProps) {
 
   return (
     <OrbitControls
-      ref={controls}
+      ref={controls as React.RefObject<any>}
       enablePan={true}
       enableZoom={true}
       enableDamping={true}

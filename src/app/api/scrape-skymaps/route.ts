@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import axios from 'axios';
 import * as cheerio from 'cheerio';
 
@@ -11,7 +11,7 @@ interface SkyMapPDF {
   monthYear: string;
 }
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const targetUrl = 'https://www.skymaps.com/downloads.html';
     const { data: html } = await axios.get(targetUrl);
