@@ -1,30 +1,32 @@
-// components/APICards.tsx
-'use client'
+// EnhancedCards.tsx (or .jsx/.tsx depending on your setup)
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation'; // or 'next/router' depending on your Next.js version
 import { 
-  CameraIcon, 
-  StarIcon, 
-  RocketLaunchIcon,
-  PhotoIcon,
-  CloudIcon,
-  GlobeAltIcon,
-  EyeIcon,
-} from '@heroicons/react/24/outline';
+  Camera, 
+  Star, 
+  Rocket, 
+  Image, 
+  Cloud, 
+  Globe, 
+  Eye,
+  ArrowRight,
+  Sparkles
+} from 'lucide-react';
 
-const Cards = () => {
+const EnhancedCards = () => {
   const [isVisible, setIsVisible] = useState(false);
+  const [hoveredCard, setHoveredCard] = useState<number | null>(null);
 
   useEffect(() => {
     setIsVisible(true);
   }, []);
 
-  // NASA Data APIs
   const nasaApis = [
     {
       title: 'Astronomy Picture of the Day',
       description: 'Discover a new astronomy picture each day with detailed explanations from professional astronomers.',
-      icon: StarIcon,
+      icon: Star,
       color: 'from-purple-500 to-pink-500',
       path: '/apod',
       features: ['Daily updates', 'HD images', 'Expert explanations'],
@@ -34,7 +36,7 @@ const Cards = () => {
     {
       title: 'Mars Rover Photos',
       description: 'Explore Mars through the eyes of NASA rovers including Curiosity, Opportunity, and Spirit.',
-      icon: CameraIcon,
+      icon: Camera,
       color: 'from-red-500 to-orange-500',
       path: '/mars-rover',
       features: ['Multiple rovers', 'Camera filters', 'Sol dates'],
@@ -44,7 +46,7 @@ const Cards = () => {
     {
       title: 'Near Earth Objects',
       description: 'Track asteroids and comets that approach Earth with detailed orbital information.',
-      icon: RocketLaunchIcon,
+      icon: Rocket,
       color: 'from-blue-500 to-cyan-500',
       path: '/neo',
       features: ['Orbital data', 'Size estimates', 'Approach dates'],
@@ -54,7 +56,7 @@ const Cards = () => {
     {
       title: 'EPIC Earth Images',
       description: 'See Earth from DSCOVR satellite with full disk images showing weather patterns.',
-      icon: CloudIcon,
+      icon: Cloud,
       color: 'from-cyan-500 to-blue-500',
       path: '/epic',
       features: ['Full disk images', 'Weather patterns', 'Daily updates'],
@@ -64,7 +66,7 @@ const Cards = () => {
     {
       title: 'NASA Image Library',
       description: 'Search through NASA\'s vast collection of images, videos, and audio files.',
-      icon: PhotoIcon,
+      icon: Image,
       color: 'from-pink-500 to-purple-500',
       path: '/images',
       features: ['Media search', 'High resolution', 'Metadata'],
@@ -73,12 +75,11 @@ const Cards = () => {
     }
   ];
 
-  // 3D Models and Interactive Views
   const interactiveViews = [
     {
       title: '3D View of Earth',
       description: 'Experience our planet in stunning 3D with interactive controls, atmospheric effects, and real-time lighting.',
-      icon: GlobeAltIcon,
+      icon: Globe,
       color: 'from-blue-600 to-green-500',
       path: '/3d-earth',
       features: ['Interactive 3D', 'Real-time rotation', 'Atmospheric effects', 'Day/Night cycle'],
@@ -88,7 +89,7 @@ const Cards = () => {
     {
       title: '3D View of Moon',
       description: 'See and observe the detailed surface of the Moon and its landmarks in immersive 3D.',
-      icon: StarIcon,
+      icon: Star,
       color: 'from-gray-400 to-blue-500',
       path: '/3d-moon',
       features: ['Moon surface', 'Important landmarks', 'Crater details', '3D exploration'],
@@ -98,7 +99,7 @@ const Cards = () => {
     {
       title: '3D View of Mars',
       description: 'See and observe the detailed surface of Mars and its landmarks with rover locations.',
-      icon: StarIcon,
+      icon: Star,
       color: 'from-red-500 to-orange-500',
       path: '/3d-mars',
       features: ['Mars surface', 'Important landmarks', 'Rover locations', 'Geological features'],
@@ -107,12 +108,11 @@ const Cards = () => {
     }
   ];
 
-  // Stellarium and Sky Observation
   const stellariumSection = [
     {
       title: 'Stellarium Sky Map',
       description: 'Interactive planetarium software showing realistic star maps, constellations, and celestial objects in real-time.',
-      icon: EyeIcon,
+      icon: Eye,
       color: 'from-indigo-500 to-purple-600',
       path: '/stellarium',
       features: ['Real-time sky', 'Constellation maps', 'Planet positions', 'Time control'],
@@ -121,235 +121,265 @@ const Cards = () => {
     }
   ];
 
-  const getGlowClass = (glow: string) => {
-    const glowClasses = {
-      purple: 'hover:shadow-purple-500/25',
-      red: 'hover:shadow-red-500/25',
-      blue: 'hover:shadow-blue-500/25',
-      green: 'hover:shadow-green-500/25',
-      cyan: 'hover:shadow-cyan-500/25',
-      indigo: 'hover:shadow-indigo-500/25',
-      pink: 'hover:shadow-pink-500/25',
-      yellow: 'hover:shadow-yellow-500/25',
-      gray: 'hover:shadow-gray-500/25'
-    };
-    return glowClasses[glow as keyof typeof glowClasses] || 'hover:shadow-blue-500/25';
-  };
+  const skyChartsSection = [
+    {
+      title: 'Sky Charts',
+      description: 'Printable and interactive monthly updated sky charts to help plan your nights of stargazing.',
+      icon: Eye,
+      color: 'from-yellow-500 to-orange-500',
+      path: '/sky-charts',
+      features: ['Monthly updates', 'Printable charts', 'Constellation guides'],
+      glow: 'yellow',
+      ctaText: 'View Charts'
+    }
+  ];
 
-  const renderCard = (api: {
-  title: string;
-  description: string;
-  icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
-  color: string;
-  path: string;
-  features: string[];
-  glow: string;
-  ctaText: string;
-}, index: number, delayOffset: number = 0) => (
+  const nasaEyesSection = [
+    {
+      title: 'NASA Eyes',
+      description: 'Explore Earth, planets, and the universe interactively through NASA Eyes web application.',
+      icon: Eye,
+      color: 'from-blue-700 to-cyan-500',
+      path: 'https://eyes.nasa.gov',
+      features: ['3D interactive models', 'Planetary exploration', 'Real-time data'],
+      glow: 'blue',
+      ctaText: 'Visit NASA Eyes',
+      external: true
+    }
+  ];
 
-    <div
-      key={index}
-      className={`group relative transition-all duration-1000 ease-out ${
-        isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-      }`}
-      style={{ transitionDelay: `${600 + delayOffset + (index * 100)}ms` }}
-    >
-      <Link href={api.path}>
-        <div className={`relative h-full bg-slate-800/30 backdrop-blur-sm border border-slate-700/50 rounded-2xl p-6 overflow-hidden transition-all duration-500 cursor-pointer hover:bg-slate-800/50 hover:border-slate-600/50 hover:shadow-2xl hover:scale-105 ${getGlowClass(api.glow)} flex flex-col min-h-[380px]`}>
-          {/* Enhanced Background Effects */}
-          <div className={`absolute inset-0 bg-gradient-to-br ${api.color} opacity-0 group-hover:opacity-10 transition-opacity duration-500`} />
+  const renderCard = (api: any, index: number, delayOffset: number = 0) => {
+    const Icon = api.icon;
+    const cardIndex = index + delayOffset;
+
+    const cardContent = (
+      <div
+        onMouseEnter={() => setHoveredCard(cardIndex)}
+        onMouseLeave={() => setHoveredCard(null)}
+        className={`group relative transition-all duration-700 ease-out cursor-pointer ${
+          isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'
+        }`}
+        style={{ transitionDelay: `${cardIndex * 80}ms` }}
+      >
+        <div className="relative h-full bg-gradient-to-br from-slate-900/90 to-slate-800/90 backdrop-blur-xl border border-slate-700/50 rounded-3xl p-7 overflow-hidden transition-all duration-500 hover:border-slate-500/70 hover:shadow-2xl hover:shadow-purple-500/20 hover:-translate-y-2 flex flex-col min-h-[400px]">
           
-          {/* Animated border glow */}
-          <div className="absolute inset-0 rounded-2xl border border-slate-600/30 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+          {/* Animated gradient background */}
+          <div className={`absolute inset-0 bg-gradient-to-br ${api.color} opacity-0 group-hover:opacity-[0.15] transition-all duration-700 blur-2xl`} />
           
-          {/* Cosmic particle effect on hover */}
-          <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700">
-            {[...Array(6)].map((_, i) => (
+          {/* Mesh gradient overlay */}
+          <div className="absolute inset-0 opacity-30">
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 via-purple-500/10 to-pink-500/10" />
+          </div>
+
+          {/* Floating particles */}
+          <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-1000">
+            {[...Array(8)].map((_, i) => (
               <div
                 key={i}
-                className="absolute w-1 h-1 bg-white rounded-full animate-pulse"
+                className="absolute w-1 h-1 bg-white/60 rounded-full"
                 style={{
-                  left: `${20 + Math.random() * 60}%`,
-                  top: `${20 + Math.random() * 60}%`,
-                  animationDelay: `${Math.random() * 2}s`,
-                  animationDuration: `${2 + Math.random() * 2}s`
+                  left: `${15 + Math.random() * 70}%`,
+                  top: `${15 + Math.random() * 70}%`,
+                  animation: `float ${3 + Math.random() * 3}s ease-in-out infinite`,
+                  animationDelay: `${Math.random() * 2}s`
                 }}
               />
             ))}
           </div>
-          
-          {/* Corner decoration with animation */}
-          <div className="absolute top-4 right-4 w-8 h-8 border border-slate-600/50 rounded-full flex items-center justify-center group-hover:border-slate-400/70 group-hover:scale-110 transition-all duration-300">
-            <div className="w-2 h-2 bg-slate-500/50 rounded-full group-hover:bg-slate-300 group-hover:animate-pulse transition-all duration-300" />
-          </div>
-          
-          {/* Enhanced Icon with Glow */}
-          <div className={`relative w-14 h-14 rounded-xl bg-gradient-to-br ${api.color} flex items-center justify-center mb-4 group-hover:scale-110 transition-all duration-500 shadow-lg flex-shrink-0`}>
-            <api.icon className="h-7 w-7 text-white drop-shadow-sm group-hover:animate-pulse" />
-            <div className={`absolute inset-0 rounded-xl bg-gradient-to-br ${api.color} blur-xl opacity-0 group-hover:opacity-60 transition-all duration-500`} />
+
+          {/* Corner accent */}
+          <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-white/5 to-transparent rounded-bl-full opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+
+          {/* Icon container with enhanced glow */}
+          <div className="relative mb-6 flex-shrink-0">
+            <div className={`relative w-16 h-16 rounded-2xl bg-gradient-to-br ${api.color} flex items-center justify-center shadow-2xl group-hover:scale-110 group-hover:rotate-6 transition-all duration-500`}>
+              <Icon className="w-8 h-8 text-white" />
+              <div className={`absolute inset-0 rounded-2xl bg-gradient-to-br ${api.color} blur-2xl opacity-0 group-hover:opacity-70 transition-all duration-500`} />
+            </div>
+            <Sparkles className="absolute -top-1 -right-1 w-5 h-5 text-yellow-400 opacity-0 group-hover:opacity-100 group-hover:animate-pulse transition-opacity duration-500" />
           </div>
 
-          {/* Content - Enhanced Animations */}
-          <div className="flex-grow flex flex-col">
-            <h3 className="text-xl font-bold text-white mb-3 group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-white group-hover:via-blue-200 group-hover:to-purple-300 group-hover:bg-clip-text transition-all duration-500 flex-shrink-0">
+          {/* Content */}
+          <div className="relative flex-grow flex flex-col z-10">
+            <h3 className="text-2xl font-bold text-white mb-3 group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-blue-400 group-hover:via-purple-400 group-hover:to-pink-400 group-hover:bg-clip-text transition-all duration-500">
               {api.title}
             </h3>
-            
-            <p className="text-slate-400 mb-4 text-sm leading-relaxed group-hover:text-slate-200 transition-all duration-500 flex-grow">
+
+            <p className="text-slate-400 mb-6 text-sm leading-relaxed group-hover:text-slate-300 transition-colors duration-300 flex-grow">
               {api.description}
             </p>
 
-            {/* Enhanced Features with Animation */}
-            <ul className="space-y-2 mb-6 flex-shrink-0">
-              {api.features.map((feature: string, featureIndex: number) => (
-                <li key={featureIndex} className="flex items-center text-xs text-slate-500 group-hover:text-slate-300 transition-all duration-500">
-                  <div className={`w-2 h-2 rounded-full bg-gradient-to-r ${api.color} mr-3 shadow-sm flex-shrink-0 group-hover:animate-pulse group-hover:scale-110 transition-all duration-300`} 
-                       style={{ transitionDelay: `${featureIndex * 100}ms` }} />
-                  <span className="font-medium group-hover:text-white transition-colors duration-500">{feature}</span>
-                </li>
+            {/* Features with staggered animation */}
+            <div className="space-y-3 mb-6">
+              {api.features.map((feature: string, idx: number) => (
+                <div 
+                  key={idx}
+                  className="flex items-center group/feature"
+                  style={{
+                    animation: hoveredCard === cardIndex ? `slideIn 0.3s ease-out ${idx * 0.1}s forwards` : 'none',
+                    opacity: hoveredCard === cardIndex ? 1 : 0.7
+                  }}
+                >
+                  <div className={`w-1.5 h-1.5 rounded-full bg-gradient-to-r ${api.color} mr-3 group-hover:scale-150 group-hover:shadow-lg transition-all duration-300`} />
+                  <span className="text-xs text-slate-500 group-hover/feature:text-white transition-colors duration-300 font-medium">
+                    {feature}
+                  </span>
+                </div>
               ))}
-            </ul>
-          </div>
-
-          {/* Enhanced CTA with Ripple Effect */}
-          <div className="flex items-center justify-between mt-auto pt-4 border-t border-slate-700/30 group-hover:border-slate-600/50 transition-all duration-500 flex-shrink-0">
-            <div className={`inline-flex items-center text-sm font-medium bg-gradient-to-r ${api.color} bg-clip-text text-transparent group-hover:text-white transition-all duration-500`}>
-              <span className="group-hover:animate-pulse">{api.ctaText}</span>
-              <svg className="ml-2 w-4 h-4 group-hover:translate-x-2 group-hover:scale-110 transition-all duration-500" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
-              </svg>
-            </div>
-            
-            <div className="flex items-center space-x-1">
-              <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse group-hover:bg-green-300 group-hover:scale-125 transition-all duration-300" />
-              <span className="text-xs text-green-400 font-medium group-hover:text-green-300 transition-colors duration-300">Live</span>
             </div>
           </div>
 
-          <div className="absolute inset-0 rounded-2xl bg-white/5 opacity-0 group-hover:opacity-100 scale-0 group-hover:scale-100 transition-all duration-700 pointer-events-none" />
+          {/* Enhanced CTA */}
+          <div className="relative flex items-center justify-between pt-5 border-t border-slate-700/30 group-hover:border-slate-600/50 transition-all duration-300 mt-auto z-10">
+            <div className="flex items-center gap-2">
+              <span className={`text-sm font-semibold bg-gradient-to-r ${api.color} bg-clip-text text-transparent group-hover:text-white transition-all duration-300`}>
+                {api.ctaText}
+              </span>
+              <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-white group-hover:translate-x-2 transition-all duration-300" />
+            </div>
+
+            <div className="flex items-center gap-2">
+              <div className="relative">
+                <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
+                <div className="absolute inset-0 w-2 h-2 bg-emerald-400 rounded-full animate-ping" />
+              </div>
+              <span className="text-xs text-emerald-400 font-semibold">Live</span>
+            </div>
+          </div>
+
+          {/* Hover overlay effect */}
+          <div className="absolute inset-0 rounded-3xl bg-gradient-to-t from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
         </div>
-      </Link>
-    </div>
-  );
+      </div>
+    );
+
+    // Decide whether to use Link (internal) or <a> (external)
+    if (!api.external) {
+      return (
+        <Link key={index} href={api.path}>
+          {cardContent}
+        </Link>
+      );
+    } else {
+      return (
+        <a
+          key={index}
+          href={api.path}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          {cardContent}
+        </a>
+      );
+    }
+  };
 
   return (
-    <section className="py-20 px-4 relative bg-black/95 backdrop-blur-lg" id="explore">
-      {/* Enhanced Space Effects Background */}
+    <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-black py-20 px-4 relative overflow-hidden">
+      {/* Enhanced background effects */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-10 left-20 w-96 h-96 bg-gradient-radial from-purple-500/10 via-purple-500/5 to-transparent rounded-full blur-3xl animate-pulse" 
-             style={{ animationDuration: '6s' }} />
-        <div className="absolute top-32 right-32 w-80 h-80 bg-gradient-radial from-blue-500/10 via-blue-500/5 to-transparent rounded-full blur-2xl animate-pulse" 
-             style={{ animationDuration: '8s', animationDelay: '2s' }} />
-        <div className="absolute bottom-20 left-1/2 transform -translate-x-1/2 w-64 h-32 bg-gradient-to-r from-transparent via-cyan-500/8 to-transparent rounded-full blur-xl animate-pulse" 
-             style={{ animationDuration: '10s', animationDelay: '4s' }} />
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-purple-500/20 rounded-full blur-[120px] animate-pulse" style={{ animationDuration: '8s' }} />
+        <div className="absolute top-1/3 right-1/4 w-96 h-96 bg-blue-500/20 rounded-full blur-[120px] animate-pulse" style={{ animationDuration: '10s', animationDelay: '2s' }} />
+        <div className="absolute bottom-0 left-1/2 w-96 h-96 bg-cyan-500/20 rounded-full blur-[120px] animate-pulse" style={{ animationDuration: '12s', animationDelay: '4s' }} />
         
-        <div className="cosmic-wave absolute top-0 left-0 w-full h-full bg-gradient-to-r from-transparent via-blue-400/8 to-transparent animate-wave-move" />
-        <div className="cosmic-wave-2 absolute top-0 left-0 w-full h-full bg-gradient-to-l from-transparent via-purple-400/6 to-transparent animate-wave-move-reverse" />
+        {/* Grid overlay */}
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:100px_100px]" />
       </div>
 
       <div className="container mx-auto max-w-7xl relative z-10">
-        {/* Main Header */}
-        <div className={`text-center mb-16 transition-all duration-1000 ease-out ${
-          isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-        }`}>
-          <h2 className={`text-4xl md:text-5xl font-bold text-white mb-6 bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text animate-float transition-all duration-1000 ease-out ${
-            isVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
-          }`} style={{ transitionDelay: '200ms' }}>
+        {/* Main header */}
+        <div className={`text-center mb-20 transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+          <div className="inline-block mb-4 px-6 py-2 bg-gradient-to-r from-blue-500/10 to-purple-500/10 border border-blue-500/20 rounded-full backdrop-blur-sm">
+            <span className="text-sm font-semibold text-blue-400">Powered by NASA APIs</span>
+          </div>
+          <h1 className="text-5xl md:text-7xl font-black text-transparent bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text mb-6 leading-tight">
             Explore the Universe
-          </h2>
-          <p className={`text-xl text-slate-300 max-w-2xl mx-auto transition-all duration-1000 ease-out ${
-            isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
-          }`} style={{ transitionDelay: '400ms' }}>
-            Access real-time space data, 3D models, and interactive sky maps
+          </h1>
+          <p className="text-xl text-slate-400 max-w-3xl mx-auto leading-relaxed">
+            Access real-time space data, immersive 3D models, and professional sky observation tools
           </p>
         </div>
 
         {/* NASA Data Section */}
-        <div className="mb-20">
-          <div className={`text-center mb-12 transition-all duration-1000 ease-out ${
-            isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-          }`} style={{ transitionDelay: '600ms' }}>
-            <h3 className="text-3xl md:text-4xl font-bold text-white mb-4 bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text">
+        <section className="mb-24">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl md:text-5xl font-bold text-transparent bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text mb-4">
               NASA Data Explorer
-            </h3>
-            <p className="text-lg text-slate-400 max-w-xl mx-auto">
-              Real-time access to NASA&apos;s comprehensive space data APIs
+            </h2>
+            <p className="text-lg text-slate-400 max-w-2xl mx-auto">
+              Real-time access to NASA's comprehensive space data APIs
             </p>
           </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
             {nasaApis.map((api, index) => renderCard(api, index, 0))}
           </div>
-        </div>
+        </section>
 
-        {/* 3D Interactive Views Section */}
-        <div className="mb-20">
-          <div className={`text-center mb-12 transition-all duration-1000 ease-out ${
-            isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-          }`} style={{ transitionDelay: '800ms' }}>
-            <h3 className="text-3xl md:text-4xl font-bold text-white mb-4 bg-gradient-to-r from-green-400 to-blue-500 bg-clip-text">
+        {/* 3D Interactive Views */}
+        <section className="mb-24">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl md:text-5xl font-bold text-transparent bg-gradient-to-r from-green-400 to-blue-500 bg-clip-text mb-4">
               3D Interactive Models
-            </h3>
-            <p className="text-lg text-slate-400 max-w-xl mx-auto">
+            </h2>
+            <p className="text-lg text-slate-400 max-w-2xl mx-auto">
               Immersive 3D experiences of celestial bodies
             </p>
           </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 justify-center">
-            {interactiveViews.map((api, index) => renderCard(api, index, 500))}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {interactiveViews.map((api, index) => renderCard(api, index, 10))}
           </div>
-        </div>
+        </section>
 
-        {/* Stellarium Section */}
-        <div>
-          <div className={`text-center mb-12 transition-all duration-1000 ease-out ${
-            isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-          }`} style={{ transitionDelay: '1000ms' }}>
-            <h3 className="text-3xl md:text-4xl font-bold text-white mb-4 bg-gradient-to-r from-indigo-400 to-purple-500 bg-clip-text">
+        {/* Sky Observation */}
+        <section className="mb-24">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl md:text-5xl font-bold text-transparent bg-gradient-to-r from-indigo-400 to-purple-500 bg-clip-text mb-4">
               Sky Observation
-            </h3>
-            <p className="text-lg text-slate-400 max-w-xl mx-auto">
-              Professional planetarium software for sky mapping and observation
+            </h2>
+            <p className="text-lg text-slate-400 max-w-2xl mx-auto">
+              Professional tools for mapping and observing the night sky
             </p>
           </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-1 gap-8 max-w-md mx-auto">
-            {stellariumSection.map((api, index) => renderCard(api, index, 800))}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+            {[...stellariumSection, ...skyChartsSection].map((api, index) => renderCard(api, index, 20))}
           </div>
-        </div>
+        </section>
+
+        {/* NASA Eyes Section */}
+        <section>
+          <div className="text-center mb-12">
+            <h2 className="text-4xl md:text-5xl font-bold text-transparent bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text mb-4">
+              NASA Eyes
+            </h2>
+            <p className="text-lg text-slate-400 max-w-2xl mx-auto">
+              Explore the universe through NASA's official interactive platform
+            </p>
+          </div>
+          <div className="grid grid-cols-1 gap-6 max-w-2xl mx-auto">
+            {nasaEyesSection.map((api, index) => renderCard(api, index, 25))}
+          </div>
+        </section>
       </div>
 
-      {/* Enhanced Custom CSS Animations */}
       <style jsx>{`
-        @keyframes wave-move {
-          0% { transform: translateX(-100%); }
-          100% { transform: translateX(100%); }
-        }
-
-        @keyframes wave-move-reverse {
-          0% { transform: translateX(100%); }
-          100% { transform: translateX(-100%); }
-        }
-
         @keyframes float {
-          0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(-10px); }
+          0%, 100% { transform: translateY(0) rotate(0deg); }
+          50% { transform: translateY(-20px) rotate(5deg); }
         }
 
-        .animate-wave-move {
-          animation: wave-move 20s linear infinite;
-        }
-
-        .animate-wave-move-reverse {
-          animation: wave-move-reverse 25s linear infinite;
-        }
-
-        .animate-float {
-          animation: float 6s ease-in-out infinite;
+        @keyframes slideIn {
+          from {
+            opacity: 0;
+            transform: translateX(-10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateX(0);
+          }
         }
       `}</style>
-    </section>
+    </div>
   );
 };
 
-export default Cards;
+export default EnhancedCards;

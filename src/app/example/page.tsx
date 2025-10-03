@@ -19,22 +19,33 @@ function Background({ url }: { url: string }) {
 }
 
 // Fixed Model (e.g. Sun)
-function FixedModel({ url, position, scale = [1, 1, 1], name, onFocus }) {
+interface FixedModelProps {
+  url: string;
+  position: [number, number, number];
+  scale?: [number, number, number];
+  name: string;
+  onFocus: (object: THREE.Object3D, name: string) => void;
+}
+
+function FixedModel({ url, position, scale = [1, 1, 1], name, onFocus }: FixedModelProps) {
   const gltf = useGLTF(url);
   const groupRef = useRef<THREE.Group>(null);
 
   useEffect(() => {
-    gltf.scene.traverse((child: any) => {
-      if (child.isMesh) {
-        child.geometry.center();
-        child.userData.clickable = true;
+    gltf.scene.traverse((child) => {
+      if ((child as THREE.Mesh).isMesh) {
+        const mesh = child as THREE.Mesh;
+        if (mesh.geometry) {
+          mesh.geometry.center();
+        }
+        mesh.userData.clickable = true;
 
         // Fix material rendering issues
-        if (child.material) {
-          child.material.needsUpdate = true;
+        if (mesh.material) {
+          mesh.material.needsUpdate = true;
           // Enable shadows if needed
-          child.castShadow = true;
-          child.receiveShadow = true;
+          mesh.castShadow = true;
+          mesh.receiveShadow = true;
         }
       }
     });
@@ -59,18 +70,29 @@ function FixedModel({ url, position, scale = [1, 1, 1], name, onFocus }) {
   );
 }
 
-function OrbitPath({ center, radius }: { center: THREE.Vector3; radius: number }) {
+interface OrbitPathProps {
+  center: THREE.Vector3;
+  radius: number;
+  pointOffsets?: THREE.Vector3[];
+}
+
+function OrbitPath({ center, radius, pointOffsets }: OrbitPathProps) {
   const points = useMemo(() => {
     const segments = 128;
-    const pts = [];
+    const pts: THREE.Vector3[] = [];
     for (let i = 0; i <= segments; i++) {
       const theta = (i / segments) * 2 * Math.PI;
       const x = center.x + radius * Math.cos(theta);
       const z = center.z + radius * Math.sin(theta);
-      pts.push(new THREE.Vector3(x, center.y, z));
+      const base = new THREE.Vector3(x, center.y, z);
+      // Add offset if exists
+      if (pointOffsets && pointOffsets[i]) {
+        base.add(pointOffsets[i]);
+      }
+      pts.push(base);
     }
     return pts;
-  }, [center, radius]);
+  }, [center, radius, pointOffsets]);
 
   const geometry = useMemo(
     () => new THREE.BufferGeometry().setFromPoints(points),
@@ -84,6 +106,16 @@ function OrbitPath({ center, radius }: { center: THREE.Vector3; radius: number }
   );
 }
 
+interface RevolvingModelProps {
+  url: string;
+  center: THREE.Vector3;
+  radius: number;
+  speed: number;
+  scale?: [number, number, number];
+  name: string;
+  onFocus: (object: THREE.Object3D, name: string) => void;
+}
+
 function RevolvingModel({
   url,
   center,
@@ -92,7 +124,7 @@ function RevolvingModel({
   scale = [1, 1, 1],
   name,
   onFocus,
-}) {
+}: RevolvingModelProps) {
   const gltf = useGLTF(url);
   const groupRef = useRef<THREE.Group>(null);
   const angle = useRef(0);
@@ -111,20 +143,22 @@ function RevolvingModel({
 
   useEffect(() => {
     // Make all meshes in the model clickable and fix rendering
-    gltf.scene.traverse((child: any) => {
-      if (child.isMesh) {
-        child.userData.clickable = true;
+    gltf.scene.traverse((child) => {
+      if ((child as THREE.Mesh).isMesh) {
+        const mesh = child as THREE.Mesh;
+        mesh.userData.clickable = true;
 
         // Fix material rendering issues
-        if (child.material) {
-          child.material.needsUpdate = true;
+        if (mesh.material) {
+          mesh.material.needsUpdate = true;
           // Enable shadows if needed
-          child.castShadow = true;
-          child.receiveShadow = true;
+          mesh.castShadow = true;
+          mesh.receiveShadow = true;
 
           // Fix common texture/material issues
-          if (child.material.map) {
-            child.material.map.needsUpdate = true;
+          const material = mesh.material as THREE.MeshStandardMaterial;
+          if (material.map) {
+            material.map.needsUpdate = true;
           }
         }
       }
@@ -150,7 +184,11 @@ function RevolvingModel({
 }
 
 // Dynamic OrbitControls that follows the focused planet
-function Controls({ focusedObject }) {
+interface ControlsProps {
+  focusedObject: THREE.Object3D | null;
+}
+
+function Controls({ focusedObject }: ControlsProps) {
   const controls = useRef<any>();
   const { camera } = useThree();
   const isUserInteracting = useRef(false);
@@ -242,12 +280,13 @@ function Controls({ focusedObject }) {
       isUserInteracting.current = false;
     };
 
-    controls.current.addEventListener("start", handleStart);
-    controls.current.addEventListener("end", handleEnd);
+    const currentControls = controls.current;
+    currentControls.addEventListener("start", handleStart);
+    currentControls.addEventListener("end", handleEnd);
 
     return () => {
-      controls.current?.removeEventListener("start", handleStart);
-      controls.current?.removeEventListener("end", handleEnd);
+      currentControls?.removeEventListener("start", handleStart);
+      currentControls?.removeEventListener("end", handleEnd);
     };
   }, []);
 
@@ -287,7 +326,7 @@ export default function RevolveRotateFocus() {
         <directionalLight position={[10, 10, 5]} intensity={1.5} castShadow />
         <directionalLight position={[-10, -10, -5]} intensity={0.5} />
         <hemisphereLight
-          skyColor={new THREE.Color(0xffffff)}
+          color={new THREE.Color(0xffffff)}
           groundColor={new THREE.Color(0x444444)}
           intensity={0.6}
         />
@@ -300,7 +339,7 @@ export default function RevolveRotateFocus() {
           <FixedModel
             url="/SampleData/PlanetModels/the_sun.glb"
             position={[0, 0, 0]}
-            scale={[10, 10, 10]}
+            scale={[50, 50, 50]}
             name="Sun"
             onFocus={handleFocus}
           />
@@ -309,7 +348,7 @@ export default function RevolveRotateFocus() {
           <RevolvingModel
             url="/SampleData/PlanetModels/mercury.glb"
             center={fixedPosition}
-            radius={50}
+            radius={70}
             speed={0}
             scale={[2, 2, 2]}
             name="Mercury"
@@ -320,17 +359,127 @@ export default function RevolveRotateFocus() {
           <RevolvingModel
             url="/SampleData/PlanetModels/venus.glb"
             center={fixedPosition}
-            radius={90}
+            radius={100}
             speed={0}
-            scale={[3, 3, 3]}
+            scale={[2.5, 2.5, 2.5]}
             name="Venus"
             onFocus={handleFocus}
           />
 
-        
+          {/* Earth */}
+          <RevolvingModel
+            url="/SampleData/PlanetModels/earth (2).glb"
+            center={fixedPosition}
+            radius={150}
+            speed={0}
+            scale={[3, 3, 3]}
+            name="Earth"
+            onFocus={handleFocus}
+          />
+
+          {/* Mars */}
+          <RevolvingModel
+            url="/SampleData/PlanetModels/mars.glb"
+            center={fixedPosition}
+            radius={180}
+            speed={0}
+            scale={[2, 2, 2]}
+            name="Mars"
+            onFocus={handleFocus}
+          />
+
+          {/* Jupiter */}
+          <RevolvingModel
+            url="/SampleData/PlanetModels/jupiter.glb"
+            center={fixedPosition}
+            radius={260}
+            speed={0}
+            scale={[10, 10, 10]}
+            name="Jupiter"
+            onFocus={handleFocus}
+          />
+
+          {/* Saturn */}
+          <RevolvingModel
+            url="/SampleData/PlanetModels/saturn.glb"
+            center={fixedPosition}
+            radius={380}
+            speed={0}
+            scale={[8, 8, 8]}
+            name="Saturn"
+            onFocus={handleFocus}
+          />
+
+          {/*Neptune*/}
+          <RevolvingModel
+            url="/SampleData/PlanetModels/uranus.glb"
+            center={fixedPosition}
+            radius={500}
+            speed={0}
+            scale={[0.01, 0.01, 0.01]}
+            name="Neptune"
+            onFocus={handleFocus}
+          />
+
+          {/*Neptune*/}
+          <RevolvingModel
+            url="/SampleData/PlanetModels/neptune.glb"
+            center={fixedPosition}
+            radius={600}
+            speed={0}
+            scale={[0.3, 0.3, 0.3]}
+            name="Neptune"
+            onFocus={handleFocus}
+          />
+
           {/* Orbits */}
-          <OrbitPath center={fixedPosition} radius={50} />
-          <OrbitPath center={fixedPosition} radius={90} />
+          <OrbitPath
+            center={fixedPosition}
+            radius={73}
+            pointOffsets={Array(129).fill(new THREE.Vector3(-0.5, 1.5, 0))}
+          />
+
+          <OrbitPath
+            center={fixedPosition}
+            radius={103}
+            pointOffsets={Array(129).fill(new THREE.Vector3(0, 2, 0))}
+          />
+
+          <OrbitPath
+            center={fixedPosition}
+            radius={153}
+            pointOffsets={Array(129).fill(new THREE.Vector3(1, 2.5, 0))}
+          />
+
+          <OrbitPath
+            center={fixedPosition}
+            radius={183}
+            pointOffsets={Array(129).fill(new THREE.Vector3(-3, 2.5, 0))}
+          />
+
+          <OrbitPath
+            center={fixedPosition}
+            radius={280}
+            pointOffsets={Array(129).fill(new THREE.Vector3(-9, 8, 0))}
+          />
+
+          <OrbitPath
+            center={fixedPosition}
+            radius={380}
+            pointOffsets={Array(129).fill(new THREE.Vector3(0, 0, 0))}
+          />
+
+          <OrbitPath
+            center={fixedPosition}
+            radius={500}
+            pointOffsets={Array(129).fill(new THREE.Vector3(0.5, 0.2, 0))}
+          />
+
+          <OrbitPath
+            center={fixedPosition}
+            radius={600}
+            pointOffsets={Array(129).fill(new THREE.Vector3(0, 0, 0))}
+          />
 
           <Controls focusedObject={focusedObject} />
         </Suspense>
