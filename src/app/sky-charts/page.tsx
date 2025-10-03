@@ -1,14 +1,10 @@
+"use client"
 import Link from 'next/link';
 import { motion } from 'framer-motion';
+import { ArrowLeftIcon, HomeIcon } from '@heroicons/react/24/outline';
 
 import SkyMapsDownloader from '@/components/SkyMaps/SkyMapsDownloader';
-import { Metadata } from 'next';
 
-export const metadata: Metadata = {
-  title: 'Sky Maps & Star Charts | Monthly Downloads',
-  description: 'Download monthly sky maps and star charts for Northern, Equatorial, and Southern hemispheres. Updated monthly with the latest astronomical data.',
-  keywords: ['sky maps', 'star charts', 'astronomy', 'constellation maps', 'sky charts'],
-};
 
 export default function SkyMapsPage() {
   return (
