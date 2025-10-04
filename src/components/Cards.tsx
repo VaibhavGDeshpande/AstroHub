@@ -1,4 +1,3 @@
-// EnhancedCards.tsx (or .jsx/.tsx depending on your setup)
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { 
@@ -10,7 +9,10 @@ import {
   Globe, 
   Eye,
   ArrowRight,
-  Sparkles
+  Sparkles,
+  Newspaper,
+  Zap,
+  Radio
 } from 'lucide-react';
 
 interface CardAPI {
@@ -88,6 +90,16 @@ const EnhancedCards = () => {
 
   const interactiveViews = [
     {
+      title: 'Solar System Explorer',
+      description: 'Navigate through our solar system with all planets, moons, and celestial bodies in real-time 3D visualization.',
+      icon: Sparkles,
+      color: 'from-orange-500 via-yellow-500 to-purple-500',
+      path: '/solar-system',
+      features: ['All 8 planets', 'Orbital mechanics', 'Interactive navigation', 'Scale accuracy'],
+      glow: 'orange',
+      ctaText: 'Explore System'
+    },
+    {
       title: '3D View of Earth',
       description: 'Experience our planet in stunning 3D with interactive controls, atmospheric effects, and real-time lighting.',
       icon: Globe,
@@ -142,6 +154,19 @@ const EnhancedCards = () => {
       features: ['Monthly updates', 'Printable charts', 'Constellation guides'],
       glow: 'yellow',
       ctaText: 'View Charts'
+    }
+  ];
+
+  const newsSection = [
+    {
+      title: 'Space News & Updates',
+      description: 'Stay informed with the latest space exploration news, mission updates, and scientific discoveries from around the world.',
+      icon: Newspaper,
+      color: 'from-emerald-500 to-teal-500',
+      path: '/news',
+      features: ['Latest articles', 'Mission updates', 'Scientific discoveries', 'Breaking news'],
+      glow: 'emerald',
+      ctaText: 'Read News'
     }
   ];
 
@@ -291,33 +316,52 @@ const EnhancedCards = () => {
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-0 left-1/4 w-96 h-96 bg-purple-500/20 rounded-full blur-[120px] animate-pulse" style={{ animationDuration: '8s' }} />
         <div className="absolute top-1/3 right-1/4 w-96 h-96 bg-blue-500/20 rounded-full blur-[120px] animate-pulse" style={{ animationDuration: '10s', animationDelay: '2s' }} />
+        <div className="absolute bottom-1/4 left-1/3 w-96 h-96 bg-emerald-500/20 rounded-full blur-[120px] animate-pulse" style={{ animationDuration: '9s', animationDelay: '1s' }} />
         <div className="absolute bottom-0 left-1/2 w-96 h-96 bg-cyan-500/20 rounded-full blur-[120px] animate-pulse" style={{ animationDuration: '12s', animationDelay: '4s' }} />
         
         {/* Grid overlay */}
         <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:100px_100px]" />
+        
+        {/* Radial gradient overlay for depth */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,rgba(0,0,0,0.4)_100%)]" />
       </div>
 
       <div className="container mx-auto max-w-7xl relative z-10">
         {/* Main header */}
-        <div className={`text-center mb-20 transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-          <div className="inline-block mb-4 px-6 py-2 bg-gradient-to-r from-blue-500/10 to-purple-500/10 border border-blue-500/20 rounded-full backdrop-blur-sm">
+        <div className={`text-center mb-24 transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+          <div className="inline-flex items-center gap-2 mb-6 px-6 py-3 bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-pink-500/10 border border-blue-500/20 rounded-full backdrop-blur-sm">
+            <Zap className="w-4 h-4 text-blue-400 animate-pulse" />
             <span className="text-sm font-semibold text-blue-400">Powered by NASA APIs</span>
+            <Radio className="w-4 h-4 text-purple-400 animate-pulse" />
           </div>
-          <h1 className="text-5xl md:text-7xl font-black text-transparent bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text mb-6 leading-tight">
+          <h1 className="text-6xl md:text-8xl font-black text-transparent bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text mb-8 leading-tight tracking-tight">
             Explore the Universe
           </h1>
-          <p className="text-xl text-slate-400 max-w-3xl mx-auto leading-relaxed">
+          <p className="text-xl md:text-2xl text-slate-400 max-w-3xl mx-auto leading-relaxed font-light">
             Access real-time space data, immersive 3D models, and professional sky observation tools
           </p>
+          
+          {/* Decorative line */}
+          <div className="flex items-center justify-center gap-3 mt-8">
+            <div className="w-20 h-px bg-gradient-to-r from-transparent via-blue-500 to-transparent"></div>
+            <Star className="w-4 h-4 text-blue-400 animate-pulse" />
+            <div className="w-20 h-px bg-gradient-to-r from-transparent via-purple-500 to-transparent"></div>
+          </div>
         </div>
 
         {/* NASA Data Section */}
-        <section className="mb-24">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl md:text-5xl font-bold text-transparent bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text mb-4">
-              NASA Data Explorer
+        <section className="mb-28">
+          <div className="text-center mb-16">
+            <div className="inline-block mb-4">
+              <div className="flex items-center gap-2 px-4 py-2 bg-blue-500/10 border border-blue-500/20 rounded-full">
+                <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></div>
+                <span className="text-xs font-semibold text-blue-400 uppercase tracking-wider">NASA Data</span>
+              </div>
+            </div>
+            <h2 className="text-5xl md:text-6xl font-black text-transparent bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text mb-5 tracking-tight">
+              Data Explorer
             </h2>
-            <p className="text-lg text-slate-400 max-w-2xl mx-auto">
+            <p className="text-lg text-slate-400 max-w-2xl mx-auto font-light">
               Real-time access to NASA&apos;s comprehensive space data APIs
             </p>
           </div>
@@ -327,12 +371,18 @@ const EnhancedCards = () => {
         </section>
 
         {/* 3D Interactive Views */}
-        <section className="mb-24">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl md:text-5xl font-bold text-transparent bg-gradient-to-r from-green-400 to-blue-500 bg-clip-text mb-4">
-              3D Interactive Models
+        <section className="mb-28">
+          <div className="text-center mb-16">
+            <div className="inline-block mb-4">
+              <div className="flex items-center gap-2 px-4 py-2 bg-green-500/10 border border-green-500/20 rounded-full">
+                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                <span className="text-xs font-semibold text-green-400 uppercase tracking-wider">Interactive</span>
+              </div>
+            </div>
+            <h2 className="text-5xl md:text-6xl font-black text-transparent bg-gradient-to-r from-green-400 to-blue-500 bg-clip-text mb-5 tracking-tight">
+              3D Models
             </h2>
-            <p className="text-lg text-slate-400 max-w-2xl mx-auto">
+            <p className="text-lg text-slate-400 max-w-2xl mx-auto font-light">
               Immersive 3D experiences of celestial bodies
             </p>
           </div>
@@ -342,31 +392,64 @@ const EnhancedCards = () => {
         </section>
 
         {/* Sky Observation */}
-        <section className="mb-24">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl md:text-5xl font-bold text-transparent bg-gradient-to-r from-indigo-400 to-purple-500 bg-clip-text mb-4">
-              Sky Observation
+        <section className="mb-28">
+          <div className="text-center mb-16">
+            <div className="inline-block mb-4">
+              <div className="flex items-center gap-2 px-4 py-2 bg-indigo-500/10 border border-indigo-500/20 rounded-full">
+                <div className="w-2 h-2 bg-indigo-400 rounded-full animate-pulse"></div>
+                <span className="text-xs font-semibold text-indigo-400 uppercase tracking-wider">Observation</span>
+              </div>
+            </div>
+            <h2 className="text-5xl md:text-6xl font-black text-transparent bg-gradient-to-r from-indigo-400 to-purple-500 bg-clip-text mb-5 tracking-tight">
+              Sky Tools
             </h2>
-            <p className="text-lg text-slate-400 max-w-2xl mx-auto">
+            <p className="text-lg text-slate-400 max-w-2xl mx-auto font-light">
               Professional tools for mapping and observing the night sky
             </p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {[...stellariumSection, ...skyChartsSection].map((api, index) => renderCard(api, index, 20))}
+          </div>
+        </section>
+
+        {/* News Section */}
+        <section className="mb-28">
+          <div className="text-center mb-16">
+            <div className="inline-block mb-4">
+              <div className="flex items-center gap-2 px-4 py-2 bg-emerald-500/10 border border-emerald-500/20 rounded-full">
+                <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
+                <span className="text-xs font-semibold text-emerald-400 uppercase tracking-wider">Live Updates</span>
+              </div>
+            </div>
+            <h2 className="text-5xl md:text-6xl font-black text-transparent bg-gradient-to-r from-emerald-400 to-teal-500 bg-clip-text mb-5 tracking-tight">
+              Space News
+            </h2>
+            <p className="text-lg text-slate-400 max-w-2xl mx-auto font-light">
+              Latest updates from space exploration and scientific discoveries
+            </p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {newsSection.map((api, index) => renderCard(api, index, 23))}
           </div>
         </section>
 
         {/* NASA Eyes Section */}
         <section>
-          <div className="text-center mb-12">
-            <h2 className="text-4xl md:text-5xl font-bold text-transparent bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text mb-4">
+          <div className="text-center mb-16">
+            <div className="inline-block mb-4">
+              <div className="flex items-center gap-2 px-4 py-2 bg-cyan-500/10 border border-cyan-500/20 rounded-full">
+                <div className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse"></div>
+                <span className="text-xs font-semibold text-cyan-400 uppercase tracking-wider">Official Platform</span>
+              </div>
+            </div>
+            <h2 className="text-5xl md:text-6xl font-black text-transparent bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text mb-5 tracking-tight">
               NASA Eyes
             </h2>
-            <p className="text-lg text-slate-400 max-w-2xl mx-auto">
+            <p className="text-lg text-slate-400 max-w-2xl mx-auto font-light">
               Explore the universe through NASA&apos;s official interactive platform
             </p>
           </div>
-          <div className="grid grid-cols-1 gap-6 max-w-2xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {nasaEyesSection.map((api, index) => renderCard(api, index, 25))}
           </div>
         </section>
