@@ -19,7 +19,7 @@ const HeroSection = () => {
   const [isVisible, setIsVisible] = useState(false);
   const [videoStopped, setVideoStopped] = useState(false);
   const [videoPlayed, setVideoPlayed] = useState(false);
-  const [requiresInteraction, setRequiresInteraction] = useState(false);
+  const [, setRequiresInteraction] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
@@ -28,7 +28,7 @@ const HeroSection = () => {
 
       // Set video properties
       video.currentTime = 0;
-      video.playbackRate = 3;
+      video.playbackRate = 4.5;
 
       // Handle video ended event
       const handleVideoEnded = () => {
@@ -70,17 +70,6 @@ const HeroSection = () => {
     }
   }, [videoPlayed]);
 
-  // Manual play handler for user interaction fallback
-  const handleManualPlay = async () => {
-    if (videoRef.current) {
-      try {
-        await videoRef.current.play();
-        setRequiresInteraction(false);
-      } catch (err) {
-        console.error('Manual play failed:', err);
-      }
-    }
-  };
 
   return (
     <section className="relative min-h-screen flex items-center overflow-hidden pt-16">
@@ -184,18 +173,6 @@ const HeroSection = () => {
                 Mars Rovers
               </span>
             </div>
-
-            {/* Manual Play Fallback */}
-            {requiresInteraction && (
-              <div className="mt-6 ml-4">
-                <button
-                  onClick={handleManualPlay}
-                  className="px-5 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
-                >
-                  ▶️ Play Video
-                </button>
-              </div>
-            )}
           </div>
         </div>
       </div>
