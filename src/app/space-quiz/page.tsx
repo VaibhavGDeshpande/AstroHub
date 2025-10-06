@@ -12,11 +12,12 @@ type Tag = 'space' | 'space_exploration' | 'astronomy' | 'astrophysics';
 
 const allTags: Tag[] = ['space', 'space_exploration', 'astronomy', 'astrophysics'];
 const difficulties = ['easy', 'medium', 'hard'] as const;
+type Difficulty = typeof difficulties[number];
 
 export default function QuizSelectionPage() {
   const router = useRouter();
   const [limit, setLimit] = useState(10);
-  const [difficulty, setDifficulty] = useState<'easy' | 'medium' | 'hard'>('hard');
+  const [difficulty, setDifficulty] = useState<Difficulty>('hard');
   const [tags, setTags] = useState<Tag[]>(['space']);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -107,7 +108,7 @@ export default function QuizSelectionPage() {
               </label>
               <select
                 value={difficulty}
-                onChange={(e) => setDifficulty(e.target.value as any)}
+                onChange={(e) => setDifficulty(e.target.value as Difficulty)}
                 className="w-full px-4 py-2 rounded-lg bg-slate-900/50 border border-slate-600/40 text-sm text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20 outline-none transition-all"
               >
                 {difficulties.map((d) => (

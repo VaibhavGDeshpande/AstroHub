@@ -9,7 +9,7 @@ import {
   SearchFilters,
   NivlSearchResponse
 } from '@/types/nivl';
-import { searchNasaMedia, getNasaAssets, createSearchParams } from '../../api_service/example';
+import { searchNasaMedia, getNasaAssets, createSearchParams } from '../../api_service/NIVL';
 import Filter from '@/components/NIVL/SearchFilter';
 import MediaGrid from '@/components/NIVL/MediaGrid';
 import MediaViewer from '@/components/NIVL/MediaViewer';

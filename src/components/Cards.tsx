@@ -12,7 +12,8 @@ import {
   Sparkles,
   Newspaper,
   Zap,
-  Radio
+  Radio,
+  Book
 } from 'lucide-react';
 
 interface CardAPI {
@@ -163,8 +164,18 @@ const EnhancedCards = () => {
       description: 'Stay informed with the latest space exploration news, mission updates, and scientific discoveries from around the world.',
       icon: Newspaper,
       color: 'from-emerald-500 to-teal-500',
-      path: '/news',
+      path: '/space-news',
       features: ['Latest articles', 'Mission updates', 'Scientific discoveries', 'Breaking news'],
+      glow: 'emerald',
+      ctaText: 'Read News'
+    },
+    {
+      title: 'Space Quiz',
+      description: 'Test your brain in the field of space, space-exploration, astronomy and astrophysics.',
+      icon: Book,
+      color: 'from-emerald-500 to-teal-500',
+      path: '/space-quiz',
+      features: ['Quiz', 'MCQ&apos;s', 'Test knowledge', '100+ questions'],
       glow: 'emerald',
       ctaText: 'Read News'
     }
@@ -422,10 +433,10 @@ const EnhancedCards = () => {
               </div>
             </div>
             <h2 className="text-5xl md:text-6xl font-black text-transparent bg-gradient-to-r from-emerald-400 to-teal-500 bg-clip-text mb-5 tracking-tight">
-              Space News
+              Space News and Space Quiz
             </h2>
             <p className="text-lg text-slate-400 max-w-2xl mx-auto font-light">
-              Latest updates from space exploration and scientific discoveries
+              Latest updates from space exploration and Test you knowledge of Universe
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

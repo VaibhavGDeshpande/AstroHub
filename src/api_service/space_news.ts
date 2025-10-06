@@ -3,6 +3,16 @@ export interface Author {
   socials: Record<string, string | null>;
 }
 
+export interface Launch {
+  launch_id: string;
+  provider: string;
+}
+
+export interface Event {
+  event_id: number;
+  provider: string;
+}
+
 export interface Article {
   id: number;
   title: string;
@@ -14,8 +24,8 @@ export interface Article {
   published_at: string;
   updated_at: string;
   featured: boolean;
-  launches: any[];
-  events: any[];
+  launches: Launch[];
+  events: Event[];
 }
 
 export interface ArticlesResponse {

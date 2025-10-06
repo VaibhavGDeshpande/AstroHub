@@ -2,14 +2,25 @@
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { ArrowLeftIcon, HomeIcon } from '@heroicons/react/24/outline';
+import dynamic from 'next/dynamic';
 
-import SkyMapsDownloader from '@/components/SkyMaps/SkyMapsDownloader';
-
+// Dynamically import SkyMapsDownloader with SSR disabled
+const SkyMapsDownloader = dynamic(
+  () => import('@/components/SkyMaps/SkyMapsDownloader'),
+  { 
+    ssr: false,
+    loading: () => (
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <div className="text-white text-xl">Loading Sky Maps...</div>
+      </div>
+    )
+  }
+);
 
 export default function SkyMapsPage() {
   return (
     <>
-    <div className="fixed top-4 left-4 z-50">
+      <div className="fixed top-4 left-4 z-50">
         <motion.div
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
@@ -25,7 +36,7 @@ export default function SkyMapsPage() {
           </Link>
         </motion.div>
       </div>
-        <SkyMapsDownloader />
+      <SkyMapsDownloader />
     </>
   )
 }

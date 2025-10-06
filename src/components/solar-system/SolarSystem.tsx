@@ -4,6 +4,7 @@ import React, { Suspense, useMemo, useRef, useState, useEffect } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls, useGLTF } from "@react-three/drei";
 import * as THREE from "three";
+import { OrbitControls as OrbitControlsImpl } from "three-stdlib";
 
 // Background component
 function Background({ url }: { url: string }) {
@@ -204,15 +205,8 @@ interface ControlsProps {
   focusedObject: THREE.Object3D | null;
 }
 
-interface OrbitControlsInstance {
-  target: THREE.Vector3;
-  update: () => void;
-  addEventListener: (event: string, handler: () => void) => void;
-  removeEventListener: (event: string, handler: () => void) => void;
-}
-
 function Controls({ focusedObject }: ControlsProps) {
-  const controls = useRef<OrbitControlsInstance | null>(null);
+  const controls = useRef<OrbitControlsImpl>(null);
   const { camera } = useThree();
   const isUserInteracting = useRef(false);
 
@@ -320,7 +314,7 @@ function Controls({ focusedObject }: ControlsProps) {
 
   return (
     <OrbitControls
-      ref={controls as React.RefObject<any>}
+      ref={controls}
       enablePan={true}
       enableZoom={true}
       enableDamping={true}
