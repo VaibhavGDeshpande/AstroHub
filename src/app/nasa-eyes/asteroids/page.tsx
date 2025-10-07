@@ -1,13 +1,13 @@
 'use client';
 
 import React, { useEffect } from 'react';
-import SolarSystemEmbed from '@/components/Nasa-eyes/Solar System/SolarSystem';
+import AsteroidsEmbed from '@/components/Nasa-eyes/Asteroids/Asteroids';
 import LoaderWrapper from '@/components/Loader';
 import { toast } from 'react-toastify';
 import ToastProvider from '@/components/Toast';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { ArrowLeftIcon } from '@heroicons/react/24/outline';
+import { ArrowLeftIcon, HomeIcon } from '@heroicons/react/24/outline';
 
 export default function SolarSystemPage() {
   useEffect(() => {
@@ -36,11 +36,12 @@ export default function SolarSystemPage() {
               className="flex items-center gap-2 px-3 py-2 rounded-lg bg-slate-800/50 hover:bg-slate-700/50 border border-slate-600/40 backdrop-blur-sm transition duration-300"
             >
               <ArrowLeftIcon className="h-4 w-4" />
+              <HomeIcon className="h-4 w-4 hidden sm:block" />
               <span className="text-sm">Back</span>
             </Link>
           </motion.div> 
         </div>
-        <SolarSystemEmbed 
+        <AsteroidsEmbed 
           embedOptions={{
             logo: false,
             menu: false,
