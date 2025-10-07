@@ -1,13 +1,13 @@
 'use client';
 
 import React, { useEffect } from 'react';
-import SolarSystemEmbed from '@/components/Nasa-eyes/Solar System/SolarSystem';
+import ExoplanetEmbed from '@/components/Nasa-eyes/Exoplanets/Exoplanets';
 import LoaderWrapper from '@/components/Loader';
 import { toast } from 'react-toastify';
 import ToastProvider from '@/components/Toast';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { ArrowLeftIcon } from '@heroicons/react/24/outline';
+import { ArrowLeftIcon} from '@heroicons/react/24/outline';
 
 export default function SolarSystemPage() {
   useEffect(() => {
@@ -40,7 +40,7 @@ export default function SolarSystemPage() {
             </Link>
           </motion.div> 
         </div>
-        <SolarSystemEmbed 
+        <ExoplanetEmbed 
           embedOptions={{
             logo: false,
             menu: false,

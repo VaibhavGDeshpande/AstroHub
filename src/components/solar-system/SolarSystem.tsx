@@ -390,7 +390,7 @@ export default function RevolveRotateFocus() {
 
           {/* Earth */}
           <RevolvingModel
-            url="/SampleData/PlanetModels/earth (2).glb"
+            url="/SampleData/PlanetModels/earth.glb"  
             center={fixedPosition}
             radius={150}
             speed={0}

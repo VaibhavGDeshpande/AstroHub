@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect } from 'react';
-import SolarSystemEmbed from '@/components/Nasa-eyes/Solar System/SolarSystem';
+import EarthEmbed from '@/components/Nasa-eyes/Earth/Earth';
 import LoaderWrapper from '@/components/Loader';
 import { toast } from 'react-toastify';
 import ToastProvider from '@/components/Toast';
@@ -40,7 +40,7 @@ export default function SolarSystemPage() {
             </Link>
           </motion.div> 
         </div>
-        <SolarSystemEmbed 
+        <EarthEmbed 
           embedOptions={{
             logo: false,
             menu: false,

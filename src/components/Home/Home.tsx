@@ -8,6 +8,7 @@ import FactsSection from '../Facts/FactsSection';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Maximize2 } from 'lucide-react';
+import Footer from './Footer';
 
 export default function Home() {
   useEffect(() => {
@@ -52,7 +53,7 @@ export default function Home() {
         autoClose: 1000,
         hideProgressBar: true,
         closeOnClick: false,
-        pauseOnHover: false, // Disable pause on hover to prevent movement
+        pauseOnHover: false,
         closeButton: true,
         theme: "dark",
         className: "!bg-slate-800/95 !border !border-blue-500/20 !backdrop-blur-md",
@@ -65,8 +66,28 @@ export default function Home() {
 
   return (
     <>
-      {/* Custom CSS to fix toast positioning */}
+      {/* Custom CSS to hide scrollbar and fix toast positioning */}
       <style jsx global>{`
+        /* Hide scrollbar for Chrome, Safari and Opera */
+        html::-webkit-scrollbar,
+        body::-webkit-scrollbar {
+          display: none;
+        }
+        
+        /* Hide scrollbar for IE, Edge and Firefox */
+        html,
+        body {
+          -ms-overflow-style: none;  /* IE and Edge */
+          scrollbar-width: none;  /* Firefox */
+        }
+        
+        /* Ensure scrolling still works */
+        html,
+        body {
+          overflow-y: auto;
+          overflow-x: hidden;
+        }
+        
         /* Fix toast container positioning and prevent movement on hover */
         .Toastify__toast-container {
           position: fixed !important;
@@ -121,6 +142,7 @@ export default function Home() {
         <HeroSection />
         <FactsSection/>
         <Cards />
+        <Footer/>
         
         {/* Toast Container for react-toastify */}
         <ToastContainer
