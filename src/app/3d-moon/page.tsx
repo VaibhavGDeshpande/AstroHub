@@ -7,9 +7,11 @@ import {
   ArrowLeftIcon,
   HomeIcon 
 } from '@heroicons/react/24/outline';
+import LoaderWrapper from '@/components/Loader';
 
 export default function MoonPage() {
   return (
+    <LoaderWrapper>
     <div className="fixed inset-0 w-screen h-screen bg-black text-white overflow-hidden">
       {/* Cosmic Background Gradients */}
       <div className="absolute inset-0 -z-10">
@@ -77,5 +79,6 @@ export default function MoonPage() {
         }
       `}</style>
     </div>
+    </LoaderWrapper>
   );
 }

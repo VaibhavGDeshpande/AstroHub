@@ -116,12 +116,12 @@ const Footer = () => {
           {/* Brand Section - Takes 3 columns */}
           <div className="lg:col-span-3 space-y-6">
             {/*eslint-disable-next-line @next/next/no-html-link-for-pages*/}
-            <a href="/" className="inline-block hover:scale-105 transition-transform duration-300">
+            <a href="#" className="inline-block hover:scale-105 transition-transform duration-300">
               <img
                 src="/assets/AstroHub.png"
                 alt="AstroHub Logo"
                 width={140}
-                height={40}
+                height={50}
                 className="transition-all duration-300"
               />
             </a>
@@ -253,9 +253,6 @@ const Footer = () => {
         <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0 text-center md:text-left">
           <div className="text-gray-400 text-sm">
             © {currentYear} AstroHub. All rights reserved.
-          </div>
-          <div className="text-gray-500 text-xs">
-            Powered by NASA APIs and astronomical databases
           </div>
         </div>
       </div>
