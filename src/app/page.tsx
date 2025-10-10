@@ -13,10 +13,10 @@ export default function HomePage() {
     <>
       <PageLoader>
         <ScreenSizeWarningModal />
-      <LenisProvider>
-        <Home />
-      </LenisProvider>
-    </PageLoader>
+        <LenisProvider>
+          <Home />
+        </LenisProvider>
+      </PageLoader>
     </>
   )
 }

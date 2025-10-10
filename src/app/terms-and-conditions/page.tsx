@@ -7,6 +7,7 @@ import { motion } from "framer-motion";
 import { ArrowLeftIcon, HomeIcon } from "@heroicons/react/24/outline";
 
 export default function TermsConditionsPage() {
+
   return (
     <LoaderWrapper>
     <div className="min-h-screen bg-gradient-to-b from-black via-blue-950/20 to-black pt-24 pb-16">
@@ -46,7 +47,7 @@ export default function TermsConditionsPage() {
           <section>
             <h2 className="text-2xl font-bold text-cyan-400 mb-4">1. Agreement to Terms</h2>
             <p className="leading-relaxed">
-              Welcome to AstroHub. By accessing or using our website, tools, and services (collectively, the &quot;Services&qout;), you agree to be bound by these Terms and Conditions (&quot;Terms&quot;). If you disagree with any part of these Terms, you may not access our Services.
+              Welcome to AstroHub. By accessing or using our website, tools, and services (collectively, the &quot;Services&quot;), you agree to be bound by these Terms and Conditions (&quot;Terms&quot;). If you disagree with any part of these Terms, you may not access our Services.
             </p>
           </section>
 

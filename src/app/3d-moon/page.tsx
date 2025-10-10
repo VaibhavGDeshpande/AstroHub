@@ -10,7 +10,7 @@ import {
 
 export default function MoonPage() {
   return (
-    <div className="min-h-screen bg-black text-white relative overflow-hidden">
+    <div className="fixed inset-0 w-screen h-screen bg-black text-white overflow-hidden">
       {/* Cosmic Background Gradients */}
       <div className="absolute inset-0 -z-10">
         <div className="absolute top-10 left-20 w-80 h-80 bg-purple-500/20 blur-[120px]" />
@@ -21,7 +21,7 @@ export default function MoonPage() {
       </div>
 
       {/* Fixed Back Button */}
-      <div className="fixed top-4 left-4 z-50">
+      <div className="fixed top-4 left-4 z-50 pt-10">
         <motion.div
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
@@ -38,54 +38,25 @@ export default function MoonPage() {
         </motion.div>
       </div>
 
-      {/* Header */}
+      {/* Fullscreen Moon Viewer Container */}
       <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8 }}
-        className="text-center pb-1 mt-4"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.3, duration: 0.8 }}
+        className="absolute inset-0 w-full h-full"
       >
-        <motion.h1
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.2, duration: 0.6 }}
-          className="text-4xl sm:text-5xl lg:text-6xl font-bold bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent animate-pulse mb-2"
-        >
-          Lunar Observatory
-        </motion.h1>
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.4, duration: 0.6 }}
-          className="text-lg text-slate-300"
-        >
-          Interactive 3D Moon Visualization
-        </motion.p>
-      </motion.div>
-
-      {/* Main Moon Viewer Container */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.6, duration: 0.8 }}
-        className="px-4 sm:px-6 lg:px-10 pb-8"
-      >
-        <div className="max-w-7xl mx-auto">
-          <div className="bg-slate-800/30 backdrop-blur-sm border border-slate-600/40 rounded-xl overflow-hidden">
-            <div className="moon-viewer-container">
-              <MoonViewer />
-            </div>
-          </div>
+        <div className="moon-viewer-container">
+          <MoonViewer />
         </div>
       </motion.div>
 
       <style jsx>{`
         .moon-viewer-container {
-          position: relative;
+          position: absolute;
+          top: 0;
+          left: 0;
           width: 100%;
-          height: 80vh;
-          min-height: 600px;
-          max-height: 900px;
+          height: 100%;
           background: rgba(0, 0, 0, 0.2);
           overflow: hidden;
         }
@@ -103,22 +74,6 @@ export default function MoonPage() {
           height: 100% !important;
           max-width: 100% !important;
           max-height: 100% !important;
-          border-radius: 0.75rem;
-        }
-
-        /* Mobile responsive adjustments */
-        @media (max-width: 768px) {
-          .moon-viewer-container {
-            height: 60vh;
-            min-height: 400px;
-          }
-        }
-
-        @media (max-width: 480px) {
-          .moon-viewer-container {
-            height: 50vh;
-            min-height: 350px;
-          }
         }
       `}</style>
     </div>

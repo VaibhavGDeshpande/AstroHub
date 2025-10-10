@@ -5,10 +5,11 @@ import Header from '@/components/Home/Header';
 import HeroSection from '@/components/Home/HeroSection';
 import Cards from '@/components/Cards';
 import FactsSection from '../Facts/FactsSection';
-import { ToastContainer, toast } from 'react-toastify';
+import {  toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Maximize2 } from 'lucide-react';
 import Footer from './Footer';
+
 
 export default function Home() {
   useEffect(() => {
@@ -87,54 +88,6 @@ export default function Home() {
           overflow-y: auto;
           overflow-x: hidden;
         }
-        
-        /* Fix toast container positioning and prevent movement on hover */
-        .Toastify__toast-container {
-          position: fixed !important;
-          top: 20px !important;
-          left: 50% !important;
-          transform: translateX(-50%) !important;
-          width: auto !important;
-          max-width: 500px !important;
-          z-index: 9999 !important;
-        }
-        
-        .Toastify__toast-container--top-center {
-          top: 20px !important;
-          left: 50% !important;
-          transform: translateX(-50%) !important;
-        }
-        
-        /* Prevent toast movement on hover */
-        .Toastify__toast {
-          position: relative !important;
-          transform: none !important;
-          transition: none !important;
-          margin-bottom: 0.5rem !important;
-        }
-        
-        .Toastify__toast:hover {
-          transform: none !important;
-        }
-        
-        /* Disable any hover animations */
-        .Toastify__toast--default:hover,
-        .Toastify__toast--info:hover,
-        .Toastify__toast--success:hover,
-        .Toastify__toast--warning:hover,
-        .Toastify__toast--error:hover {
-          transform: none !important;
-          box-shadow: none !important;
-        }
-        
-        /* Custom toast styling */
-        .Toastify__toast {
-          background: rgba(30, 41, 59, 0.95) !important;
-          border: 1px solid rgba(59, 130, 246, 0.2) !important;
-          backdrop-filter: blur(12px) !important;
-          border-radius: 8px !important;
-          color: white !important;
-        }
       `}</style>
 
       <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-900">
@@ -143,28 +96,6 @@ export default function Home() {
         <FactsSection/>
         <Cards />
         <Footer/>
-        
-        {/* Toast Container for react-toastify */}
-        <ToastContainer
-          position="top-center"
-          newestOnTop={false}
-          closeOnClick={false}
-          pauseOnHover={false} 
-          pauseOnFocusLoss={false} 
-          draggable={false} 
-          theme="dark"
-          limit={1} 
-          toastClassName="bg-slate-800/95 border border-blue-500/20 backdrop-blur-md"
-          style={{
-            position: 'fixed',
-            top: '20px',
-            left: '50%',
-            transform: 'translateX(-50%)',
-            width: 'auto',
-            maxWidth: '500px',
-            zIndex: 9999
-          }}
-        />
       </div>
     </>
   );
