@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence, MotionConfig } from 'framer-motion';
-import { ArrowRight, Sparkles, Zap, Radio, Star, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ArrowRight, Sparkles, Star, ChevronLeft, ChevronRight } from 'lucide-react';
 import { cardSections, CardAPI } from './cardData';
 
 const EnhancedCards = () => {
@@ -331,11 +331,6 @@ const EnhancedCards = () => {
         <div className="container mx-auto max-w-7xl relative z-10">
           {/* Main header */}
           <div className={`text-center mb-24 transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-            <div className="inline-flex items-center gap-2 mb-6 px-6 py-3 bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-pink-500/10 border border-blue-500/20 rounded-full backdrop-blur-sm">
-              <Zap className="w-4 h-4 text-blue-400 animate-pulse" />
-              <span className="text-sm font-semibold text-blue-400">Powered by NASA APIs</span>
-              <Radio className="w-4 h-4 text-purple-400 animate-pulse" />
-            </div>
             <h1 className="text-6xl md:text-8xl font-black text-transparent bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text mb-8 leading-tight tracking-tight">
               Explore the Universe
             </h1>

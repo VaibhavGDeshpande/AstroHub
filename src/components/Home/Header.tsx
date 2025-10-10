@@ -94,9 +94,9 @@ const Header = () => {
             <img
               src="/assets/AstroHub.png"
               alt="AstroHub Logo"
-              width={isCompact ? 120 : 140}
-              height={isCompact ? 32 : 40}
-              className="transition-all duration-500"
+              width={isCompact ? 120 : 180}
+              height={isCompact ? 32 : 60}
+              className="transition-all duration-500 mt-4"
             />
           </div>
         </div>

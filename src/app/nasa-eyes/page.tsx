@@ -35,7 +35,7 @@ const nasaCards: CardData[] = [
     description: "Discover over 5,500 exoplanet systems orbiting distant stars. Filter by Earth-sized, rocky planets, or gas giants with real NASA data.",
     icon: Telescope,
     color: "from-purple-500 to-pink-500",
-    path: "nasa-eyes/exoplanets",
+    path: "nasa-eyes/exoplanet",
     features: [
       "5,500+ exoplanets",
       "Advanced filtering",
