@@ -20,7 +20,6 @@ export const useNewsNotification = () => {
 
         const latestArticle = data.results[0];
         console.log('Latest article:', latestArticle);
-        localStorage.setItem('lastNewsId','33476')
 
         const lastSeenId = localStorage.getItem('lastNewsId');
         console.log('Last seen ID:', lastSeenId);
