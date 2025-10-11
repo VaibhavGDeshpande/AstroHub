@@ -39,7 +39,11 @@ export const metadata: Metadata = {
     "space data",
     "satellite imagery",
     "cosmos",
-    "universe"
+    "universe",
+    "3D Models",
+    "Nasa Eyes",
+    "Space News",
+    "Space Quiz"
   ],
   authors: [{ name: "Vaibhav Ganesh Deshpande" }],
   creator: "Vaibhav Ganesh Deshpande",
@@ -73,7 +77,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "AstroHub - Astronomy Hub for Astrophiles and young astronomers",
     description: "Explore the cosmos with NASA's public APIs including APOD, EPIC, and more stunning space imagery and data.",
-    images: ["/og-image.jpg"],
+    images: ["/assets/AstroHub.png"],
     creator: "@yourtwitterhandle", 
   },
   robots: {
