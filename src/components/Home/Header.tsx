@@ -1,8 +1,9 @@
 // components/Header.tsx
 'use client'
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { ChevronDownIcon, Bars3Icon, XMarkIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline';
+
 
 const Header = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -11,6 +12,8 @@ const Header = () => {
   const [lastScrollY, setLastScrollY] = useState(0);
   const [scrollY, setScrollY] = useState(0);
   const [searchQuery, setSearchQuery] = useState('');
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
 
   useEffect(() => {
     const updateScrollDirection = () => {
@@ -29,9 +32,11 @@ const Header = () => {
       }
     };
 
+
     window.addEventListener("scroll", updateScrollDirection);
     return () => window.removeEventListener("scroll", updateScrollDirection);
   }, [scrollDirection, lastScrollY]);
+
 
   // Categorized data from cardData.ts
   const exploreCategories = [
@@ -40,7 +45,7 @@ const Header = () => {
       title: 'NASA Data',
       items: [
         { name: 'Astronomy Picture of the Day', path: '/apod' },
-        { name: 'Mars Rover Photos', path: '/mars-rover' },
+        // { name: 'Mars Rover Photos', path: '/mars-rover' },
         { name: 'Near Earth Objects', path: '/neo' },
         { name: 'EPIC Earth Images', path: '/epic' },
         { name: 'NASA Image Library', path: '/images' },
@@ -75,6 +80,7 @@ const Header = () => {
     }
   ];
 
+
   // Filter categories and items based on search query
   const filteredCategories = exploreCategories.map(category => ({
     ...category,
@@ -83,6 +89,7 @@ const Header = () => {
       category.title.toLowerCase().includes(searchQuery.toLowerCase())
     )
   })).filter(category => category.items.length > 0);
+
 
   const SpaceLogo = () => {
     const isCompact = scrollY > 50;
@@ -104,6 +111,7 @@ const Header = () => {
     );
   };
 
+
   const getHeaderClasses = () => {
     let transformClass = 'translate-y-0';
     let heightClass = 'h-16';
@@ -119,6 +127,7 @@ const Header = () => {
     return `${transformClass} ${heightClass}`;
   };
 
+
   return (
     <header className={`fixed top-0 left-0 right-0 z-50 bg-transparent transition-all duration-500 ease-in-out ${getHeaderClasses()}`}>
       <div className="container mx-auto px-4">
@@ -127,11 +136,13 @@ const Header = () => {
             <SpaceLogo />
           </Link>
 
+
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8 relative z-10">
           
-            {/* Explore Dropdown with Hover */}
+            {/* Explore Dropdown with Hover - FIXED */}
             <div 
+              ref={dropdownRef}
               className="relative"
               onMouseEnter={() => setIsDropdownOpen(true)}
               onMouseLeave={() => {
@@ -147,99 +158,107 @@ const Header = () => {
                 <div className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-cyan-400 to-blue-500 group-hover:w-full transition-all duration-300" />
               </button>
 
-              {/* Larger Dropdown Menu with Search and Categories */}
-              <div className={`absolute right-0 mt-2 w-[600px] bg-black/95 backdrop-blur-xl rounded-xl shadow-2xl border border-cyan-400/20 z-50 transition-all duration-300 ease-out origin-top-right ${
+
+              {/* Dropdown Menu with NO GAP - FIXED */}
+              <div className={`absolute right-0 pt-2 w-[600px] z-50 transition-all duration-300 ease-out origin-top-right ${
                 isDropdownOpen 
-                  ? 'opacity-100 visible transform scale-100 translate-y-0' 
-                  : 'opacity-0 invisible transform scale-95 -translate-y-2 pointer-events-none'
+                  ? 'opacity-100 visible' 
+                  : 'opacity-0 invisible pointer-events-none'
               }`}>
-                {/* Search Bar */}
-                <div className="p-4 border-b border-cyan-400/20 sticky top-0 bg-black/95 backdrop-blur-xl z-10">
-                  <div className="relative">
-                    <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-cyan-400" />
-                    <input
-                      type="text"
-                      placeholder="Search astronomy tools..."
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      className="w-full pl-11 pr-4 py-2.5 bg-black/50 border border-cyan-400/30 rounded-lg text-white text-sm placeholder-gray-400 focus:outline-none focus:border-cyan-400 transition-colors"
-                    />
+                <div className="bg-black/95 backdrop-blur-xl rounded-xl shadow-2xl border border-cyan-400/20">
+                  {/* Search Bar */}
+                  <div className="p-4 border-b border-cyan-400/20 sticky top-0 bg-black/95 backdrop-blur-xl z-10 rounded-t-xl">
+                    <div className="relative">
+                      <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-cyan-400" />
+                      <input
+                        type="text"
+                        placeholder="Search astronomy tools..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="w-full pl-11 pr-4 py-2.5 bg-black/50 border border-cyan-400/30 rounded-lg text-white text-sm placeholder-gray-400 focus:outline-none focus:border-cyan-400 transition-colors"
+                      />
+                    </div>
                   </div>
-                </div>
 
-                {/* Categorized Menu Items - No Scrollbar */}
-                <div 
-                  className="p-4 max-h-[480px] overflow-y-auto hide-scrollbar"
-                  style={{
-                    scrollbarWidth: 'none',
-                    msOverflowStyle: 'none',
-                  }}
-                >
-                  <style jsx>{`
-                    .hide-scrollbar::-webkit-scrollbar {
-                      display: none;
-                    }
-                  `}</style>
 
-                  {filteredCategories.length > 0 ? (
-                    <div className="grid grid-cols-2 gap-6">
-                      {filteredCategories.map((category, categoryIndex) => (
-                        <div 
-                          key={category.id}
-                          className={`transition-all duration-300 ${
-                            isDropdownOpen 
-                              ? 'opacity-100 translate-y-0' 
-                              : 'opacity-0 translate-y-2'
-                          }`}
-                          style={{ 
-                            transitionDelay: isDropdownOpen ? `${100 + (categoryIndex * 100)}ms` : '0ms' 
-                          }}
-                        >
-                          {/* Category Header */}
-                          <div className="mb-3 pb-2 border-b border-cyan-400/20">
-                            <h3 className="text-cyan-400 font-semibold text-sm uppercase tracking-wide">
-                              {category.title}
-                            </h3>
+                  {/* Categorized Menu Items - No Scrollbar */}
+                  <div 
+                    className="p-4 max-h-[480px] overflow-y-auto hide-scrollbar"
+                    style={{
+                      scrollbarWidth: 'none',
+                      msOverflowStyle: 'none',
+                    }}
+                  >
+                    <style jsx>{`
+                      .hide-scrollbar::-webkit-scrollbar {
+                        display: none;
+                      }
+                    `}</style>
+
+
+                    {filteredCategories.length > 0 ? (
+                      <div className="grid grid-cols-2 gap-6">
+                        {filteredCategories.map((category, categoryIndex) => (
+                          <div 
+                            key={category.id}
+                            className={`transition-all duration-300 ${
+                              isDropdownOpen 
+                                ? 'opacity-100 translate-y-0' 
+                                : 'opacity-0 translate-y-2'
+                            }`}
+                            style={{ 
+                              transitionDelay: isDropdownOpen ? `${100 + (categoryIndex * 100)}ms` : '0ms' 
+                            }}
+                          >
+                            {/* Category Header */}
+                            <div className="mb-3 pb-2 border-b border-cyan-400/20">
+                              <h3 className="text-cyan-400 font-semibold text-sm uppercase tracking-wide">
+                                {category.title}
+                              </h3>
+                            </div>
+
+
+                            {/* Category Items */}
+                            <div className="space-y-1">
+                              {category.items.map((item, itemIndex) => (
+                                <Link
+                                  key={itemIndex}
+                                  href={item.path}
+                                  className="block px-3 py-2.5 text-sm text-white hover:bg-gradient-to-r hover:from-cyan-500/20 hover:to-blue-500/20 hover:text-cyan-100 rounded-lg transition-all duration-200 hover:translate-x-1"
+                                  onClick={() => {
+                                    setIsDropdownOpen(false);
+                                    setSearchQuery('');
+                                  }}
+                                >
+                                  <div className="flex items-center space-x-2">
+                                    <div className="w-1.5 h-1.5 bg-cyan-400 rounded-full flex-shrink-0" />
+                                    <span className="line-clamp-1">{item.name}</span>
+                                  </div>
+                                </Link>
+                              ))}
+                            </div>
                           </div>
-
-                          {/* Category Items */}
-                          <div className="space-y-1">
-                            {category.items.map((item, itemIndex) => (
-                              <Link
-                                key={itemIndex}
-                                href={item.path}
-                                className="block px-3 py-2.5 text-sm text-white hover:bg-gradient-to-r hover:from-cyan-500/20 hover:to-blue-500/20 hover:text-cyan-100 rounded-lg transition-all duration-200 hover:translate-x-1"
-                                onClick={() => {
-                                  setIsDropdownOpen(false);
-                                  setSearchQuery('');
-                                }}
-                              >
-                                <div className="flex items-center space-x-2">
-                                  <div className="w-1.5 h-1.5 bg-cyan-400 rounded-full flex-shrink-0" />
-                                  <span className="line-clamp-1">{item.name}</span>
-                                </div>
-                              </Link>
-                            ))}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="py-12 text-center">
-                      <div className="text-cyan-400/30 text-6xl mb-4">🔍</div>
-                      <p className="text-gray-400 text-sm">
-                        No tools found matching <span className="text-cyan-400">&quot;{searchQuery}&quot;</span>
-                      </p>
-                    </div>
-                  )}
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="py-12 text-center">
+                        <div className="text-cyan-400/30 text-6xl mb-4">🔍</div>
+                        <p className="text-gray-400 text-sm">
+                          No tools found matching <span className="text-cyan-400">&quot;{searchQuery}&quot;</span>
+                        </p>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
+
 
             <Link href="/about" className="relative group text-white hover:text-cyan-400 transition-colors drop-shadow-lg">
               <span className={`transition-all duration-300 font-medium ${scrollY > 50 ? 'text-sm' : 'text-base'}`}>About</span>
               <div className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-cyan-400 to-blue-500 group-hover:w-full transition-all duration-300" />
             </Link>
+
 
             {/* Additional Links */}
             <Link href="/contact-us" className="relative group text-white hover:text-cyan-400 transition-colors drop-shadow-lg">
@@ -247,16 +266,19 @@ const Header = () => {
               <div className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-cyan-400 to-blue-500 group-hover:w-full transition-all duration-300" />
             </Link>
 
+
             <Link href="/privacy-policy" className="relative group text-white hover:text-cyan-400 transition-colors drop-shadow-lg">
               <span className={`transition-all duration-300 font-medium ${scrollY > 50 ? 'text-sm' : 'text-base'}`}>Privacy Policy</span>
               <div className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-cyan-400 to-blue-500 group-hover:w-full transition-all duration-300" />
             </Link>
+
 
             <Link href="/terms-and-conditions" className="relative group text-white hover:text-cyan-400 transition-colors drop-shadow-lg">
               <span className={`transition-all duration-300 font-medium ${scrollY > 50 ? 'text-sm' : 'text-base'}`}>Terms & Conditions</span>
               <div className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-cyan-400 to-blue-500 group-hover:w-full transition-all duration-300" />
             </Link>
           </nav>
+
 
           {/* Mobile menu button */}
           <button 
@@ -270,6 +292,7 @@ const Header = () => {
             )}
           </button>
         </div>
+
 
         {/* Mobile Menu */}
         {isMobileMenuOpen && (
@@ -317,6 +340,7 @@ const Header = () => {
                 </div>
               </div>
 
+
               {/* Mobile Categorized Items - No Scrollbar */}
               <div 
                 className={`space-y-4 max-h-[400px] overflow-y-auto hide-scrollbar transition-all duration-300 ${
@@ -333,6 +357,7 @@ const Header = () => {
                     display: none;
                   }
                 `}</style>
+
 
                 {filteredCategories.map((category) => (
                   <div key={category.id} className="space-y-2">
@@ -365,9 +390,10 @@ const Header = () => {
                 )}
               </div>
 
+
               {/* Mobile Additional Links */}
               <div className="pt-4 border-t border-cyan-400/20 space-y-3">
-                <Link href="/contact" className={`block text-white hover:text-cyan-400 transition-all duration-300 font-medium ${
+                <Link href="/contact-us" className={`block text-white hover:text-cyan-400 transition-all duration-300 font-medium ${
                   isMobileMenuOpen ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4'
                 }`}
                       style={{ transitionDelay: '400ms' }}
@@ -381,7 +407,7 @@ const Header = () => {
                       onClick={() => setIsMobileMenuOpen(false)}>
                   Privacy Policy
                 </Link>
-                <Link href="/terms-conditions" className={`block text-white hover:text-cyan-400 transition-all duration-300 font-medium ${
+                <Link href="/terms-and-conditions" className={`block text-white hover:text-cyan-400 transition-all duration-300 font-medium ${
                   isMobileMenuOpen ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4'
                 }`}
                       style={{ transitionDelay: '500ms' }}
@@ -396,5 +422,6 @@ const Header = () => {
     </header>
   );
 };
+
 
 export default Header;

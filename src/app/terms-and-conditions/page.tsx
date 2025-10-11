@@ -7,24 +7,23 @@ import { motion } from "framer-motion";
 import { ArrowLeftIcon, HomeIcon } from "@heroicons/react/24/outline";
 
 export default function TermsConditionsPage() {
-
   return (
     <LoaderWrapper>
-    <div className="min-h-screen bg-gradient-to-b from-black via-blue-950/20 to-black pt-24 pb-16">
+    <div className="min-h-screen bg-gradient-to-b from-black via-blue-950/20 to-black pb-16">
       <div className="container mx-auto px-4 max-w-5xl">
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">
             <span className="bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
-              Terms & Conditions
+              Terms and Conditions
             </span>
           </h1>
           <p className="text-gray-400 text-sm">
-            Last Updated: October 7, 2025
+            Last updated: October 10, 2025
           </p>
         </div>
+        
         <div className="fixed top-4 left-4 z-50">
-          {/* Back Button */}
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
@@ -45,184 +44,182 @@ export default function TermsConditionsPage() {
           
           {/* Introduction */}
           <section>
-            <h2 className="text-2xl font-bold text-cyan-400 mb-4">1. Agreement to Terms</h2>
             <p className="leading-relaxed">
-              Welcome to AstroHub. By accessing or using our website, tools, and services (collectively, the &quot;Services&quot;), you agree to be bound by these Terms and Conditions (&quot;Terms&quot;). If you disagree with any part of these Terms, you may not access our Services.
+              Please read these terms and conditions carefully before using Our Service.
             </p>
           </section>
 
-          {/* Use License */}
+          {/* Interpretation and Definitions */}
           <section>
-            <h2 className="text-2xl font-bold text-cyan-400 mb-4">2. Use License</h2>
+            <h2 className="text-2xl font-bold text-cyan-400 mb-4">Interpretation and Definitions</h2>
+            
+            <h3 className="text-xl font-semibold text-white mb-3">Interpretation</h3>
+            <p className="leading-relaxed mb-6">
+              The words whose initial letters are capitalized have meanings defined under the following conditions. The following definitions shall have the same meaning regardless of whether they appear in singular or in plural.
+            </p>
+
+            <h3 className="text-xl font-semibold text-white mb-3">Definitions</h3>
+            <p className="leading-relaxed mb-3">For the purposes of these Terms and Conditions:</p>
+            <ul className="list-disc list-inside space-y-2 ml-4">
+              <li><strong className="text-white">Affiliate</strong> means an entity that controls, is controlled by, or is under common control with a party, where &quot;control&quot; means ownership of 50% or more of the shares, equity interest or other securities entitled to vote for election of directors or other managing authority.</li>
+              <li><strong className="text-white">Country</strong> refers to: Maharashtra, India</li>
+              <li><strong className="text-white">Company</strong> (referred to as either &quot;the Company&quot;, &quot;We&quot;, &quot;Us&quot; or &quot;Our&quot; in this Agreement) refers to AstroHub.</li>
+              <li><strong className="text-white">Device</strong> means any device that can access the Service such as a computer, a cell phone or a digital tablet.</li>
+              <li><strong className="text-white">Service</strong> refers to the AstroHub Website.</li>
+              <li><strong className="text-white">Terms and Conditions</strong> (also referred as &quot;Terms&quot;) mean these Terms and Conditions that form the entire agreement between You and the Company regarding the use of the Service.</li>
+              <li><strong className="text-white">Third-party Social Media Service</strong> means any services or content (including data, information, products or services) provided by a third-party that may be displayed, included or made available by the Service.</li>
+              <li><strong className="text-white">Website</strong> refers to AstroHub, accessible from <a href="https://explorenasa.vercel.app/" className="text-cyan-400 hover:text-cyan-300 underline" target="_blank" rel="noopener noreferrer">https://explorenasa.vercel.app/</a></li>
+              <li><strong className="text-white">You</strong> means the individual accessing or using the Service, or the company, or other legal entity on behalf of which such individual is accessing or using the Service, as applicable.</li>
+            </ul>
+          </section>
+
+          {/* Acknowledgment */}
+          <section>
+            <h2 className="text-2xl font-bold text-cyan-400 mb-4">Acknowledgment</h2>
             <p className="leading-relaxed mb-4">
-              Subject to your compliance with these Terms, AstroHub grants you a limited, non-exclusive, non-transferable, and revocable license to:
+              These are the Terms and Conditions governing the use of this Service and the agreement that operates between You and the Company. These Terms and Conditions set out the rights and obligations of all users regarding the use of the Service.
             </p>
-            <ul className="list-disc list-inside space-y-2 ml-4">
-              <li>Access and use the Services for personal, educational, and non-commercial purposes</li>
-              <li>View and interact with astronomy data, images, and tools provided through our website</li>
-              <li>Download content that is explicitly marked as downloadable</li>
-            </ul>
-          </section>
-
-          {/* Acceptable Use */}
-          <section>
-            <h2 className="text-2xl font-bold text-cyan-400 mb-4">3. Acceptable Use Policy</h2>
-            <p className="leading-relaxed mb-2">
-              You agree not to:
-            </p>
-            <ul className="list-disc list-inside space-y-2 ml-4">
-              <li>Use the Services for any unlawful purpose or in violation of any applicable laws</li>
-              <li>Attempt to gain unauthorized access to any portion of the Services</li>
-              <li>Interfere with or disrupt the Services or servers connected to the Services</li>
-              <li>Use automated systems (bots, scrapers) to access the Services without permission</li>
-              <li>Transmit any viruses, malware, or harmful code</li>
-              <li>Impersonate any person or entity or misrepresent your affiliation</li>
-              <li>Collect or harvest personal information of other users</li>
-              <li>Use the Services to distribute spam or unsolicited communications</li>
-            </ul>
-          </section>
-
-          {/* NASA Data Attribution */}
-          <section>
-            <h2 className="text-2xl font-bold text-cyan-400 mb-4">4. Third-Party Content and APIs</h2>
-            <div className="space-y-4">
-              <div>
-                <h3 className="text-xl font-semibold text-white mb-2">4.1 NASA APIs</h3>
-                <p className="leading-relaxed">
-                  AstroHub utilizes NASA&apos;s publicly available APIs to provide astronomy data, images, and information. All NASA content is subject to NASA&apos;s own terms of use and media usage guidelines. We do not claim ownership of any NASA-provided content.
-                </p>
-              </div>
-              <div>
-                <h3 className="text-xl font-semibold text-white mb-2">4.2 Third-Party Links</h3>
-                <p className="leading-relaxed">
-                  Our Services may contain links to third-party websites or services. We are not responsible for the content, privacy policies, or practices of any third-party sites. You access these at your own risk.
-                </p>
-              </div>
-            </div>
-          </section>
-
-          {/* Intellectual Property */}
-          <section>
-            <h2 className="text-2xl font-bold text-cyan-400 mb-4">5. Intellectual Property Rights</h2>
             <p className="leading-relaxed mb-4">
-              Unless otherwise indicated, AstroHub owns or licenses all intellectual property rights in the Services, including:
+              Your access to and use of the Service is conditioned on Your acceptance of and compliance with these Terms and Conditions. These Terms and Conditions apply to all visitors, users and others who access or use the Service.
             </p>
-            <ul className="list-disc list-inside space-y-2 ml-4">
-              <li>Website design, layout, and user interface</li>
-              <li>Custom-developed tools and visualizations</li>
-              <li>Original text, graphics, and educational content</li>
-              <li>Software, code, and algorithms</li>
-            </ul>
-            <p className="leading-relaxed mt-4">
-              You may not reproduce, distribute, modify, or create derivative works from our proprietary content without explicit written permission.
-            </p>
-          </section>
-
-          {/* User Accounts */}
-          <section>
-            <h2 className="text-2xl font-bold text-cyan-400 mb-4">6. User Accounts</h2>
-            <p className="leading-relaxed mb-2">
-              If you create an account on our platform, you are responsible for:
-            </p>
-            <ul className="list-disc list-inside space-y-2 ml-4">
-              <li>Maintaining the confidentiality of your account credentials</li>
-              <li>All activities that occur under your account</li>
-              <li>Notifying us immediately of any unauthorized access</li>
-              <li>Providing accurate and complete registration information</li>
-            </ul>
-            <p className="leading-relaxed mt-4">
-              We reserve the right to suspend or terminate accounts that violate these Terms.
-            </p>
-          </section>
-
-          {/* Disclaimer of Warranties */}
-          <section>
-            <h2 className="text-2xl font-bold text-cyan-400 mb-4">7. Disclaimer of Warranties</h2>
             <p className="leading-relaxed mb-4">
-              THE SERVICES ARE PROVIDED &quot;AS IS&quot; AND &quot;AS AVAILABLE&quot; WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO:
+              By accessing or using the Service You agree to be bound by these Terms and Conditions. If You disagree with any part of these Terms and Conditions then You may not access the Service.
             </p>
-            <ul className="list-disc list-inside space-y-2 ml-4">
-              <li>Warranties of merchantability or fitness for a particular purpose</li>
-              <li>Warranties that the Services will be uninterrupted, secure, or error-free</li>
-              <li>Warranties regarding the accuracy, reliability, or completeness of content</li>
-            </ul>
-            <p className="leading-relaxed mt-4">
-              We do not warrant that astronomical data or information provided is suitable for any specific purpose or will meet your requirements.
+            <p className="leading-relaxed mb-4">
+              You represent that you are over the age of 18. The Company does not permit those under 18 to use the Service.
             </p>
-          </section>
-
-          {/* Limitation of Liability */}
-          <section>
-            <h2 className="text-2xl font-bold text-cyan-400 mb-4">8. Limitation of Liability</h2>
             <p className="leading-relaxed">
-              TO THE MAXIMUM EXTENT PERMITTED BY LAW, ASTROHUB SHALL NOT BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES, OR ANY LOSS OF PROFITS OR REVENUES, WHETHER INCURRED DIRECTLY OR INDIRECTLY, OR ANY LOSS OF DATA, USE, GOODWILL, OR OTHER INTANGIBLE LOSSES RESULTING FROM:
+              Your access to and use of the Service is also conditioned on Your acceptance of and compliance with the Privacy Policy of the Company. Our Privacy Policy describes Our policies and procedures on the collection, use and disclosure of Your personal information when You use the Application or the Website and tells You about Your privacy rights and how the law protects You. Please read Our Privacy Policy carefully before using Our Service.
             </p>
-            <ul className="list-disc list-inside space-y-2 ml-4 mt-4">
-              <li>Your access to or use of (or inability to access or use) the Services</li>
-              <li>Any conduct or content of third parties on the Services</li>
-              <li>Unauthorized access, use, or alteration of your data</li>
-              <li>Any errors, inaccuracies, or omissions in the Services</li>
-            </ul>
           </section>
 
-          {/* Indemnification */}
+          {/* Links to Other Websites */}
           <section>
-            <h2 className="text-2xl font-bold text-cyan-400 mb-4">9. Indemnification</h2>
+            <h2 className="text-2xl font-bold text-cyan-400 mb-4">Links to Other Websites</h2>
+            <p className="leading-relaxed mb-4">
+              Our Service may contain links to third-party web sites or services that are not owned or controlled by the Company.
+            </p>
+            <p className="leading-relaxed mb-4">
+              The Company has no control over, and assumes no responsibility for, the content, privacy policies, or practices of any third party web sites or services. You further acknowledge and agree that the Company shall not be responsible or liable, directly or indirectly, for any damage or loss caused or alleged to be caused by or in connection with the use of or reliance on any such content, goods or services available on or through any such web sites or services.
+            </p>
             <p className="leading-relaxed">
-              You agree to indemnify, defend, and hold harmless AstroHub, its officers, directors, employees, and agents from any claims, liabilities, damages, losses, and expenses, including reasonable attorneys&apos; fees, arising out of or in any way connected with your access to or use of the Services, or your violation of these Terms.
+              We strongly advise You to read the terms and conditions and privacy policies of any third-party web sites or services that You visit.
             </p>
           </section>
 
           {/* Termination */}
           <section>
-            <h2 className="text-2xl font-bold text-cyan-400 mb-4">10. Termination</h2>
+            <h2 className="text-2xl font-bold text-cyan-400 mb-4">Termination</h2>
+            <p className="leading-relaxed mb-4">
+              We may terminate or suspend Your access immediately, without prior notice or liability, for any reason whatsoever, including without limitation if You breach these Terms and Conditions.
+            </p>
             <p className="leading-relaxed">
-              We may terminate or suspend your access to the Services immediately, without prior notice or liability, for any reason, including if you breach these Terms. Upon termination, your right to use the Services will cease immediately. All provisions that by their nature should survive termination shall survive, including ownership provisions, warranty disclaimers, and limitations of liability.
+              Upon termination, Your right to use the Service will cease immediately.
             </p>
           </section>
 
-          {/* Educational Purpose */}
+          {/* Limitation of Liability */}
           <section>
-            <h2 className="text-2xl font-bold text-cyan-400 mb-4">11. Educational Purpose Disclaimer</h2>
+            <h2 className="text-2xl font-bold text-cyan-400 mb-4">Limitation of Liability</h2>
+            <p className="leading-relaxed mb-4">
+              Notwithstanding any damages that You might incur, the entire liability of the Company and any of its suppliers under any provision of this Terms and Your exclusive remedy for all of the foregoing shall be limited to the amount actually paid by You through the Service or 100 USD if You haven&apos;t purchased anything through the Service.
+            </p>
+            <p className="leading-relaxed mb-4">
+              To the maximum extent permitted by applicable law, in no event shall the Company or its suppliers be liable for any special, incidental, indirect, or consequential damages whatsoever (including, but not limited to, damages for loss of profits, loss of data or other information, for business interruption, for personal injury, loss of privacy arising out of or in any way related to the use of or inability to use the Service, third-party software and/or third-party hardware used with the Service, or otherwise in connection with any provision of this Terms), even if the Company or any supplier has been advised of the possibility of such damages and even if the remedy fails of its essential purpose.
+            </p>
             <p className="leading-relaxed">
-              AstroHub is designed for educational and informational purposes. The astronomical data, images, and information provided should not be used as the sole basis for critical decisions. Always verify information from multiple authoritative sources for important uses.
+              Some states do not allow the exclusion of implied warranties or limitation of liability for incidental or consequential damages, which means that some of the above limitations may not apply. In these states, each party&apos;s liability will be limited to the greatest extent permitted by law.
+            </p>
+          </section>
+
+          {/* "AS IS" and "AS AVAILABLE" Disclaimer */}
+          <section>
+            <h2 className="text-2xl font-bold text-cyan-400 mb-4">&quot;AS IS&quot; and &quot;AS AVAILABLE&quot; Disclaimer</h2>
+            <p className="leading-relaxed mb-4">
+              The Service is provided to You &quot;AS IS&quot; and &quot;AS AVAILABLE&quot; and with all faults and defects without warranty of any kind. To the maximum extent permitted under applicable law, the Company, on its own behalf and on behalf of its Affiliates and its and their respective licensors and service providers, expressly disclaims all warranties, whether express, implied, statutory or otherwise, with respect to the Service, including all implied warranties of merchantability, fitness for a particular purpose, title and non-infringement, and warranties that may arise out of course of dealing, course of performance, usage or trade practice. Without limitation to the foregoing, the Company provides no warranty or undertaking, and makes no representation of any kind that the Service will meet Your requirements, achieve any intended results, be compatible or work with any other software, applications, systems or services, operate without interruption, meet any performance or reliability standards or be error free or that any errors or defects can or will be corrected.
+            </p>
+            <p className="leading-relaxed mb-4">
+              Without limiting the foregoing, neither the Company nor any of the company&apos;s provider makes any representation or warranty of any kind, express or implied: (i) as to the operation or availability of the Service, or the information, content, and materials or products included thereon; (ii) that the Service will be uninterrupted or error-free; (iii) as to the accuracy, reliability, or currency of any information or content provided through the Service; or (iv) that the Service, its servers, the content, or e-mails sent from or on behalf of the Company are free of viruses, scripts, trojan horses, worms, malware, timebombs or other harmful components.
+            </p>
+            <p className="leading-relaxed">
+              Some jurisdictions do not allow the exclusion of certain types of warranties or limitations on applicable statutory rights of a consumer, so some or all of the above exclusions and limitations may not apply to You. But in such a case the exclusions and limitations set forth in this section shall be applied to the greatest extent enforceable under applicable law.
             </p>
           </section>
 
           {/* Governing Law */}
           <section>
-            <h2 className="text-2xl font-bold text-cyan-400 mb-4">12. Governing Law and Jurisdiction</h2>
+            <h2 className="text-2xl font-bold text-cyan-400 mb-4">Governing Law</h2>
             <p className="leading-relaxed">
-              These Terms shall be governed by and construed in accordance with the laws of India, without regard to its conflict of law provisions. Any disputes arising from these Terms or the Services shall be subject to the exclusive jurisdiction of the courts located in Pune, Maharashtra, India.
+              The laws of the Country, excluding its conflicts of law rules, shall govern this Terms and Your use of the Service. Your use of the Application may also be subject to other local, state, national, or international laws.
             </p>
           </section>
 
-          {/* Changes to Terms */}
+          {/* Disputes Resolution */}
           <section>
-            <h2 className="text-2xl font-bold text-cyan-400 mb-4">13. Changes to Terms</h2>
+            <h2 className="text-2xl font-bold text-cyan-400 mb-4">Disputes Resolution</h2>
             <p className="leading-relaxed">
-              We reserve the right to modify or replace these Terms at any time at our sole discretion. We will provide notice of any material changes by posting the new Terms on this page and updating the &quot;Last Updated&quot; date. Your continued use of the Services after such changes constitutes acceptance of the new Terms.
+              If You have any concern or dispute about the Service, You agree to first try to resolve the dispute informally by contacting the Company.
             </p>
           </section>
 
-          {/* Severability */}
+          {/* For European Union (EU) Users */}
           <section>
-            <h2 className="text-2xl font-bold text-cyan-400 mb-4">14. Severability</h2>
+            <h2 className="text-2xl font-bold text-cyan-400 mb-4">For European Union (EU) Users</h2>
             <p className="leading-relaxed">
-              If any provision of these Terms is held to be invalid or unenforceable, the remaining provisions will continue in full force and effect. The invalid or unenforceable provision will be deemed superseded by a valid provision that most closely matches the intent of the original provision.
+              If You are a European Union consumer, you will benefit from any mandatory provisions of the law of the country in which You are resident.
             </p>
           </section>
 
-          {/* Contact Information */}
+          {/* United States Legal Compliance */}
           <section>
-            <h2 className="text-2xl font-bold text-cyan-400 mb-4">15. Contact Us</h2>
+            <h2 className="text-2xl font-bold text-cyan-400 mb-4">United States Legal Compliance</h2>
+            <p className="leading-relaxed">
+              You represent and warrant that (i) You are not located in a country that is subject to the United States government embargo, or that has been designated by the United States government as a &quot;terrorist supporting&quot; country, and (ii) You are not listed on any United States government list of prohibited or restricted parties.
+            </p>
+          </section>
+
+          {/* Severability and Waiver */}
+          <section>
+            <h2 className="text-2xl font-bold text-cyan-400 mb-4">Severability and Waiver</h2>
+            
+            <h3 className="text-xl font-semibold text-white mb-3">Severability</h3>
+            <p className="leading-relaxed mb-6">
+              If any provision of these Terms is held to be unenforceable or invalid, such provision will be changed and interpreted to accomplish the objectives of such provision to the greatest extent possible under applicable law and the remaining provisions will continue in full force and effect.
+            </p>
+
+            <h3 className="text-xl font-semibold text-white mb-3">Waiver</h3>
+            <p className="leading-relaxed">
+              Except as provided herein, the failure to exercise a right or to require performance of an obligation under these Terms shall not affect a party&apos;s ability to exercise such right or require such performance at any time thereafter nor shall the waiver of a breach constitute a waiver of any subsequent breach.
+            </p>
+          </section>
+
+          {/* Translation Interpretation */}
+          <section>
+            <h2 className="text-2xl font-bold text-cyan-400 mb-4">Translation Interpretation</h2>
+            <p className="leading-relaxed">
+              These Terms and Conditions may have been translated if We have made them available to You on our Service. You agree that the original English text shall prevail in the case of a dispute.
+            </p>
+          </section>
+
+          {/* Changes to These Terms and Conditions */}
+          <section>
+            <h2 className="text-2xl font-bold text-cyan-400 mb-4">Changes to These Terms and Conditions</h2>
             <p className="leading-relaxed mb-4">
-              If you have any questions about these Terms and Conditions, please contact us:
+              We reserve the right, at Our sole discretion, to modify or replace these Terms at any time. If a revision is material We will make reasonable efforts to provide at least 30 days&apos; notice prior to any new terms taking effect. What constitutes a material change will be determined at Our sole discretion.
             </p>
-            <div className="bg-cyan-400/5 border border-cyan-400/20 rounded-lg p-6 space-y-2">
-              <p><strong className="text-white">Email:</strong> legal@astrohub.com</p>
-              <p><strong className="text-white">Website:</strong> www.astrohub.com</p>
-              <p><strong className="text-white">Contact Form:</strong> <a href="/contact" className="text-cyan-400 hover:text-cyan-300 underline">Contact Us Page</a></p>
+            <p className="leading-relaxed">
+              By continuing to access or use Our Service after those revisions become effective, You agree to be bound by the revised terms. If You do not agree to the new terms, in whole or in part, please stop using the website and the Service.
+            </p>
+          </section>
+
+          {/* Contact Us */}
+          <section>
+            <h2 className="text-2xl font-bold text-cyan-400 mb-4">Contact Us</h2>
+            <p className="leading-relaxed mb-4">
+              If you have any questions about these Terms and Conditions, You can contact us:
+            </p>
+            <div className="bg-cyan-400/5 border border-cyan-400/20 rounded-lg p-6">
+              <p><strong className="text-white">By email:</strong> deshpande.vaibhav1012@gmail.com</p>
             </div>
           </section>
         </div>

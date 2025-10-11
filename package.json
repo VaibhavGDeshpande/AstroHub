@@ -9,12 +9,14 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@emailjs/browser": "^4.4.1",
     "@heroicons/react": "^2.0.18",
     "@react-three/drei": "^10.7.6",
     "@react-three/fiber": "^9.3.0",
     "axios": "^1.12.2",
     "cheerio": "^1.1.2",
     "dotenv": "^17.2.2",
+    "emailjs": "^4.0.3",
     "framer-motion": "^12.23.22",
     "lenis": "^1.3.11",
     "lucide-react": "^0.543.0",

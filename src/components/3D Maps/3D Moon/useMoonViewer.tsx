@@ -38,7 +38,7 @@ export const useMoonViewer = () => {
           viewer.scene.primitives.add(tileset1);
 
           // Add boundary data sources
-          const boundariesResource = await Cesium.IonResource.fromAssetId(2683530);
+          const boundariesResource = await Cesium.IonResource.fromAssetId(2683531);
           const boundarySource = await Cesium.GeoJsonDataSource.load(boundariesResource, {
             clampToGround: true,
             fill: Cesium.Color.fromBytes(26, 106, 113).withAlpha(0.6),
