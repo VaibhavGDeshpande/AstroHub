@@ -16,7 +16,7 @@ const Footer = () => {
       title: 'NASA Data',
       items: [
         { name: 'Astronomy Picture of the Day', path: '/apod' },
-        { name: 'Mars Rover Photos', path: '/mars-rover' },
+        // { name: 'Mars Rover Photos', path: '/mars-rover' },
         { name: 'Near Earth Objects', path: '/neo' },
         { name: 'EPIC Earth Images', path: '/epic' },
         { name: 'NASA Image Library', path: '/images' },
@@ -115,7 +115,6 @@ const Footer = () => {
           
           {/* Brand Section - Takes 3 columns */}
           <div className="lg:col-span-3 space-y-6">
-            {/*eslint-disable-next-line @next/next/no-html-link-for-pages*/}
             <a href="#" className="inline-block hover:scale-105 transition-transform duration-300">
               <img
                 src="/assets/AstroHub.png"

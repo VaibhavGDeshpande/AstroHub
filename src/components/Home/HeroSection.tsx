@@ -23,53 +23,103 @@ const HeroSection = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
-    if (videoRef.current && !videoPlayed) {
+    // Check if video has been played in this session
+    const hasPlayedVideo = sessionStorage.getItem('hasPlayedHeroVideo');
+
+    if (videoRef.current) {
       const video = videoRef.current;
 
-      // Set video properties
-      video.currentTime = 0;
-      video.playbackRate = 4.5;
+      if (!videoPlayed && !hasPlayedVideo) {
+        // First time in this session - play the video
+        video.currentTime = 0;
+        video.playbackRate = 4.5;
 
-      // Handle video ended event
-      const handleVideoEnded = () => {
-        console.log('Video finished playing');
-        setVideoStopped(true);
-        setVideoPlayed(true);
+        // Handle video ended event
+        const handleVideoEnded = () => {
+          console.log('Video finished playing');
+          setVideoStopped(true);
+          setVideoPlayed(true);
 
-        // Show text content with smooth transition
-        setTimeout(() => {
+          // Store the video duration to show last frame later
+          sessionStorage.setItem('hasPlayedHeroVideo', 'true');
+          sessionStorage.setItem('videoLastFrame', video.duration.toString());
+
+          // Show text content with smooth transition
+          setTimeout(() => {
+            setIsVisible(true);
+          }, 200);
+        };
+
+        // Handle autoplay restriction errors
+        const handlePlayError = (error: unknown) => {
+          console.log('Video autoplay failed:', error);
+          setRequiresInteraction(true);
+          
+          // Still mark as played and show content
+          setVideoStopped(true);
+          setVideoPlayed(true);
           setIsVisible(true);
-        }, 200);
-      };
+          sessionStorage.setItem('hasPlayedHeroVideo', 'true');
+          if (video.duration) {
+            sessionStorage.setItem('videoLastFrame', video.duration.toString());
+          }
+        };
 
-      // Handle autoplay restriction errors
-      const handlePlayError = (error: unknown) => {
-        console.log('Video autoplay failed:', error);
-        setRequiresInteraction(true);
-      };
+        // Handle video load errors
+        const handleVideoError = () => {
+          console.error('Video failed to load');
+          setVideoStopped(true);
+          setVideoPlayed(true);
+          setIsVisible(true);
+          sessionStorage.setItem('hasPlayedHeroVideo', 'true');
+        };
 
-      // Handle video load errors
-      const handleVideoError = () => {
-        console.error('Video failed to load');
-        setVideoStopped(true);
-        setVideoPlayed(true);
-        setIsVisible(true);
-      };
+        // Add event listeners
+        video.addEventListener('ended', handleVideoEnded);
+        video.addEventListener('error', handleVideoError);
 
-      // Add event listeners
-      video.addEventListener('ended', handleVideoEnded);
-      video.addEventListener('error', handleVideoError);
+        // Attempt to autoplay video
+        video.play().catch(handlePlayError);
 
-      // Attempt to autoplay video
-      video.play().catch(handlePlayError);
+        return () => {
+          video.removeEventListener('ended', handleVideoEnded);
+          video.removeEventListener('error', handleVideoError);
+        };
+      } else if (hasPlayedVideo) {
+        // Video was already played this session - show last frame
+        const lastFrameTime = sessionStorage.getItem('videoLastFrame');
+        
+        // Wait for video metadata to load
+        const handleMetadataLoaded = () => {
+          if (lastFrameTime) {
+            video.currentTime = parseFloat(lastFrameTime);
+          } else {
+            // Fallback to end of video
+            video.currentTime = video.duration;
+          }
+          
+          // Pause on last frame
+          video.pause();
+          
+          // Set states to show content immediately
+          setVideoStopped(true);
+          setVideoPlayed(true);
+          setIsVisible(true);
+        };
 
-      return () => {
-        video.removeEventListener('ended', handleVideoEnded);
-        video.removeEventListener('error', handleVideoError);
-      };
+        // Check if metadata is already loaded
+        if (video.readyState >= 1) {
+          handleMetadataLoaded();
+        } else {
+          video.addEventListener('loadedmetadata', handleMetadataLoaded);
+        }
+
+        return () => {
+          video.removeEventListener('loadedmetadata', handleMetadataLoaded);
+        };
+      }
     }
   }, [videoPlayed]);
-
 
   return (
     <section className="relative min-h-screen flex items-center overflow-hidden pt-16">

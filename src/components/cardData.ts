@@ -24,7 +24,7 @@ export interface CardSection {
 
 // Import icons (you'll use these in your component)
 import { 
-  Camera, 
+  // Camera, 
   Star, 
   Rocket, 
   Image, 
@@ -54,16 +54,16 @@ export const cardSections: CardSection[] = [
         glow: 'purple',
         ctaText: 'Explore Data'
       },
-      {
-        title: 'Mars Rover Photos',
-        description: 'Explore Mars through the eyes of NASA rovers including Curiosity, Opportunity, and Spirit.',
-        icon: Camera,
-        color: 'from-red-500 to-orange-500',
-        path: '/mars-rover',
-        features: ['Multiple rovers', 'Camera filters', 'Sol dates'],
-        glow: 'red',
-        ctaText: 'Explore Data'
-      },
+      // {
+      //   title: 'Mars Rover Photos',
+      //   description: 'Explore Mars through the eyes of NASA rovers including Curiosity, Opportunity, and Spirit.',
+      //   icon: Camera,
+      //   color: 'from-red-500 to-orange-500',
+      //   path: '/mars-rover',
+      //   features: ['Multiple rovers', 'Camera filters', 'Sol dates'],
+      //   glow: 'red',
+      //   ctaText: 'Explore Data'
+      // },
       {
         title: 'Near Earth Objects',
         description: 'Track asteroids and comets that approach Earth with detailed orbital information.',

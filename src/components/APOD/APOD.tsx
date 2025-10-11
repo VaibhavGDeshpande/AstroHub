@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   VideoCameraIcon,
   ClockIcon,
+  ExclamationTriangleIcon,
 } from '@heroicons/react/24/outline';
 import { useState } from 'react';
 
@@ -64,10 +65,23 @@ const APODImageInfo: React.FC<APODImageInfoProps> = ({
 
   return (
     <div className="h-full flex flex-col">
+      {/* NASA Funding Lapse Disclaimer */}
+      <div className="bg-yellow-900/30 border border-yellow-600/50 rounded-lg p-4 mb-4">
+        <div className="flex items-start gap-3">
+          <ExclamationTriangleIcon className="h-6 w-6 text-yellow-500 flex-shrink-0 mt-0.5" />
+          <div>
+            <h3 className="text-yellow-400 font-semibold mb-1">Notice</h3>
+            <p className="text-yellow-200/90 text-sm">
+              Due to the lapse in federal government funding, NASA is not updating this website. We sincerely regret this inconvenience.
+            </p>
+          </div>
+        </div>
+      </div>
+
       {/* Desktop Search Section */}
       {searchSection}
 
-      {/* Mobile Layout (unchanged for now) */}
+      {/* Mobile Layout */}
       <div className="block lg:hidden space-y-4 flex-1 overflow-y-auto">
         {/* Mobile version stays the same */}
       </div>
