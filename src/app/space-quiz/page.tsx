@@ -45,6 +45,7 @@ export default function QuizSelectionPage() {
   if (isLoading) return <LoaderWrapper />;
 
   return (
+    <LoaderWrapper>
     <div className="min-h-screen bg-black text-white relative overflow-hidden">
       {/* Background */}
       <div className="absolute inset-0 -z-10">
@@ -159,5 +160,6 @@ export default function QuizSelectionPage() {
         </div>
       </div>
     </div>
+    </LoaderWrapper>
   );
 }
