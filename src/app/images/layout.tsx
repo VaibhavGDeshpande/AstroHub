@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 		description:
 			"Explore NASA's Image and Video Library with rich filters and previews.",
 		url: 'https://yourdomain.com/images',
-		siteName: 'NASA Explorer',
+		siteName: 'AstroHub',
 		images: [
 			{
 				url: '/images-og.png',

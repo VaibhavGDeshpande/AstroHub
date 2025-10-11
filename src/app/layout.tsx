@@ -17,8 +17,8 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "NASA Explorer - Space Data & Imagery",
-    template: "%s | NASA Explorer"
+    default: "AstroHub - One-Stop Space Platform with professional observation tools",
+    template: "%s | AstroHub"
   },
   icons: {
     icon:[
