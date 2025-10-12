@@ -8,7 +8,6 @@ import { cardSections, CardAPI } from './cardData';
 
 const EnhancedCards = () => {
   const [isVisible, setIsVisible] = useState(false);
-  // Removed unused hoveredCard state to satisfy eslint no-unused-vars
   const [activeIndices, setActiveIndices] = useState<{ [key: string]: number }>({});
   const [isMobile, setIsMobile] = useState(false);
   const [direction, setDirection] = useState<{ [key: string]: number }>({});
@@ -192,7 +191,7 @@ const EnhancedCards = () => {
         animate={isCenter ? "center" : "side"}
         className="h-full"
       >
-        <div className="relative h-full bg-gradient-to-br from-slate-900/90 to-slate-800/90 backdrop-blur-xl border border-slate-700/50 rounded-3xl p-7 overflow-hidden transition-all duration-300 hover:border-slate-500/70 hover:shadow-2xl hover:shadow-purple-500/20 hover:-translate-y-2 flex flex-col min-h-[400px] cursor-pointer">
+        <div className="relative h-full bg-gradient-to-br from-slate-900/90 to-slate-800/90 backdrop-blur-xl border border-slate-700/50 rounded-2xl sm:rounded-3xl p-5 sm:p-7 overflow-hidden transition-all duration-300 hover:border-slate-500/70 hover:shadow-2xl hover:shadow-purple-500/20 hover:-translate-y-2 flex flex-col min-h-[380px] sm:min-h-[400px] cursor-pointer group">
           
           {/* Animated gradient background */}
           <div className={`absolute inset-0 bg-gradient-to-br ${api.color} opacity-0 group-hover:opacity-[0.15] transition-all duration-500 blur-2xl`} />
@@ -219,15 +218,15 @@ const EnhancedCards = () => {
           </div>
 
           {/* Corner accent */}
-          <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-white/5 to-transparent rounded-bl-full opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+          <div className="absolute top-0 right-0 w-24 sm:w-32 h-24 sm:h-32 bg-gradient-to-br from-white/5 to-transparent rounded-bl-full opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
           {/* Icon container */}
-          <div className="relative mb-6 flex-shrink-0">
-            <div className={`relative w-16 h-16 rounded-2xl bg-gradient-to-br ${api.color} flex items-center justify-center shadow-2xl group-hover:scale-110 group-hover:rotate-6 transition-all duration-300`}>
-              <Icon className="w-8 h-8 text-white" />
-              <div className={`absolute inset-0 rounded-2xl bg-gradient-to-br ${api.color} blur-2xl opacity-0 group-hover:opacity-70 transition-all duration-300`} />
+          <div className="relative mb-4 sm:mb-6 flex-shrink-0">
+            <div className={`relative w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl bg-gradient-to-br ${api.color} flex items-center justify-center shadow-2xl group-hover:scale-110 group-hover:rotate-6 transition-all duration-300`}>
+              <Icon className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
+              <div className={`absolute inset-0 rounded-xl sm:rounded-2xl bg-gradient-to-br ${api.color} blur-2xl opacity-0 group-hover:opacity-70 transition-all duration-300`} />
             </div>
-            <Sparkles className="absolute -top-1 -right-1 w-5 h-5 text-yellow-400 opacity-0 group-hover:opacity-100 group-hover:animate-pulse transition-opacity duration-300" />
+            <Sparkles className="absolute -top-1 -right-1 w-4 h-4 sm:w-5 sm:h-5 text-yellow-400 opacity-0 group-hover:opacity-100 group-hover:animate-pulse transition-opacity duration-300" />
           </div>
 
           {/* Content - Only animate on center card */}
@@ -240,14 +239,14 @@ const EnhancedCards = () => {
           >
             <motion.h3 
               variants={isCenter ? itemVariants : undefined}
-              className="text-2xl font-bold text-white mb-3 group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-blue-400 group-hover:via-purple-400 group-hover:to-pink-400 group-hover:bg-clip-text transition-all duration-300"
+              className="text-xl sm:text-2xl font-bold text-white mb-2 sm:mb-3 group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-blue-400 group-hover:via-purple-400 group-hover:to-pink-400 group-hover:bg-clip-text transition-all duration-300"
             >
               {api.title}
             </motion.h3>
 
             <motion.p 
               variants={isCenter ? itemVariants : undefined}
-              className="text-slate-400 mb-6 text-sm leading-relaxed group-hover:text-slate-300 transition-colors duration-200 flex-grow"
+              className="text-slate-400 mb-4 sm:mb-6 text-xs sm:text-sm leading-relaxed group-hover:text-slate-300 transition-colors duration-200 flex-grow"
             >
               {api.description}
             </motion.p>
@@ -255,7 +254,7 @@ const EnhancedCards = () => {
             {/* Features */}
             <motion.div 
               variants={isCenter ? contentVariants : undefined}
-              className="space-y-3 mb-6"
+              className="space-y-2 sm:space-y-3 mb-4 sm:mb-6"
             >
               {api.features.map((feature: string, idx: number) => (
                 <motion.div 
@@ -263,7 +262,7 @@ const EnhancedCards = () => {
                   variants={isCenter ? itemVariants : {}}
                   className="flex items-center group/feature"
                 >
-                  <div className={`w-1.5 h-1.5 rounded-full bg-gradient-to-r ${api.color} mr-3 group-hover:scale-150 group-hover:shadow-lg transition-all duration-200`} />
+                  <div className={`w-1.5 h-1.5 rounded-full bg-gradient-to-r ${api.color} mr-2 sm:mr-3 group-hover:scale-150 group-hover:shadow-lg transition-all duration-200`} />
                   <span className="text-xs text-slate-500 group-hover/feature:text-white transition-colors duration-200 font-medium">
                     {feature}
                   </span>
@@ -273,25 +272,25 @@ const EnhancedCards = () => {
           </motion.div>
 
           {/* CTA */}
-          <div className="relative flex items-center justify-between pt-5 border-t border-slate-700/30 group-hover:border-slate-600/50 transition-all duration-200 mt-auto z-10">
-            <div className="flex items-center gap-2">
-              <span className={`text-sm font-semibold bg-gradient-to-r ${api.color} bg-clip-text text-transparent group-hover:text-white transition-all duration-200`}>
+          <div className="relative flex items-center justify-between pt-4 sm:pt-5 border-t border-slate-700/30 group-hover:border-slate-600/50 transition-all duration-200 mt-auto z-10">
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              <span className={`text-xs sm:text-sm font-semibold bg-gradient-to-r ${api.color} bg-clip-text text-transparent group-hover:text-white transition-all duration-200`}>
                 {api.ctaText}
               </span>
-              <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-white group-hover:translate-x-2 transition-all duration-200" />
+              <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4 text-slate-400 group-hover:text-white group-hover:translate-x-2 transition-all duration-200" />
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5 sm:gap-2">
               <div className="relative">
-                <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
-                <div className="absolute inset-0 w-2 h-2 bg-emerald-400 rounded-full animate-ping" />
+                <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-emerald-400 rounded-full animate-pulse" />
+                <div className="absolute inset-0 w-1.5 h-1.5 sm:w-2 sm:h-2 bg-emerald-400 rounded-full animate-ping" />
               </div>
               <span className="text-xs text-emerald-400 font-semibold">Live</span>
             </div>
           </div>
 
           {/* Hover overlay */}
-          <div className="absolute inset-0 rounded-3xl bg-gradient-to-t from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+          <div className="absolute inset-0 rounded-2xl sm:rounded-3xl bg-gradient-to-t from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
         </div>
       </motion.div>
     );
@@ -313,13 +312,13 @@ const EnhancedCards = () => {
 
   return (
     <MotionConfig transition={{ duration: 0.4, ease: 'easeInOut' }}>
-      <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-black py-20 px-4 relative overflow-hidden">
+      <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-black py-12 sm:py-16 md:py-20 px-4 relative overflow-hidden">
         {/* Enhanced background effects */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-0 left-1/4 w-96 h-96 bg-purple-500/20 rounded-full blur-[120px] animate-pulse" style={{ animationDuration: '8s' }} />
-          <div className="absolute top-1/3 right-1/4 w-96 h-96 bg-blue-500/20 rounded-full blur-[120px] animate-pulse" style={{ animationDuration: '10s', animationDelay: '2s' }} />
-          <div className="absolute bottom-1/4 left-1/3 w-96 h-96 bg-emerald-500/20 rounded-full blur-[120px] animate-pulse" style={{ animationDuration: '9s', animationDelay: '1s' }} />
-          <div className="absolute bottom-0 left-1/2 w-96 h-96 bg-cyan-500/20 rounded-full blur-[120px] animate-pulse" style={{ animationDuration: '12s', animationDelay: '4s' }} />
+          <div className="absolute top-0 left-1/4 w-64 sm:w-96 h-64 sm:h-96 bg-purple-500/20 rounded-full blur-[120px] animate-pulse" style={{ animationDuration: '8s' }} />
+          <div className="absolute top-1/3 right-1/4 w-64 sm:w-96 h-64 sm:h-96 bg-blue-500/20 rounded-full blur-[120px] animate-pulse" style={{ animationDuration: '10s', animationDelay: '2s' }} />
+          <div className="absolute bottom-1/4 left-1/3 w-64 sm:w-96 h-64 sm:h-96 bg-emerald-500/20 rounded-full blur-[120px] animate-pulse" style={{ animationDuration: '9s', animationDelay: '1s' }} />
+          <div className="absolute bottom-0 left-1/2 w-64 sm:w-96 h-64 sm:h-96 bg-cyan-500/20 rounded-full blur-[120px] animate-pulse" style={{ animationDuration: '12s', animationDelay: '4s' }} />
           
           {/* Grid overlay */}
           <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:100px_100px]" />
@@ -330,19 +329,19 @@ const EnhancedCards = () => {
 
         <div className="container mx-auto max-w-7xl relative z-10">
           {/* Main header */}
-          <div className={`text-center mb-24 transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-            <h1 className="text-6xl md:text-8xl font-black text-transparent bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text mb-8 leading-tight tracking-tight">
+          <div className={`text-center mb-16 sm:mb-20 md:mb-24 transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-8xl font-black text-transparent bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text mb-6 sm:mb-8 leading-tight tracking-tight px-4">
               Explore the Universe
             </h1>
-            <p className="text-xl md:text-2xl text-slate-400 max-w-3xl mx-auto leading-relaxed font-light">
+            <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-slate-400 max-w-3xl mx-auto leading-relaxed font-light px-4">
               Access real-time space data, immersive 3D models, and professional sky observation tools
             </p>
             
             {/* Decorative line */}
-            <div className="flex items-center justify-center gap-3 mt-8">
-              <div className="w-20 h-px bg-gradient-to-r from-transparent via-blue-500 to-transparent"></div>
-              <Star className="w-4 h-4 text-blue-400 animate-pulse" />
-              <div className="w-20 h-px bg-gradient-to-r from-transparent via-purple-500 to-transparent"></div>
+            <div className="flex items-center justify-center gap-2 sm:gap-3 mt-6 sm:mt-8">
+              <div className="w-12 sm:w-20 h-px bg-gradient-to-r from-transparent via-blue-500 to-transparent"></div>
+              <Star className="w-3 h-3 sm:w-4 sm:h-4 text-blue-400 animate-pulse" />
+              <div className="w-12 sm:w-20 h-px bg-gradient-to-r from-transparent via-purple-500 to-transparent"></div>
             </div>
           </div>
 
@@ -354,18 +353,18 @@ const EnhancedCards = () => {
             const sectionDirection = direction[section.id] || 1;
 
             return (
-              <section key={section.id} className="mb-28">
-                <div className="text-center mb-16">
-                  <div className="inline-block mb-4">
-                    <div className={`flex items-center gap-2 px-4 py-2 ${getBadgeColor(section.badgeColor)} border rounded-full`}>
-                      <div className={`w-2 h-2 bg-${section.badgeColor}-400 rounded-full animate-pulse`}></div>
+              <section key={section.id} className="mb-20 sm:mb-24 md:mb-28">
+                <div className="text-center mb-12 sm:mb-14 md:mb-16 px-4">
+                  <div className="inline-block mb-3 sm:mb-4">
+                    <div className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 ${getBadgeColor(section.badgeColor)} border rounded-full`}>
+                      <div className={`w-1.5 h-1.5 sm:w-2 sm:h-2 bg-${section.badgeColor}-400 rounded-full animate-pulse`}></div>
                       <span className="text-xs font-semibold uppercase tracking-wider">{section.badgeText}</span>
                     </div>
                   </div>
-                  <h2 className={`text-5xl md:text-6xl font-black text-transparent bg-gradient-to-r ${section.titleGradient} bg-clip-text mb-5 tracking-tight`}>
+                  <h2 className={`text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-transparent bg-gradient-to-r ${section.titleGradient} bg-clip-text mb-4 sm:mb-5 tracking-tight`}>
                     {section.badgeText}
                   </h2>
-                  <p className="text-lg text-slate-400 max-w-2xl mx-auto font-light">
+                  <p className="text-sm sm:text-base md:text-lg text-slate-400 max-w-2xl mx-auto font-light">
                     {section.subtitle}
                   </p>
                 </div>
@@ -373,17 +372,17 @@ const EnhancedCards = () => {
                 {shouldShowCarousel ? (
                   <>
                     {/* Desktop View - Three cards carousel with arrows */}
-                    <div className="hidden lg:block relative">
+                    <div className="hidden lg:block relative px-12 xl:px-16">
                       {/* Navigation Arrows - Desktop */}
                       <button
                         onClick={() => handlePrevious(section.id, section.cards.length)}
-                        className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-6 z-10 w-12 h-12 rounded-full bg-gradient-to-br from-slate-800/90 to-slate-700/90 border border-slate-600/50 flex items-center justify-center hover:border-purple-500/50 hover:shadow-lg hover:shadow-purple-500/20 transition-all duration-300 group"
+                        className="absolute left-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 xl:w-12 xl:h-12 rounded-full bg-gradient-to-br from-slate-800/90 to-slate-700/90 border border-slate-600/50 flex items-center justify-center hover:border-purple-500/50 hover:shadow-lg hover:shadow-purple-500/20 transition-all duration-300 group"
                         aria-label="Previous slide"
                       >
-                        <ChevronLeft className="w-6 h-6 text-slate-400 group-hover:text-white transition-colors" />
+                        <ChevronLeft className="w-5 h-5 xl:w-6 xl:h-6 text-slate-400 group-hover:text-white transition-colors" />
                       </button>
                       
-                      <div className="flex justify-center gap-6 relative w-full mb-8">
+                      <div className="flex justify-center gap-4 xl:gap-6 relative w-full mb-8">
                         {visibleCards.map(({ card, position, originalIndex }) => (
                           <div key={`${section.id}-${card.title}`} className="w-1/3">
                             {renderCard(card, position, section.id, originalIndex)}
@@ -393,39 +392,39 @@ const EnhancedCards = () => {
 
                       <button
                         onClick={() => handleNext(section.id, section.cards.length)}
-                        className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-6 z-10 w-12 h-12 rounded-full bg-gradient-to-br from-slate-800/90 to-slate-700/90 border border-slate-600/50 flex items-center justify-center hover:border-purple-500/50 hover:shadow-lg hover:shadow-purple-500/20 transition-all duration-300 group"
+                        className="absolute right-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 xl:w-12 xl:h-12 rounded-full bg-gradient-to-br from-slate-800/90 to-slate-700/90 border border-slate-600/50 flex items-center justify-center hover:border-purple-500/50 hover:shadow-lg hover:shadow-purple-500/20 transition-all duration-300 group"
                         aria-label="Next slide"
                       >
-                        <ChevronRight className="w-6 h-6 text-slate-400 group-hover:text-white transition-colors" />
+                        <ChevronRight className="w-5 h-5 xl:w-6 xl:h-6 text-slate-400 group-hover:text-white transition-colors" />
                       </button>
                     </div>
 
-                    {/* Mobile View - Single card carousel with arrows */}
-                    <div className="lg:hidden relative">
-                      {/* Navigation Arrows - Mobile */}
+                    {/* Mobile/Tablet View - Single card carousel with arrows */}
+                    <div className="lg:hidden relative px-4">
+                      {/* Navigation Arrows - Mobile/Tablet */}
                       <div className="flex justify-between items-center mb-4 px-2">
                         <button
                           onClick={() => handlePrevious(section.id, section.cards.length)}
-                          className="w-10 h-10 rounded-full bg-gradient-to-br from-slate-800/90 to-slate-700/90 border border-slate-600/50 flex items-center justify-center hover:border-purple-500/50 transition-all duration-300"
+                          className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-slate-800/90 to-slate-700/90 border border-slate-600/50 flex items-center justify-center hover:border-purple-500/50 transition-all duration-300"
                           aria-label="Previous slide"
                         >
-                          <ChevronLeft className="w-5 h-5 text-slate-400" />
+                          <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5 text-slate-400" />
                         </button>
                         
-                        <span className="text-sm text-slate-500 font-medium">
+                        <span className="text-xs sm:text-sm text-slate-500 font-medium">
                           {activeIndex + 1} / {section.cards.length}
                         </span>
 
                         <button
                           onClick={() => handleNext(section.id, section.cards.length)}
-                          className="w-10 h-10 rounded-full bg-gradient-to-br from-slate-800/90 to-slate-700/90 border border-slate-600/50 flex items-center justify-center hover:border-purple-500/50 transition-all duration-300"
+                          className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-slate-800/90 to-slate-700/90 border border-slate-600/50 flex items-center justify-center hover:border-purple-500/50 transition-all duration-300"
                           aria-label="Next slide"
                         >
-                          <ChevronRight className="w-5 h-5 text-slate-400" />
+                          <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 text-slate-400" />
                         </button>
                       </div>
 
-                      <div className="min-h-[400px] relative mb-8">
+                      <div className="min-h-[380px] sm:min-h-[400px] relative mb-6 sm:mb-8">
                         <AnimatePresence initial={false} mode="wait" custom={sectionDirection}>
                           <motion.div
                             key={`mobile-${section.id}-${activeIndex}`}
@@ -443,7 +442,7 @@ const EnhancedCards = () => {
                     </div>
 
                     {/* Indicator Dots */}
-                    <div className="flex justify-center mt-8 space-x-2">
+                    <div className="flex justify-center mt-6 sm:mt-8 space-x-1.5 sm:space-x-2">
                       {section.cards.map((_, idx) => (
                         <motion.button
                           key={idx}
@@ -454,7 +453,7 @@ const EnhancedCards = () => {
                             }));
                             setActiveIndices(prev => ({ ...prev, [section.id]: idx }));
                           }}
-                          className={`w-3 h-3 rounded-full transition-all duration-300 ${
+                          className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full transition-all duration-300 ${
                             activeIndex === idx ? 'bg-purple-500' : 'bg-slate-600'
                           }`}
                           whileHover={{ scale: 1.2 }}
@@ -469,7 +468,7 @@ const EnhancedCards = () => {
                   </>
                 ) : (
                   // Regular grid for sections with fewer than 3 cards
-                  <div className={`grid ${section.cards.length === 2 ? 'grid-cols-1 md:grid-cols-2' : 'grid-cols-1'} gap-6 max-w-4xl mx-auto`}>
+                  <div className={`grid ${section.cards.length === 2 ? 'grid-cols-1 md:grid-cols-2' : 'grid-cols-1'} gap-4 sm:gap-6 max-w-4xl mx-auto px-4`}>
                     {section.cards.map((api, index) => (
                       <div
                         key={index}

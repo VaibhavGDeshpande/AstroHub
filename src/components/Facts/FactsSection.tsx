@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 const FactsSection = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const sectionRef = useRef<HTMLDivElement>(null);
-  const intervalRef = useRef<NodeJS.Timeout | null>(null); // Use ref instead of state
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [videoLoaded, setVideoLoaded] = useState(false);
   const [currentFactIndex, setCurrentFactIndex] = useState(0);
@@ -127,7 +127,6 @@ const FactsSection = () => {
 
   // Fact rotation - only when in view
   useEffect(() => {
-    // Clear any existing interval
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
       intervalRef.current = null;
@@ -137,26 +136,22 @@ const FactsSection = () => {
       return;
     }
 
-    // Reset to first fact when coming into view
     setCurrentFactIndex(0);
 
-    // Start fact rotation
     intervalRef.current = setInterval(() => {
       setCurrentFactIndex((prevIndex) => 
         (prevIndex + 1) % astronomyFacts.length
       );
     }, 4000);
 
-    // Cleanup function
     return () => {
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
         intervalRef.current = null;
       }
     };
-  }, [isInView, videoLoaded, astronomyFacts.length]); // Remove factInterval from dependencies
+  }, [isInView, videoLoaded, astronomyFacts.length]);
 
-  // Cleanup interval on unmount
   useEffect(() => {
     return () => {
       if (intervalRef.current) {
@@ -187,7 +182,7 @@ const FactsSection = () => {
   return (
     <motion.section 
       ref={sectionRef}
-      className="relative min-h-screen flex items-center justify-center overflow-hidden bg-slate-900"
+      className="relative min-h-[70vh] sm:min-h-[80vh] md:min-h-screen flex items-center justify-center overflow-hidden bg-slate-900"
       initial={{ opacity: 0 }}
       whileInView={{ opacity: 1 }}
       viewport={{ 
@@ -214,7 +209,7 @@ const FactsSection = () => {
         <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/40" />
       </div>
 
-      {/* Professional Facts Section - Only show when in view */}
+      {/* Professional Facts Section - Moved Down */}
       <AnimatePresence>
         {isInView && videoLoaded && (
           <motion.div
@@ -227,27 +222,27 @@ const FactsSection = () => {
               ease: "easeOut",
               staggerChildren: 0.2
             }}
-            className="absolute top-12 left-1/2 transform -translate-x-1/2 z-20 max-w-4xl mx-auto px-6"
+            className="absolute top-32 sm:top-40 md:top-48 lg:top-56 left-1/2 transform -translate-x-1/2 z-20 max-w-4xl mx-auto px-4 sm:px-6 w-full"
           >
             {/* Clean Header */}
             <motion.div 
-              className="text-center mb-12"
+              className="text-center mb-8 sm:mb-10 md:mb-12"
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
             >
-              <div className="flex items-center justify-center mb-4">
-                <div className="h-px w-16 bg-gradient-to-r from-transparent to-slate-400"></div>
-                <h2 className="mx-6 text-slate-300 font-medium text-sm tracking-[0.2em] uppercase">
+              <div className="flex items-center justify-center mb-3 sm:mb-4">
+                <div className="h-px w-12 sm:w-16 bg-gradient-to-r from-transparent to-slate-400"></div>
+                <h2 className="mx-4 sm:mx-6 text-slate-300 font-medium text-xs sm:text-sm tracking-[0.15em] sm:tracking-[0.2em] uppercase">
                   Astronomical Insights
                 </h2>
-                <div className="h-px w-16 bg-gradient-to-l from-transparent to-slate-400"></div>
+                <div className="h-px w-12 sm:w-16 bg-gradient-to-l from-transparent to-slate-400"></div>
               </div>
             </motion.div>
 
             {/* Fully Transparent Content Card */}
             <div className="relative">
-              <div className="relative px-8 py-10 md:px-12 md:py-14">
+              <div className="relative px-4 py-8 sm:px-8 sm:py-10 md:px-12 md:py-14">
                 <AnimatePresence mode="wait">
                   <motion.div
                     key={`fact-${currentFactIndex}-${isInView}`}
@@ -261,7 +256,7 @@ const FactsSection = () => {
                       y: { duration: 0.6 },
                       rotateX: { duration: 0.6 }
                     }}
-                    className="text-center space-y-6"
+                    className="text-center space-y-4 sm:space-y-6"
                   >
                     {/* Minimalist Icon */}
                     <motion.div
@@ -276,8 +271,8 @@ const FactsSection = () => {
                       }}
                       className="flex justify-center"
                     >
-                      <div className="w-16 h-16 rounded-full bg-black/20 backdrop-blur-sm border border-white/10 flex items-center justify-center hover:bg-black/30 transition-all duration-300">
-                        <span className="text-2xl">{currentFact.emoji}</span>
+                      <div className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-full bg-black/20 backdrop-blur-sm border border-white/10 flex items-center justify-center hover:bg-black/30 transition-all duration-300">
+                        <span className="text-xl sm:text-2xl">{currentFact.emoji}</span>
                       </div>
                     </motion.div>
 
@@ -290,7 +285,7 @@ const FactsSection = () => {
                         delay: 0.3,
                         ease: "easeOut"
                       }}
-                      className="text-xl md:text-2xl text-white font-light leading-relaxed max-w-3xl mx-auto"
+                      className="text-base sm:text-lg md:text-xl lg:text-2xl text-white font-light leading-relaxed max-w-3xl mx-auto px-2"
                       style={{ 
                         textShadow: '0 2px 8px rgba(0, 0, 0, 0.8), 0 4px 16px rgba(0, 0, 0, 0.6)' 
                       }}
@@ -302,7 +297,7 @@ const FactsSection = () => {
 
                 {/* Professional Progress Bar */}
                 <motion.div 
-                  className="mt-10 flex justify-center"
+                  className="mt-8 sm:mt-10 flex justify-center"
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ duration: 0.5, delay: 0.4 }}
@@ -313,7 +308,7 @@ const FactsSection = () => {
                         key={index}
                         className={`h-1.5 rounded-full transition-all duration-500 ${
                           index === currentFactIndex 
-                            ? 'w-6 bg-white/80' 
+                            ? 'w-4 sm:w-6 bg-white/80' 
                             : 'w-1.5 bg-white/30'
                         }`}
                         initial={{ scale: 0 }}
@@ -334,7 +329,7 @@ const FactsSection = () => {
 
       {/* Enhanced scroll indicator */}
       <motion.div 
-        className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-20"
+        className="absolute bottom-6 sm:bottom-8 left-1/2 transform -translate-x-1/2 z-20"
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 1 }}
@@ -350,30 +345,30 @@ const FactsSection = () => {
           className="flex flex-col items-center text-white/60"
         >
           <span className="text-xs mb-2 tracking-wider">SCROLL</span>
-          <div className="w-px h-8 bg-gradient-to-b from-white/60 to-transparent"></div>
+          <div className="w-px h-6 sm:h-8 bg-gradient-to-b from-white/60 to-transparent"></div>
         </motion.div>
       </motion.div>
 
       {/* Transparent bottom fade */}
-      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-black/60 to-transparent z-5" />
+      <div className="absolute bottom-0 left-0 right-0 h-24 sm:h-32 bg-gradient-to-t from-black/60 to-transparent z-5" />
       
       {/* Minimal corner accents with animations */}
       <motion.div 
-        className="absolute top-6 left-6 w-8 h-8 border-l border-t border-slate-400/20 z-10"
+        className="absolute top-4 sm:top-6 left-4 sm:left-6 w-6 h-6 sm:w-8 sm:h-8 border-l border-t border-slate-400/20 z-10"
         initial={{ opacity: 0, scale: 0 }}
         whileInView={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.5, delay: 0.8 }}
         viewport={{ once: false }}
       />
       <motion.div 
-        className="absolute bottom-6 left-6 w-8 h-8 border-l border-b border-slate-400/20 z-10"
+        className="absolute bottom-4 sm:bottom-6 left-4 sm:left-6 w-6 h-6 sm:w-8 sm:h-8 border-l border-b border-slate-400/20 z-10"
         initial={{ opacity: 0, scale: 0 }}
         whileInView={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.5, delay: 1.0 }}
         viewport={{ once: false }}
       />
       <motion.div 
-        className="absolute bottom-6 right-6 w-8 h-8 border-r border-b border-slate-400/20 z-10"
+        className="absolute bottom-4 sm:bottom-6 right-4 sm:right-6 w-6 h-6 sm:w-8 sm:h-8 border-r border-b border-slate-400/20 z-10"
         initial={{ opacity: 0, scale: 0 }}
         whileInView={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.5, delay: 1.1 }}

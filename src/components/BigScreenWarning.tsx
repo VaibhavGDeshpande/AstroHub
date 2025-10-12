@@ -1,4 +1,4 @@
-// components/ScreenSizeWarningModal.tsx
+
 'use client'
 import { useState, useEffect } from 'react';
 import { XMarkIcon, ComputerDesktopIcon, DevicePhoneMobileIcon } from '@heroicons/react/24/outline';
