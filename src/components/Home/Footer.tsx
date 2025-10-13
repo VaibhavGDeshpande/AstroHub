@@ -16,7 +16,6 @@ const Footer = () => {
       title: 'NASA Data',
       items: [
         { name: 'Astronomy Picture of the Day', path: '/apod' },
-        // { name: 'Mars Rover Photos', path: '/mars-rover' },
         { name: 'Near Earth Objects', path: '/neo' },
         { name: 'EPIC Earth Images', path: '/epic' },
         { name: 'NASA Image Library', path: '/images' },
@@ -109,32 +108,33 @@ const Footer = () => {
         <div className="absolute w-1 h-1 bg-blue-400/30 rounded-full animate-pulse" style={{ top: '70%', right: '40%', animationDelay: '1.5s' }} />
       </div>
 
-      <div className="container mx-auto px-4 py-12 relative">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 lg:py-12 relative">
         {/* Main Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-8 lg:gap-8">
           
-          {/* Brand Section - Takes 3 columns */}
-          <div className="lg:col-span-3 space-y-6">
+          {/* Brand Section - Full width on mobile, half on tablet, 3 columns on desktop */}
+          <div className="md:col-span-2 lg:col-span-3 space-y-4 sm:space-y-6">
+            {/*eslint-disable-next-line @next/next/no-html-link-for-pages*/}
             <a href="#" className="inline-block hover:scale-105 transition-transform duration-300">
               <img
                 src="/assets/AstroHub.png"
                 alt="AstroHub Logo"
                 width={140}
-                height={50}
-                className="transition-all duration-300"
+                height={90}
+                className="w-32 sm:w-36 lg:w-40 h-auto transition-all duration-300"
               />
             </a>
-            <p className="text-gray-400 text-sm leading-relaxed">
+            <p className="text-gray-400 text-sm sm:text-base leading-relaxed max-w-sm">
               Explore the cosmos with AstroHub.
             </p>
             
             {/* Social Links */}
             <div>
-              <h4 className="text-white font-semibold mb-3 text-base flex items-center">
+              <h4 className="text-white font-semibold mb-3 text-sm sm:text-base flex items-center">
                 <div className="w-1 h-1 bg-cyan-400 rounded-full mr-2" />
                 Follow Us
               </h4>
-              <div className="flex space-x-4">
+              <div className="flex space-x-3 sm:space-x-4">
                 {socialLinks.map((social, index) => (
                   <a
                     key={index}
@@ -152,41 +152,44 @@ const Footer = () => {
 
             {/* Contact Info */}
             <div>
-              <h4 className="text-white font-semibold mb-3 text-base flex items-center">
+              <h4 className="text-white font-semibold mb-3 text-sm sm:text-base flex items-center">
                 <div className="w-1 h-1 bg-cyan-400 rounded-full mr-2" />
                 Contact
               </h4>
               <ul className="space-y-2">
-                <li className="flex items-start space-x-2 text-gray-400 text-xs">
-                  <EnvelopeIcon className="w-4 h-4 text-cyan-400 mt-0.5 flex-shrink-0" />
-                  <a href="mailto:deshpande.vaibhav1012@gmail.com" className="hover:text-cyan-400 transition-colors">
+                <li className="flex items-start space-x-2 text-gray-400 text-xs sm:text-sm">
+                  <EnvelopeIcon className="w-4 h-4 sm:w-5 sm:h-5 text-cyan-400 mt-0.5 flex-shrink-0" />
+                  <a 
+                    href="mailto:deshpande.vaibhav1012@gmail.com" 
+                    className="hover:text-cyan-400 transition-colors break-all"
+                  >
                     deshpande.vaibhav1012@gmail.com
                   </a>
                 </li>
-                <li className="flex items-start space-x-2 text-gray-400 text-xs">
-                  <MapPinIcon className="w-4 h-4 text-cyan-400 mt-0.5 flex-shrink-0" />
+                <li className="flex items-start space-x-2 text-gray-400 text-xs sm:text-sm">
+                  <MapPinIcon className="w-4 h-4 sm:w-5 sm:h-5 text-cyan-400 mt-0.5 flex-shrink-0" />
                   <span>Pune, Maharashtra</span>
                 </li>
               </ul>
             </div>
           </div>
 
-          {/* Navigation Links - Takes 9 columns */}
-          <div className="lg:col-span-9">
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8">
+          {/* Navigation Links - Full width on mobile, spans remaining columns */}
+          <div className="md:col-span-2 lg:col-span-9">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-6 sm:gap-8">
               
               {/* Explore Categories */}
               {exploreLinks.map((category) => (
-                <div key={category.id}>
-                  <h3 className="text-white font-semibold mb-4 text-sm uppercase tracking-wider">
+                <div key={category.id} className="min-w-0">
+                  <h3 className="text-white font-semibold mb-3 sm:mb-4 text-xs sm:text-sm uppercase tracking-wider">
                     {category.title}
                   </h3>
-                  <ul className="space-y-2.5">
+                  <ul className="space-y-2 sm:space-y-2.5">
                     {category.items.map((link, index) => (
                       <li key={index}>
                         <a
                           href={link.path}
-                          className="text-gray-400 hover:text-cyan-400 transition-all duration-300 text-sm hover:translate-x-1 inline-block group"
+                          className="text-gray-400 hover:text-cyan-400 transition-all duration-300 text-xs sm:text-sm hover:translate-x-1 inline-block group break-words"
                         >
                           <span className="relative">
                             {link.name}
@@ -199,17 +202,17 @@ const Footer = () => {
                 </div>
               ))}
 
-              {/* Quick Links & Resources Combined */}
-              <div>
-                <h3 className="text-white font-semibold mb-4 text-sm uppercase tracking-wider">
+              {/* Quick Links */}
+              <div className="min-w-0">
+                <h3 className="text-white font-semibold mb-3 sm:mb-4 text-xs sm:text-sm uppercase tracking-wider">
                   Quick Links
                 </h3>
-                <ul className="space-y-2.5 mb-6">
+                <ul className="space-y-2 sm:space-y-2.5">
                   {quickLinks.map((link, index) => (
                     <li key={index}>
                       <a
                         href={link.path}
-                        className="text-gray-400 hover:text-cyan-400 transition-all duration-300 text-sm hover:translate-x-1 inline-block group"
+                        className="text-gray-400 hover:text-cyan-400 transition-all duration-300 text-xs sm:text-sm hover:translate-x-1 inline-block group break-words"
                       >
                         <span className="relative">
                           {link.name}
@@ -219,18 +222,21 @@ const Footer = () => {
                     </li>
                   ))}
                 </ul>
+              </div>
 
-                <h3 className="text-white font-semibold mb-4 text-sm uppercase tracking-wider">
+              {/* Resources */}
+              <div className="min-w-0">
+                <h3 className="text-white font-semibold mb-3 sm:mb-4 text-xs sm:text-sm uppercase tracking-wider">
                   Resources
                 </h3>
-                <ul className="space-y-2.5">
+                <ul className="space-y-2 sm:space-y-2.5">
                   {resources.map((resource, index) => (
                     <li key={index}>
                       <a
                         href={resource.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-gray-400 hover:text-cyan-400 transition-all duration-300 text-sm hover:translate-x-1 inline-block group"
+                        className="text-gray-400 hover:text-cyan-400 transition-all duration-300 text-xs sm:text-sm hover:translate-x-1 inline-block group break-words"
                       >
                         <span className="relative">
                           {resource.name}
@@ -246,11 +252,11 @@ const Footer = () => {
         </div>
 
         {/* Divider */}
-        <div className="border-t border-cyan-400/20 my-8" />
+        <div className="border-t border-cyan-400/20 my-6 sm:my-8" />
 
         {/* Bottom Bar */}
-        <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0 text-center md:text-left">
-          <div className="text-gray-400 text-sm">
+        <div className="flex flex-col sm:flex-row justify-between items-center space-y-3 sm:space-y-0 text-center sm:text-left">
+          <div className="text-gray-400 text-xs sm:text-sm">
             © {currentYear} AstroHub. All rights reserved.
           </div>
         </div>

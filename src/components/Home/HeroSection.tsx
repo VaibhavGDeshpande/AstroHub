@@ -122,7 +122,7 @@ const HeroSection = () => {
   }, [videoPlayed]);
 
   return (
-    <section className="relative min-h-screen flex items-center overflow-hidden pt-16">
+    <section className="relative h-[70vh] sm:h-[80vh] md:min-h-screen flex items-center overflow-hidden pt-16 sm:pt-20 md:pt-16">
       {/* Background Video */}
       <div className="absolute inset-0">
         <video
@@ -152,11 +152,11 @@ const HeroSection = () => {
       </div>
 
       {/* Hero Content */}
-      <div className="relative z-10 px-6 lg:px-12 max-w-7xl mx-auto w-full">
+      <div className="relative z-10 px-4 sm:px-6 lg:px-12 max-w-7xl mx-auto w-full">
         <div className="max-w-4xl">
-          <div className="space-y-6">
+          <div className="space-y-4 sm:space-y-6">
             <h1
-              className={`text-5xl md:text-7xl lg:text-8xl font-bold mb-6 transition-all duration-1000 ease-out ${
+              className={`text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-bold mb-4 sm:mb-6 transition-all duration-1000 ease-out ${
                 videoStopped && isVisible
                   ? 'opacity-100 translate-y-0'
                   : 'opacity-0 translate-y-12'
@@ -175,7 +175,7 @@ const HeroSection = () => {
             </h1>
 
             <div
-              className={`space-y-3 ml-4 transition-all duration-1000 ease-out ${
+              className={`space-y-2 sm:space-y-3 ml-2 sm:ml-4 transition-all duration-1000 ease-out ${
                 videoStopped && isVisible
                   ? 'opacity-100 translate-y-0'
                   : 'opacity-0 translate-y-8'
@@ -183,12 +183,12 @@ const HeroSection = () => {
               style={{ transitionDelay: '600ms' }}
             >
               <p
-                className={`text-lg md:text-xl lg:text-2xl text-cyan-100 leading-relaxed font-light ${inter.className} subtitle-text`}
+                className={`text-base sm:text-lg md:text-xl lg:text-2xl text-cyan-100 leading-relaxed font-light ${inter.className} subtitle-text`}
               >
                 Your gateway to the cosmos
               </p>
               <p
-                className={`text-sm md:text-base lg:text-lg text-slate-300 leading-relaxed max-w-2xl ${inter.className} description-text transition-all duration-1000 ease-out ${
+                className={`text-sm sm:text-base lg:text-lg text-slate-300 leading-relaxed max-w-2xl ${inter.className} description-text transition-all duration-1000 ease-out ${
                   videoStopped && isVisible
                     ? 'opacity-100 scale-100'
                     : 'opacity-0 scale-95'
@@ -203,23 +203,23 @@ const HeroSection = () => {
 
             {/* Key Features Tags */}
             <div
-              className={`flex flex-wrap gap-2 mt-6 ml-4 transition-all duration-1000 ease-out ${
+              className={`flex flex-wrap gap-2 mt-4 sm:mt-6 ml-2 sm:ml-4 transition-all duration-1000 ease-out ${
                 videoStopped && isVisible
                   ? 'opacity-100 translate-y-0'
                   : 'opacity-0 translate-y-8'
               }`}
               style={{ transitionDelay: '1000ms' }}
             >
-              <span className="px-3 py-1.5 bg-blue-500/20 text-blue-300 rounded-full text-xs font-medium backdrop-blur-sm border border-blue-400/30 hover:bg-blue-500/30 transition-colors duration-300">
+              <span className="px-2.5 sm:px-3 py-1 sm:py-1.5 bg-blue-500/20 text-blue-300 rounded-full text-xs font-medium backdrop-blur-sm border border-blue-400/30 hover:bg-blue-500/30 transition-colors duration-300">
                 NASA APIs
               </span>
-              <span className="px-3 py-1.5 bg-purple-500/20 text-purple-300 rounded-full text-xs font-medium backdrop-blur-sm border border-purple-400/30 hover:bg-purple-500/30 transition-colors duration-300">
+              <span className="px-2.5 sm:px-3 py-1 sm:py-1.5 bg-purple-500/20 text-purple-300 rounded-full text-xs font-medium backdrop-blur-sm border border-purple-400/30 hover:bg-purple-500/30 transition-colors duration-300">
                 Sky Maps
               </span>
-              <span className="px-3 py-1.5 bg-green-500/20 text-green-300 rounded-full text-xs font-medium backdrop-blur-sm border border-green-400/30 hover:bg-green-500/30 transition-colors duration-300">
+              <span className="px-2.5 sm:px-3 py-1 sm:py-1.5 bg-green-500/20 text-green-300 rounded-full text-xs font-medium backdrop-blur-sm border border-green-400/30 hover:bg-green-500/30 transition-colors duration-300">
                 Planets
               </span>
-              <span className="px-3 py-1.5 bg-orange-500/20 text-orange-300 rounded-full text-xs font-medium backdrop-blur-sm border border-orange-400/30 hover:bg-orange-500/30 transition-colors duration-300">
+              <span className="px-2.5 sm:px-3 py-1 sm:py-1.5 bg-orange-500/20 text-orange-300 rounded-full text-xs font-medium backdrop-blur-sm border border-orange-400/30 hover:bg-orange-500/30 transition-colors duration-300">
                 Mars Rovers
               </span>
             </div>

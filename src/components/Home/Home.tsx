@@ -36,24 +36,24 @@ export default function Home() {
         };
 
         const ToastContent = () => (
-          <div className="flex items-center gap-3 p-2">
+          <div className="flex items-center gap-2 sm:gap-3 p-1 sm:p-2">
             <div className="flex-1">
-              <div className="text-sm text-gray-300 mb-3">
+              <div className="text-xs sm:text-sm text-gray-300 mb-2 sm:mb-3">
                 View this cosmic journey in fullscreen for the ultimate stargazing experience
               </div>
               <button
                 onClick={enterFullscreen}
-                className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-2 rounded-md transition-colors w-full justify-center"
+                className="flex items-center gap-1.5 sm:gap-2 bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm px-3 sm:px-4 py-1.5 sm:py-2 rounded-md transition-colors w-full justify-center"
               >
-                <Maximize2 className="w-4 h-4" />
-                Go Fullscreen (F11)
+                <Maximize2 className="w-3 h-3 sm:w-4 sm:h-4" />
+                <span className="whitespace-nowrap">Go Fullscreen (F11)</span>
               </button>
             </div>
           </div>
         );
 
         toast(<ToastContent />, {
-          position: "top-center",
+          position: window.innerWidth < 640 ? "top-center" : "top-center",
           autoClose: 1000,
           hideProgressBar: true,
           closeOnClick: false,
@@ -74,7 +74,7 @@ export default function Home() {
 
   return (
     <>
-      {/* Custom CSS to hide scrollbar and fix toast positioning */}
+      {/* Custom CSS for scrollbar and responsive toast positioning */}
       <style jsx global>{`
         /* Hide scrollbar for Chrome, Safari and Opera */
         html::-webkit-scrollbar,
@@ -95,14 +95,86 @@ export default function Home() {
           overflow-y: auto;
           overflow-x: hidden;
         }
+
+        /* Responsive toast container positioning */
+        .Toastify__toast-container {
+          width: auto !important;
+          max-width: 95vw !important;
+          padding: 0.5rem !important;
+        }
+
+        /* Mobile toast positioning */
+        @media only screen and (max-width: 640px) {
+          .Toastify__toast-container--bottom-center {
+            bottom: 1rem !important;
+            left: 50% !important;
+            transform: translateX(-50%) !important;
+            width: calc(100vw - 2rem) !important;
+            max-width: 100% !important;
+          }
+
+          .Toastify__toast-container--top-center {
+            top: 5rem !important;
+            left: 50% !important;
+            transform: translateX(-50%) !important;
+            width: calc(100vw - 2rem) !important;
+          }
+        }
+
+        /* Tablet toast positioning */
+        @media only screen and (min-width: 641px) and (max-width: 768px) {
+          .Toastify__toast-container {
+            max-width: 90vw !important;
+          }
+        }
+
+        /* Desktop toast positioning */
+        @media only screen and (min-width: 769px) {
+          .Toastify__toast-container {
+            max-width: 500px !important;
+          }
+
+          .Toastify__toast-container--top-center {
+            top: 5rem !important;
+          }
+        }
+
+        /* Responsive toast body */
+        .Toastify__toast {
+          font-size: 0.875rem !important;
+          padding: 0.75rem !important;
+          min-height: auto !important;
+          border-radius: 0.5rem !important;
+        }
+
+        @media only screen and (max-width: 640px) {
+          .Toastify__toast {
+            font-size: 0.8125rem !important;
+            padding: 0.625rem !important;
+            margin-bottom: 0 !important;
+          }
+        }
+
+        /* Close button responsive sizing */
+        .Toastify__close-button {
+          opacity: 0.7 !important;
+        }
+
+        @media only screen and (max-width: 640px) {
+          .Toastify__close-button {
+            width: 1.25rem !important;
+            height: 1.25rem !important;
+            font-size: 1rem !important;
+          }
+        }
       `}</style>
 
       <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-900">
         <Header />
         <HeroSection />
-        <FactsSection/>
+        <FactsSection />
         <Cards />
-        <Footer/>
+        <Footer />
       </div>
     </>
   );
