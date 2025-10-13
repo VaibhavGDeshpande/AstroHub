@@ -1,12 +1,14 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import * as Cesium from 'cesium';
 import { ViewerWithControls } from '@/types/moonviewer';
 import { pointsOfInterest, locationConfigs } from '@/app/3d-moon/config/moonConfig';
 
 export const useMoonViewer = () => {
   const [isLoading, setIsLoading] = useState(true);
+  // Add ref to store boundary data source
+  const boundarySourceRef = useRef<Cesium.GeoJsonDataSource | null>(null);
 
   const initializeMoonViewer = useCallback(
     (
@@ -45,23 +47,46 @@ export const useMoonViewer = () => {
           // Load boundary resource once
           const boundariesResource = await Cesium.IonResource.fromAssetId(2683531);
           
-          // Create first data source
+          // Create first data source (mare boundaries)
           const boundarySource = await Cesium.GeoJsonDataSource.load(boundariesResource, {
             clampToGround: true,
             fill: Cesium.Color.fromBytes(26, 108, 113, 102),
+            stroke: Cesium.Color.CYAN.withAlpha(0.8),
+            strokeWidth: 2,
           });
 
-          // Clone the resource URL for second data source
+          // Ensure boundaries render over both terrain and 3D tiles
+          boundarySource.entities.values.forEach((entity) => {
+            if (entity.polygon) {
+              // Classify against both terrain and 3D Tiles so the overlay is visible
+              entity.polygon.classificationType = new Cesium.ConstantProperty(Cesium.ClassificationType.BOTH);
+            }
+            if (entity.polyline) {
+              // Keep lines draped on the surface for visibility
+              entity.polyline.clampToGround = new Cesium.ConstantProperty(true);
+              if (!entity.polyline.width) {
+                entity.polyline.width = new Cesium.ConstantProperty(2);
+              }
+            }
+          });
+
+          // Clone the resource URL for second data source (Artemis 3)
           const artemis3Resource = boundariesResource.clone();
           const artemis3Source = await Cesium.GeoJsonDataSource.load(artemis3Resource, {
             clampToGround: true,
             fill: Cesium.Color.fromBytes(243, 242, 99, 102),
           });
 
+          // Hide both by default
           boundarySource.show = false;
           artemis3Source.show = false;
+          
+          // Add to viewer
           viewer.dataSources.add(boundarySource);
           viewer.dataSources.add(artemis3Source);
+
+          // Store reference to boundary source for toggle function
+          boundarySourceRef.current = boundarySource;
 
           // Cache camera position for reuse
           const cameraPositionCallback = new Cesium.CallbackProperty(() => 
@@ -143,7 +168,6 @@ export const useMoonViewer = () => {
             copernicus: createFlyToFunction(locationConfigs.copernicus, false),
             tycho: createFlyToFunction(locationConfigs.tycho, false),
             shackleton: createFlyToFunction(locationConfigs.shackleton, true),
-            toggleBoundaries: (show: boolean) => { boundarySource.show = show; },
           };
 
           setIsLoading(false);
@@ -161,6 +185,8 @@ export const useMoonViewer = () => {
           viewerRef.current.destroy();
           viewerRef.current = null;
         }
+        // Clear the ref
+        boundarySourceRef.current = null;
       };
     },
     []

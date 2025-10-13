@@ -29,18 +29,13 @@ export default function MoonControls({ viewerRef, onLocationClick }: MoonControl
       case 'tycho':
         flyToFunctions.tycho();
         break;
-      // case 'shackleton':
-      //   flyToFunctions.shackleton();
-        break;
     }
     
-    setIsOpen(false); // Close dropdown after selection
+    setIsOpen(false);
     onLocationClick?.();
   };
 
-  const handleBoundariesToggle = (checked: boolean) => {
-    viewerRef.current?.flyToLocations?.toggleBoundaries(checked);
-  };
+  
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -68,15 +63,13 @@ export default function MoonControls({ viewerRef, onLocationClick }: MoonControl
 
   const locations = [
     { id: 'seaOfTranquility', name: 'Sea of Tranquility' },
-    { id: 'apollo11', name: 'Apollo 11'},
+    { id: 'apollo11', name: 'Apollo 11' },
     { id: 'copernicus', name: 'Copernicus' },
     { id: 'tycho', name: 'Tycho' },
-    // { id: 'shackleton', name: 'Shackleton', icon: '🏔️' }
   ];
 
   return (
     <div ref={dropdownRef} className="moon-controls-dropdown">
-      {/* Dropdown Trigger Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="dropdown-trigger"
@@ -101,12 +94,8 @@ export default function MoonControls({ viewerRef, onLocationClick }: MoonControl
         </svg>
       </button>
 
-      {/* Dropdown Menu */}
       <div className={`dropdown-menu ${isOpen ? 'open' : ''}`}>
-
-        {/* Location Items */}
         <div className="dropdown-section">
-          {/* <div className="section-label">Locations</div> */}
           {locations.map((location) => (
             <button
               key={location.id}
@@ -116,21 +105,6 @@ export default function MoonControls({ viewerRef, onLocationClick }: MoonControl
               <span className="item-text">{location.name}</span>
             </button>
           ))}
-        </div>
-
-        {/* Separator */}
-        <div className="dropdown-separator"></div>
-
-        {/* Settings Section */}
-        <div className="dropdown-section">
-          {/* <div className="section-label">Settings</div> */}
-          <label className="dropdown-item checkbox-item">
-            <input 
-              type="checkbox" 
-              onChange={(e) => handleBoundariesToggle(e.target.checked)}
-            />
-            <span className="checkbox-text">Show Mare Boundaries</span>
-          </label>
         </div>
       </div>
 
@@ -146,7 +120,7 @@ export default function MoonControls({ viewerRef, onLocationClick }: MoonControl
           display: flex;
           align-items: center;
           gap: 8px;
-          padding: 8px 12px;
+          padding: 10px 14px;
           background: rgba(42, 42, 42, 0.95);
           color: white;
           border: none;
@@ -157,7 +131,7 @@ export default function MoonControls({ viewerRef, onLocationClick }: MoonControl
           backdrop-filter: blur(10px);
           box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
           transition: all 0.2s ease;
-          min-width: 100px;
+          min-width: 160px;
         }
 
         .dropdown-trigger:hover {
@@ -186,11 +160,10 @@ export default function MoonControls({ viewerRef, onLocationClick }: MoonControl
 
         .dropdown-menu {
           position: absolute;
-          top: 100%;
+          top: calc(100% + 4px);
           left: 0;
-          width: 180px;
+          width: 220px;
           max-width: 80vw;
-          margin-top: 4px;
           background: rgba(42, 42, 42, 0.98);
           backdrop-filter: blur(15px);
           border-radius: 12px;
@@ -209,30 +182,8 @@ export default function MoonControls({ viewerRef, onLocationClick }: MoonControl
           transform: translateY(0) scale(1);
         }
 
-        .dropdown-header {
-          padding: 16px 16px 8px 16px;
-          border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .dropdown-header h3 {
-          margin: 0;
-          font-size: 16px;
-          font-weight: 600;
-          color: white;
-          text-align: center;
-        }
-
         .dropdown-section {
           padding: 8px 0;
-        }
-
-        .section-label {
-          padding: 8px 16px 4px 16px;
-          font-size: 12px;
-          font-weight: 500;
-          color: rgba(255, 255, 255, 0.6);
-          text-transform: uppercase;
-          letter-spacing: 0.5px;
         }
 
         .dropdown-item {
@@ -262,12 +213,6 @@ export default function MoonControls({ viewerRef, onLocationClick }: MoonControl
           gap: 12px;
         }
 
-        // .item-icon {
-        //   font-size: 16px;
-        //   width: 20px;
-        //   text-align: center;
-        // }
-
         .item-text {
           flex: 1;
         }
@@ -278,10 +223,11 @@ export default function MoonControls({ viewerRef, onLocationClick }: MoonControl
         }
 
         .checkbox-item input[type="checkbox"] {
-          width: 16px;
-          height: 16px;
-          accent-color: #3b82f6;
+          width: 18px;
+          height: 18px;
+          accent-color: #60a5fa;
           cursor: pointer;
+          flex-shrink: 0;
         }
 
         .checkbox-text {
@@ -294,38 +240,35 @@ export default function MoonControls({ viewerRef, onLocationClick }: MoonControl
           margin: 4px 16px;
         }
 
-        /* Mobile Styles */
-        @media (max-width: 7px) {
+        @media (max-width: 768px) {
           .moon-controls-dropdown {
-            position: absolute;
             top: 10px;
             left: 10px;
-            right: auto;
-            width: 10px;
+            right: 10px;
           }
 
           .dropdown-trigger {
-            min-width: 42vw;
-            justify-content: center;
+            width: 100%;
+            min-width: auto;
             padding: 12px 14px;
-            font-size: 16px;
+            font-size: 15px;
           }
 
           .dropdown-menu {
-            width: 42vw;
-            max-width: 72vw;
-            max-height: 100px;
+            width: 100%;
+            max-width: none;
+            max-height: 60vh;
           }
 
           .dropdown-item {
-            padding: 12px 5px;
-            font-size: 16px;
-            min-height: 52px;
+            padding: 14px 16px;
+            font-size: 15px;
+            min-height: 48px;
           }
 
-          .section-label {
-            padding: 12px 16px 6px 16px;
-            font-size: 13px;
+          .checkbox-item input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
           }
         }
       `}</style>
