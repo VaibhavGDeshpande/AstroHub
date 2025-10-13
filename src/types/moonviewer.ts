@@ -7,7 +7,6 @@ export interface ViewerWithControls extends Cesium.Viewer {
     copernicus: () => void;
     tycho: () => void;
     shackleton: () => void;
-    toggleBoundaries: (show: boolean) => void;
   };
 }
 

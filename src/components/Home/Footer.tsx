@@ -114,7 +114,6 @@ const Footer = () => {
           
           {/* Brand Section - Full width on mobile, half on tablet, 3 columns on desktop */}
           <div className="md:col-span-2 lg:col-span-3 space-y-4 sm:space-y-6">
-            {/*eslint-disable-next-line @next/next/no-html-link-for-pages*/}
             <a href="#" className="inline-block hover:scale-105 transition-transform duration-300">
               <img
                 src="/assets/AstroHub.png"
