@@ -138,7 +138,7 @@ export default function ContactPage() {
                       onChange={handleChange}
                       required
                       className="w-full pl-11 pr-4 py-2.5 bg-black/50 border border-cyan-400/30 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-cyan-400 transition-colors text-sm"
-                      placeholder="John"
+                      
                     />
                   </div>
                 </div>
@@ -157,7 +157,7 @@ export default function ContactPage() {
                       onChange={handleChange}
                       required
                       className="w-full pl-11 pr-4 py-2.5 bg-black/50 border border-cyan-400/30 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-cyan-400 transition-colors text-sm"
-                      placeholder="Doe"
+                      
                     />
                   </div>
                 </div>
@@ -178,7 +178,7 @@ export default function ContactPage() {
                     onChange={handleChange}
                     required
                     className="w-full pl-11 pr-4 py-2.5 bg-black/50 border border-cyan-400/30 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-cyan-400 transition-colors text-sm"
-                    placeholder="john.doe@example.com"
+                    
                   />
                 </div>
               </div>
@@ -198,7 +198,7 @@ export default function ContactPage() {
                     onChange={handleChange}
                     required
                     className="w-full pl-11 pr-4 py-2.5 bg-black/50 border border-cyan-400/30 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-cyan-400 transition-colors text-sm"
-                    placeholder="Brief description of your inquiry"
+                    
                   />
                 </div>
               </div>
@@ -216,7 +216,7 @@ export default function ContactPage() {
                   required
                   rows={4}
                   className="w-full px-4 py-2.5 bg-black/50 border border-cyan-400/30 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-cyan-400 transition-colors resize-none text-sm"
-                  placeholder="Tell us more about your inquiry..."
+                  
                 />
               </div>
 
