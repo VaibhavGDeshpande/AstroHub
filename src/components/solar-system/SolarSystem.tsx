@@ -2,20 +2,48 @@
 
 import React, { Suspense, useMemo, useRef, useState, useEffect } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { OrbitControls, useGLTF } from "@react-three/drei";
+import { OrbitControls, useGLTF, Html } from "@react-three/drei";
 import * as THREE from "three";
 import { OrbitControls as OrbitControlsImpl } from "three-stdlib";
+
+// Loading Screen Component
+function LoadingScreen() {
+  return (
+    <Html center>
+      <div style={{ 
+        color: 'white', 
+        fontSize: '24px',
+        fontFamily: 'Arial, sans-serif',
+        textAlign: 'center',
+        background: 'rgba(0,0,0,0.7)',
+        padding: '20px 40px',
+        borderRadius: '10px'
+      }}>
+        <div>Loading Solar System...</div>
+        <div style={{ fontSize: '14px', marginTop: '10px' }}>
+          Please wait while models are being loaded
+        </div>
+      </div>
+    </Html>
+  );
+}
 
 // Background component
 function Background({ url }: { url: string }) {
   const { scene } = useThree();
+  
   useEffect(() => {
     const loader = new THREE.TextureLoader();
     loader.load(url, (texture) => {
       texture.mapping = THREE.EquirectangularReflectionMapping;
       scene.background = texture;
     });
+    
+    return () => {
+      scene.background = null;
+    };
   }, [scene, url]);
+  
   return null;
 }
 
@@ -36,30 +64,47 @@ function FixedModel({ url, position, scale = [1, 1, 1], name, onFocus }: FixedMo
     gltf.scene.traverse((child) => {
       if ((child as THREE.Mesh).isMesh) {
         const mesh = child as THREE.Mesh;
-        if (mesh.geometry) {
+        
+        // Center geometry once
+        if (mesh.geometry && !mesh.userData.centered) {
           mesh.geometry.center();
+          mesh.userData.centered = true;
         }
+        
         mesh.userData.clickable = true;
 
-        // Fix material rendering issues
+        // Simplify material updates
         if (mesh.material) {
-          // Handle both single material and material array
-          if (Array.isArray(mesh.material)) {
-            mesh.material.forEach(material => {
-              material.needsUpdate = true;
-            });
-          } else {
-            mesh.material.needsUpdate = true;
-          }
-          // Enable shadows if needed
-          mesh.castShadow = true;
-          mesh.receiveShadow = true;
+          const materials = Array.isArray(mesh.material) 
+            ? mesh.material 
+            : [mesh.material];
+          
+          materials.forEach(mat => {
+            mat.needsUpdate = true;
+          });
         }
       }
     });
 
     console.log(`Loaded ${name} model:`, gltf.scene);
-  }, [gltf, name]);
+  }, [gltf.scene, name]);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      gltf.scene.traverse((child) => {
+        if ((child as THREE.Mesh).isMesh) {
+          const mesh = child as THREE.Mesh;
+          mesh.geometry?.dispose();
+          if (Array.isArray(mesh.material)) {
+            mesh.material.forEach(m => m.dispose());
+          } else {
+            mesh.material?.dispose();
+          }
+        }
+      });
+    };
+  }, [gltf.scene]);
 
   return (
     <group
@@ -106,6 +151,13 @@ function OrbitPath({ center, radius, pointOffsets }: OrbitPathProps) {
     () => new THREE.BufferGeometry().setFromPoints(points),
     [points]
   );
+
+  // Cleanup geometry on unmount
+  useEffect(() => {
+    return () => {
+      geometry.dispose();
+    };
+  }, [geometry]);
 
   return (
     <primitive object={new THREE.Line(geometry, new THREE.LineBasicMaterial({ color: 'white', linewidth: 2 }))} />
@@ -154,35 +206,42 @@ function RevolvingModel({
         const mesh = child as THREE.Mesh;
         mesh.userData.clickable = true;
 
-        // Fix material rendering issues
+        // Simplify material updates
         if (mesh.material) {
-          // Handle both single material and material array
-          if (Array.isArray(mesh.material)) {
-            mesh.material.forEach(material => {
-              material.needsUpdate = true;
-              // Fix common texture/material issues
-              const standardMaterial = material as THREE.MeshStandardMaterial;
-              if (standardMaterial.map) {
-                standardMaterial.map.needsUpdate = true;
-              }
-            });
-          } else {
-            mesh.material.needsUpdate = true;
-            // Fix common texture/material issues
-            const material = mesh.material as THREE.MeshStandardMaterial;
-            if (material.map) {
-              material.map.needsUpdate = true;
+          const materials = Array.isArray(mesh.material) 
+            ? mesh.material 
+            : [mesh.material];
+          
+          materials.forEach(mat => {
+            mat.needsUpdate = true;
+            const standardMaterial = mat as THREE.MeshStandardMaterial;
+            if (standardMaterial.map) {
+              standardMaterial.map.needsUpdate = true;
             }
-          }
-          // Enable shadows if needed
-          mesh.castShadow = true;
-          mesh.receiveShadow = true;
+          });
         }
       }
     });
 
     console.log(`Loaded ${name} model at radius ${radius}:`, gltf.scene);
-  }, [gltf, name, radius]);
+  }, [gltf.scene, name, radius]);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      gltf.scene.traverse((child) => {
+        if ((child as THREE.Mesh).isMesh) {
+          const mesh = child as THREE.Mesh;
+          mesh.geometry?.dispose();
+          if (Array.isArray(mesh.material)) {
+            mesh.material.forEach(m => m.dispose());
+          } else {
+            mesh.material?.dispose();
+          }
+        }
+      });
+    };
+  }, [gltf.scene]);
 
   return (
     <group
@@ -337,23 +396,19 @@ export default function RevolveRotateFocus() {
       <Canvas
         camera={{ position: [0, 50, 200], fov: 60 }}
         gl={{
-          antialias: true,
+          antialias: false, // Set to false for better performance
           toneMapping: THREE.ACESFilmicToneMapping,
           toneMappingExposure: 1.0,
-          outputColorSpace: THREE.SRGBColorSpace
+          outputColorSpace: THREE.SRGBColorSpace,
+          powerPreference: "high-performance"
         }}
+        dpr={[1, 2]} // Limit pixel ratio for better performance
       >
-        {/* Enhanced lighting for better model visibility */}
-        <ambientLight intensity={0.8} />
-        <directionalLight position={[10, 10, 5]} intensity={1.5} castShadow />
-        <directionalLight position={[-10, -10, -5]} intensity={0.5} />
-        <hemisphereLight
-          color={new THREE.Color(0xffffff)}
-          groundColor={new THREE.Color(0x444444)}
-          intensity={0.6}
-        />
+        {/* Simplified lighting for better performance */}
+        <ambientLight intensity={1.2} />
+        <directionalLight position={[10, 10, 5]} intensity={1.5} />
 
-        <Suspense fallback={null}>
+        <Suspense fallback={<LoadingScreen />}>
           {/* 🌌 Background */}
           <Background url="/SampleData/PlanetModels/milkyway.jpg" />
 
@@ -390,7 +445,7 @@ export default function RevolveRotateFocus() {
 
           {/* Earth */}
           <RevolvingModel
-            url="/SampleData/PlanetModels/earth.glb"  
+            url="/SampleData/PlanetModels/earth.glb"
             center={fixedPosition}
             radius={150}
             speed={0}
@@ -432,18 +487,18 @@ export default function RevolveRotateFocus() {
             onFocus={handleFocus}
           />
 
-          {/*Neptune*/}
+          {/* Uranus */}
           <RevolvingModel
             url="/SampleData/PlanetModels/uranus.glb"
             center={fixedPosition}
             radius={500}
             speed={0}
             scale={[0.01, 0.01, 0.01]}
-            name="Neptune"
+            name="Uranus"
             onFocus={handleFocus}
           />
 
-          {/*Neptune*/}
+          {/* Neptune */}
           <RevolvingModel
             url="/SampleData/PlanetModels/neptune.glb"
             center={fixedPosition}
@@ -509,3 +564,14 @@ export default function RevolveRotateFocus() {
     </div>
   );
 }
+
+// Preload all models - Place at bottom of file (CRITICAL for performance)
+useGLTF.preload("/SampleData/PlanetModels/the_sun.glb");
+useGLTF.preload("/SampleData/PlanetModels/mercury.glb");
+useGLTF.preload("/SampleData/PlanetModels/venus.glb");
+useGLTF.preload("/SampleData/PlanetModels/earth.glb");
+useGLTF.preload("/SampleData/PlanetModels/mars.glb");
+useGLTF.preload("/SampleData/PlanetModels/jupiter.glb");
+useGLTF.preload("/SampleData/PlanetModels/saturn.glb");
+useGLTF.preload("/SampleData/PlanetModels/uranus.glb");
+useGLTF.preload("/SampleData/PlanetModels/neptune.glb");
