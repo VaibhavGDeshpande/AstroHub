@@ -202,14 +202,14 @@ const FactsSection = () => {
           preload="auto"
           onClick={handleVideoClick}
         >
-          <source src="/assets/mars1.mp4" type="video/mp4" />
+          <source src="https://assets.mixkit.co/videos/preview/mixkit-mars-in-space-1765-large.mp4" type="video/mp4" />
         </video>
         
         <div className="absolute inset-0 bg-black/20" />
         <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/40" />
       </div>
 
-      {/* Professional Facts Section - Moved Down */}
+      {/* Facts Section - Repositioned for Desktop */}
       <AnimatePresence>
         {isInView && videoLoaded && (
           <motion.div
@@ -222,11 +222,11 @@ const FactsSection = () => {
               ease: "easeOut",
               staggerChildren: 0.2
             }}
-            className="absolute top-32 sm:top-40 md:top-48 lg:top-56 left-1/2 transform -translate-x-1/2 z-20 max-w-4xl mx-auto px-4 sm:px-6 w-full"
+            className="absolute top-32 sm:top-40 md:top-24 lg:top-28 left-1/2 transform -translate-x-1/2 z-20 max-w-4xl mx-auto px-4 sm:px-6 w-full"
           >
-            {/* Clean Header */}
+            {/* Clean Header - Top on Desktop */}
             <motion.div 
-              className="text-center mb-8 sm:mb-10 md:mb-12"
+              className="text-center mb-8 sm:mb-10 md:mb-16 lg:mb-20"
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
@@ -240,7 +240,7 @@ const FactsSection = () => {
               </div>
             </motion.div>
 
-            {/* Fully Transparent Content Card */}
+            {/* Content Card - Centered on Desktop */}
             <div className="relative">
               <div className="relative px-4 py-8 sm:px-8 sm:py-10 md:px-12 md:py-14">
                 <AnimatePresence mode="wait">

@@ -17,120 +17,40 @@ const inter = Inter({
 
 const HeroSection = () => {
   const [isVisible, setIsVisible] = useState(false);
-  const [videoStopped, setVideoStopped] = useState(false);
-  const [videoPlayed, setVideoPlayed] = useState(false);
-  const [, setRequiresInteraction] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
-    // Check if video has been played in this session
-    const hasPlayedVideo = sessionStorage.getItem('hasPlayedHeroVideo');
+    setIsVisible(true);
 
     if (videoRef.current) {
       const video = videoRef.current;
 
-      if (!videoPlayed && !hasPlayedVideo) {
-        // First time in this session - play the video
-        video.currentTime = 0;
-        video.playbackRate = 4.5;
+      const handlePlayError = (error: unknown) => {
+        console.log('Video autoplay failed:', error);
+      };
 
-        // Handle video ended event
-        const handleVideoEnded = () => {
-          console.log('Video finished playing');
-          setVideoStopped(true);
-          setVideoPlayed(true);
+      const handleVideoError = () => {
+        console.error('Video failed to load');
+      };
 
-          // Store the video duration to show last frame later
-          sessionStorage.setItem('hasPlayedHeroVideo', 'true');
-          sessionStorage.setItem('videoLastFrame', video.duration.toString());
+      video.addEventListener('error', handleVideoError);
+      video.play().catch(handlePlayError);
 
-          // Show text content with smooth transition
-          setTimeout(() => {
-            setIsVisible(true);
-          }, 200);
-        };
-
-        // Handle autoplay restriction errors
-        const handlePlayError = (error: unknown) => {
-          console.log('Video autoplay failed:', error);
-          setRequiresInteraction(true);
-          
-          // Still mark as played and show content
-          setVideoStopped(true);
-          setVideoPlayed(true);
-          setIsVisible(true);
-          sessionStorage.setItem('hasPlayedHeroVideo', 'true');
-          if (video.duration) {
-            sessionStorage.setItem('videoLastFrame', video.duration.toString());
-          }
-        };
-
-        // Handle video load errors
-        const handleVideoError = () => {
-          console.error('Video failed to load');
-          setVideoStopped(true);
-          setVideoPlayed(true);
-          setIsVisible(true);
-          sessionStorage.setItem('hasPlayedHeroVideo', 'true');
-        };
-
-        // Add event listeners
-        video.addEventListener('ended', handleVideoEnded);
-        video.addEventListener('error', handleVideoError);
-
-        // Attempt to autoplay video
-        video.play().catch(handlePlayError);
-
-        return () => {
-          video.removeEventListener('ended', handleVideoEnded);
-          video.removeEventListener('error', handleVideoError);
-        };
-      } else if (hasPlayedVideo) {
-        // Video was already played this session - show last frame
-        const lastFrameTime = sessionStorage.getItem('videoLastFrame');
-        
-        // Wait for video metadata to load
-        const handleMetadataLoaded = () => {
-          if (lastFrameTime) {
-            video.currentTime = parseFloat(lastFrameTime);
-          } else {
-            // Fallback to end of video
-            video.currentTime = video.duration;
-          }
-          
-          // Pause on last frame
-          video.pause();
-          
-          // Set states to show content immediately
-          setVideoStopped(true);
-          setVideoPlayed(true);
-          setIsVisible(true);
-        };
-
-        // Check if metadata is already loaded
-        if (video.readyState >= 1) {
-          handleMetadataLoaded();
-        } else {
-          video.addEventListener('loadedmetadata', handleMetadataLoaded);
-        }
-
-        return () => {
-          video.removeEventListener('loadedmetadata', handleMetadataLoaded);
-        };
-      }
+      return () => {
+        video.removeEventListener('error', handleVideoError);
+      };
     }
-  }, [videoPlayed]);
+  }, []);
 
   return (
     <section className="relative h-[70vh] sm:h-[80vh] md:min-h-screen flex items-center overflow-hidden pt-16 sm:pt-20 md:pt-16">
-      {/* Background Video */}
+      {/* Background Video - Continuously Playing */}
       <div className="absolute inset-0">
         <video
           ref={videoRef}
-          className={`w-full h-full object-cover transition-opacity duration-500 ${
-            videoStopped ? 'opacity-100' : 'opacity-100'
-          }`}
+          className="w-full h-full object-cover transition-opacity duration-500"
           muted
+          loop
           playsInline
           preload="metadata"
           style={{
@@ -139,16 +59,10 @@ const HeroSection = () => {
             backfaceVisibility: 'hidden',
           }}
         >
-          <source src="/assets/eclipse - Trim.mp4" type="video/mp4" />
+          <source src="/assets/earth.mp4" type="video/mp4" />
           Your browser does not support the video tag.
         </video>
-        <div
-          className={`absolute inset-0 transition-all duration-1000 ${
-            videoStopped
-              ? 'bg-gradient-to-r from-black/90 via-black/60 to-black/30'
-              : 'bg-gradient-to-r from-black/80 via-black/40 to-transparent'
-          }`}
-        />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/60 to-black/30" />
       </div>
 
       {/* Hero Content */}
@@ -157,16 +71,12 @@ const HeroSection = () => {
           <div className="space-y-4 sm:space-y-6">
             <h1
               className={`text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-bold mb-4 sm:mb-6 transition-all duration-1000 ease-out ${
-                videoStopped && isVisible
-                  ? 'opacity-100 translate-y-0'
-                  : 'opacity-0 translate-y-12'
+                isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'
               }`}
             >
               <span
                 className={`block text-white ${orbitron.className} astro-hub-text transition-all duration-1000 ease-out ${
-                  videoStopped && isVisible
-                    ? 'opacity-100 translate-x-0'
-                    : 'opacity-0 -translate-x-8'
+                  isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-8'
                 }`}
                 style={{ transitionDelay: '200ms' }}
               >
@@ -176,9 +86,7 @@ const HeroSection = () => {
 
             <div
               className={`space-y-2 sm:space-y-3 ml-2 sm:ml-4 transition-all duration-1000 ease-out ${
-                videoStopped && isVisible
-                  ? 'opacity-100 translate-y-0'
-                  : 'opacity-0 translate-y-8'
+                isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
               }`}
               style={{ transitionDelay: '600ms' }}
             >
@@ -189,9 +97,7 @@ const HeroSection = () => {
               </p>
               <p
                 className={`text-sm sm:text-base lg:text-lg text-slate-300 leading-relaxed max-w-2xl ${inter.className} description-text transition-all duration-1000 ease-out ${
-                  videoStopped && isVisible
-                    ? 'opacity-100 scale-100'
-                    : 'opacity-0 scale-95'
+                  isVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
                 }`}
                 style={{ transitionDelay: '800ms' }}
               >
@@ -204,9 +110,7 @@ const HeroSection = () => {
             {/* Key Features Tags */}
             <div
               className={`flex flex-wrap gap-2 mt-4 sm:mt-6 ml-2 sm:ml-4 transition-all duration-1000 ease-out ${
-                videoStopped && isVisible
-                  ? 'opacity-100 translate-y-0'
-                  : 'opacity-0 translate-y-8'
+                isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
               }`}
               style={{ transitionDelay: '1000ms' }}
             >
