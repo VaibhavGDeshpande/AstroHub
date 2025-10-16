@@ -202,7 +202,7 @@ const FactsSection = () => {
           preload="auto"
           onClick={handleVideoClick}
         >
-          <source src="https://assets.mixkit.co/videos/preview/mixkit-mars-in-space-1765-large.mp4" type="video/mp4" />
+          <source src="/assets/mars1.mp4" type="video/mp4" />
         </video>
         
         <div className="absolute inset-0 bg-black/20" />
