@@ -43,19 +43,19 @@ const HeroSection = () => {
   }, []);
 
   return (
-    <section className="relative h-[70vh] sm:h-[80vh] md:min-h-screen flex items-center overflow-hidden pt-16 sm:pt-20 md:pt-16">
+    <section className="relative h-[100dvh] md:min-h-screen flex items-center overflow-hidden">
       {/* Background Video - Continuously Playing */}
-      <div className="absolute inset-0">
+      <div className="absolute inset-0 w-full h-full">
         <video
           ref={videoRef}
-          className="w-full h-full object-cover transition-opacity duration-500"
+          className="absolute top-1/2 left-1/2 min-w-full min-h-full w-auto h-auto -translate-x-1/2 -translate-y-1/2"
           muted
           loop
           playsInline
           preload="metadata"
           style={{
+            objectFit: 'cover',
             willChange: 'transform',
-            transform: 'translate3d(0,0,0)',
             backfaceVisibility: 'hidden',
           }}
         >
