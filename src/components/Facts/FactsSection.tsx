@@ -182,7 +182,7 @@ const FactsSection = () => {
   return (
     <motion.section 
       ref={sectionRef}
-      className="relative min-h-[70vh] sm:min-h-[80vh] md:min-h-screen flex items-center justify-center overflow-hidden bg-slate-900"
+      className="relative min-h-dvh md:min-h-screen flex items-center justify-center overflow-hidden bg-slate-900"
       initial={{ opacity: 0 }}
       whileInView={{ opacity: 1 }}
       viewport={{ 
@@ -195,12 +195,15 @@ const FactsSection = () => {
       <div className="absolute inset-0 w-full h-full">
         <video
           ref={videoRef}
-          className="w-full h-full object-cover cursor-pointer"
+          className="absolute top-1/2 left-1/2 min-w-full min-h-full w-auto h-auto -translate-x-1/2 -translate-y-1/2 object-cover cursor-pointer"
           muted={true}
           loop
           playsInline
           preload="auto"
           onClick={handleVideoClick}
+          style={{
+            objectFit: 'cover',
+          }}
         >
           <source src="/assets/mars1.mp4" type="video/mp4" />
         </video>

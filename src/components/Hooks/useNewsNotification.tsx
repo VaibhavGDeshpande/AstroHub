@@ -19,12 +19,10 @@ export const useNewsNotification = () => {
         if (!data.success || !data.data.items || data.data.items.length === 0) return;
 
         const latestArticle = data.data.items[0];
-        console.log('Latest article:', latestArticle);
 
         // localStorage.setItem('lastNewsLink','https://spacenews.com/artemis-accords-nations-mark-fifth-anniversary/')
 
         const lastSeenLink = localStorage.getItem('lastNewsLink');
-        console.log('Last seen link:', lastSeenLink);
 
         if (lastSeenLink && lastSeenLink !== latestArticle.link) {
           toast.success(
