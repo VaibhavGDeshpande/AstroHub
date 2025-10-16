@@ -1,18 +1,26 @@
-// components/ArticleCard.tsx
 "use client";
 import React from "react";
 import { motion } from "framer-motion";
-import { Article } from "@/api_service/space_news";
+
+interface NewsItem {
+  title: string;
+  link: string;
+  pubDate: string;
+  content: string;
+  creator: string;
+  categories: string[];
+  imageUrl: string | null;
+}
 
 interface ArticleCardProps {
-  article: Article;
+  article: NewsItem;
   index: number;
 }
 
 export default function ArticleCard({ article, index }: ArticleCardProps) {
   return (
     <motion.a
-      href={article.url}
+      href={article.link}
       target="_blank"
       rel="noopener noreferrer"
       initial={{ opacity: 0, y: 20 }}
@@ -23,7 +31,7 @@ export default function ArticleCard({ article, index }: ArticleCardProps) {
       {/* Image Container */}
       <div className="relative h-48 sm:h-56 overflow-hidden bg-slate-900">
         <img
-          src={article.image_url}
+          src={article.imageUrl || ''}
           alt={article.title}
           loading="lazy"
           onError={(e) => {
@@ -32,7 +40,7 @@ export default function ArticleCard({ article, index }: ArticleCardProps) {
           }}
           className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-105"
         />
-        {/* Gradient Overlay - Lighter for better visibility */}
+        {/* Gradient Overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-transparent to-transparent opacity-40 pointer-events-none" />
       </div>
 
@@ -45,14 +53,12 @@ export default function ArticleCard({ article, index }: ArticleCardProps) {
         <div className="text-sm text-slate-400 mb-3 flex items-center gap-2">
           <span className="text-purple-400">✦</span>
           <span className="line-clamp-1">
-            {article.authors.length > 0 
-              ? article.authors.map((a) => a.name).join(", ")
-              : "Unknown Author"}
+            {article.creator || "Unknown Author"}
           </span>
         </div>
         
         <p className="text-slate-300 text-sm leading-relaxed mb-4 flex-1 line-clamp-4">
-          {article.summary}
+          {article.content.replace(/<[^>]*>/g, '')}
         </p>
         
         <div className="flex items-center justify-between text-xs text-slate-500 mt-auto pt-4 border-t border-slate-700/50">
@@ -60,9 +66,13 @@ export default function ArticleCard({ article, index }: ArticleCardProps) {
             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
             </svg>
-            {new Date(article.published_at).toLocaleDateString()}
+            {new Date(article.pubDate).toLocaleDateString()}
           </span>
-          <span className="text-purple-400 font-medium">{article.news_site}</span>
+          <span className="text-purple-400 font-medium">
+            {article.categories && article.categories.length > 0 
+              ? article.categories[0] 
+              : "Space News"}
+          </span>
         </div>
       </div>
 

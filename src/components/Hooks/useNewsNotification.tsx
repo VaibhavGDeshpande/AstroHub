@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { toast } from 'react-toastify';
 import { Newspaper } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { ArticlesResponse } from '@/api_service/space_news';
+
 
 export const useNewsNotification = () => {
   const router = useRouter();
@@ -12,19 +12,21 @@ export const useNewsNotification = () => {
   useEffect(() => {
     const checkForNewNews = async () => {
       try {
-        const response = await fetch('https://api.spaceflightnewsapi.net/v4/articles?limit=1&ordering=-published_at');
+        const response = await fetch('/api/spacenews', { cache: 'no-store' });
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
 
-        const data: ArticlesResponse = await response.json();
-        if (!data.results || data.results.length === 0) return;
+        const data = await response.json();
+        if (!data.success || !data.data.items || data.data.items.length === 0) return;
 
-        const latestArticle = data.results[0];
+        const latestArticle = data.data.items[0];
         console.log('Latest article:', latestArticle);
 
-        const lastSeenId = localStorage.getItem('lastNewsId');
-        console.log('Last seen ID:', lastSeenId);
+        // localStorage.setItem('lastNewsLink','https://spacenews.com/artemis-accords-nations-mark-fifth-anniversary/')
 
-        if (lastSeenId && lastSeenId !== String(latestArticle.id)) {
+        const lastSeenLink = localStorage.getItem('lastNewsLink');
+        console.log('Last seen link:', lastSeenLink);
+
+        if (lastSeenLink && lastSeenLink !== latestArticle.link) {
           toast.success(
             <div style={{ 
               display: 'flex', 
@@ -73,20 +75,20 @@ export const useNewsNotification = () => {
               pauseOnHover: true,
               draggable: true,
               icon: false,
-              className:'custom-news-toast',
+              className: 'custom-news-toast',
               onClick: () => router.push('/space-news'),
             }
           );
         }
 
-        localStorage.setItem('lastNewsId', String(latestArticle.id));
+        localStorage.setItem('lastNewsLink', latestArticle.link);
       } catch (error) {
         console.error('Error checking news:', error);
       }
     };
 
     checkForNewNews();
-    const interval = setInterval(checkForNewNews, 60000);
+    const interval = setInterval(checkForNewNews, 60000); // Check every minute
     return () => clearInterval(interval);
   }, [router]);
 };

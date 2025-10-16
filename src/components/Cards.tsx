@@ -1,8 +1,7 @@
-// components/EnhancedCards.tsx
 'use client'
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { motion, AnimatePresence, MotionConfig } from 'framer-motion';
+import { motion, AnimatePresence, MotionConfig, PanInfo } from 'framer-motion';
 import { ArrowRight, Sparkles, Star, ChevronLeft, ChevronRight } from 'lucide-react';
 import { cardSections, CardAPI } from './cardData';
 
@@ -14,7 +13,7 @@ const EnhancedCards = () => {
 
   useEffect(() => {
     setIsVisible(true);
-    
+
     // Initialize active indices for each section
     const initialIndices: { [key: string]: number } = {};
     const initialDirections: { [key: string]: number } = {};
@@ -35,10 +34,12 @@ const EnhancedCards = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Auto-rotate cards every 4 seconds
+  // Auto-rotate cards every 4 seconds - ONLY FOR DESKTOP
   useEffect(() => {
+    if (isMobile) return; // Skip auto-rotation on mobile
+
     const intervals: NodeJS.Timeout[] = [];
-    
+
     cardSections.forEach(section => {
       if (section.cards.length >= 3) {
         const interval = setInterval(() => {
@@ -53,7 +54,7 @@ const EnhancedCards = () => {
     });
 
     return () => intervals.forEach(interval => clearInterval(interval));
-  }, []);
+  }, [isMobile]); // Added isMobile dependency
 
   // Navigation handlers
   const handlePrevious = (sectionId: string, cardsLength: number) => {
@@ -70,6 +71,29 @@ const EnhancedCards = () => {
       ...prev,
       [sectionId]: (prev[sectionId] + 1) % cardsLength
     }));
+  };
+
+  // Swipe handlers
+  const swipeConfidenceThreshold = 10000;
+  const swipePower = (offset: number, velocity: number) => {
+    return Math.abs(offset) * velocity;
+  };
+
+  const handleDragEnd = (
+    sectionId: string,
+    cardsLength: number,
+    e: MouseEvent | TouchEvent | PointerEvent,
+    { offset, velocity }: PanInfo
+  ) => {
+    const swipe = swipePower(offset.x, velocity.x);
+
+    if (swipe < -swipeConfidenceThreshold) {
+      // Swiped left - go to next
+      handleNext(sectionId, cardsLength);
+    } else if (swipe > swipeConfidenceThreshold) {
+      // Swiped right - go to previous
+      handlePrevious(sectionId, cardsLength);
+    }
   };
 
   const getBadgeColor = (color: string) => {
@@ -122,7 +146,7 @@ const EnhancedCards = () => {
     }
   };
 
-  // Smoother mobile card variants with direction support
+  // Enhanced mobile card variants with swipe support
   const mobileCardVariants = {
     enter: (direction: number) => ({
       x: direction > 0 ? 300 : -300,
@@ -136,6 +160,9 @@ const EnhancedCards = () => {
       zIndex: 1,
       transition: {
         duration: 0.4,
+        type: "spring" as const,
+        stiffness: 300,
+        damping: 30
       }
     },
     exit: (direction: number) => ({
@@ -192,10 +219,10 @@ const EnhancedCards = () => {
         className="h-full"
       >
         <div className="relative h-full bg-gradient-to-br from-slate-900/90 to-slate-800/90 backdrop-blur-xl border border-slate-700/50 rounded-2xl sm:rounded-3xl p-5 sm:p-7 overflow-hidden transition-all duration-300 hover:border-slate-500/70 hover:shadow-2xl hover:shadow-purple-500/20 hover:-translate-y-2 flex flex-col min-h-[380px] sm:min-h-[400px] cursor-pointer group">
-          
+
           {/* Animated gradient background */}
           <div className={`absolute inset-0 bg-gradient-to-br ${api.color} opacity-0 group-hover:opacity-[0.15] transition-all duration-500 blur-2xl`} />
-          
+
           {/* Mesh gradient overlay */}
           <div className="absolute inset-0 opacity-30">
             <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 via-purple-500/10 to-pink-500/10" />
@@ -230,21 +257,21 @@ const EnhancedCards = () => {
           </div>
 
           {/* Content - Only animate on center card */}
-          <motion.div 
+          <motion.div
             className="relative flex-grow flex flex-col z-10"
             variants={isCenter ? contentVariants : undefined}
             initial={isCenter ? "hidden" : false}
             animate={isCenter ? "visible" : false}
             key={isCenter ? `content-${sectionId}-${originalIndex}-${activeIndices[sectionId]}` : undefined}
           >
-            <motion.h3 
+            <motion.h3
               variants={isCenter ? itemVariants : undefined}
               className="text-xl sm:text-2xl font-bold text-white mb-2 sm:mb-3 group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-blue-400 group-hover:via-purple-400 group-hover:to-pink-400 group-hover:bg-clip-text transition-all duration-300"
             >
               {api.title}
             </motion.h3>
 
-            <motion.p 
+            <motion.p
               variants={isCenter ? itemVariants : undefined}
               className="text-slate-400 mb-4 sm:mb-6 text-xs sm:text-sm leading-relaxed group-hover:text-slate-300 transition-colors duration-200 flex-grow"
             >
@@ -252,12 +279,12 @@ const EnhancedCards = () => {
             </motion.p>
 
             {/* Features */}
-            <motion.div 
+            <motion.div
               variants={isCenter ? contentVariants : undefined}
               className="space-y-2 sm:space-y-3 mb-4 sm:mb-6"
             >
               {api.features.map((feature: string, idx: number) => (
-                <motion.div 
+                <motion.div
                   key={idx}
                   variants={isCenter ? itemVariants : {}}
                   className="flex items-center group/feature"
@@ -280,15 +307,27 @@ const EnhancedCards = () => {
               <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4 text-slate-400 group-hover:text-white group-hover:translate-x-2 transition-all duration-200" />
             </div>
 
-            <div className="flex items-center gap-1.5 sm:gap-2">
-              <div className="relative">
-                <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-emerald-400 rounded-full animate-pulse" />
-                <div className="absolute inset-0 w-1.5 h-1.5 sm:w-2 sm:h-2 bg-emerald-400 rounded-full animate-ping" />
+            {api.status && (
+              <div className="flex items-center gap-1.5 sm:gap-2">
+                <div className="relative">
+                  <div className={`w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full ${api.status === 'Live'
+                      ? 'bg-emerald-400 animate-pulse'
+                      : 'bg-orange-400 animate-pulse'
+                    }`} />
+                  <div className={`absolute inset-0 w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full ${api.status === 'Live'
+                      ? 'bg-emerald-400 animate-ping'
+                      : 'bg-orange-400 animate-ping'
+                    }`} />
+                </div>
+                <span className={`text-xs font-semibold ${api.status === 'Live'
+                    ? 'text-emerald-400'
+                    : 'text-orange-400'
+                  }`}>
+                  {api.status}
+                </span>
               </div>
-              <span className="text-xs text-emerald-400 font-semibold">Live</span>
-            </div>
+            )}
           </div>
-
           {/* Hover overlay */}
           <div className="absolute inset-0 rounded-2xl sm:rounded-3xl bg-gradient-to-t from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
         </div>
@@ -319,10 +358,10 @@ const EnhancedCards = () => {
           <div className="absolute top-1/3 right-1/4 w-64 sm:w-96 h-64 sm:h-96 bg-blue-500/20 rounded-full blur-[120px] animate-pulse" style={{ animationDuration: '10s', animationDelay: '2s' }} />
           <div className="absolute bottom-1/4 left-1/3 w-64 sm:w-96 h-64 sm:h-96 bg-emerald-500/20 rounded-full blur-[120px] animate-pulse" style={{ animationDuration: '9s', animationDelay: '1s' }} />
           <div className="absolute bottom-0 left-1/2 w-64 sm:w-96 h-64 sm:h-96 bg-cyan-500/20 rounded-full blur-[120px] animate-pulse" style={{ animationDuration: '12s', animationDelay: '4s' }} />
-          
+
           {/* Grid overlay */}
           <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:100px_100px]" />
-          
+
           {/* Radial gradient overlay */}
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,rgba(0,0,0,0.4)_100%)]" />
         </div>
@@ -336,7 +375,7 @@ const EnhancedCards = () => {
             <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-slate-400 max-w-3xl mx-auto leading-relaxed font-light px-4">
               Access real-time space data, immersive 3D models, and professional sky observation tools
             </p>
-            
+
             {/* Decorative line */}
             <div className="flex items-center justify-center gap-2 sm:gap-3 mt-6 sm:mt-8">
               <div className="w-12 sm:w-20 h-px bg-gradient-to-r from-transparent via-blue-500 to-transparent"></div>
@@ -371,7 +410,7 @@ const EnhancedCards = () => {
 
                 {shouldShowCarousel ? (
                   <>
-                    {/* Desktop View - Three cards carousel with arrows */}
+                    {/* Desktop View - Three cards carousel with arrows and auto-scroll */}
                     <div className="hidden lg:block relative px-12 xl:px-16">
                       {/* Navigation Arrows - Desktop */}
                       <button
@@ -381,7 +420,7 @@ const EnhancedCards = () => {
                       >
                         <ChevronLeft className="w-5 h-5 xl:w-6 xl:h-6 text-slate-400 group-hover:text-white transition-colors" />
                       </button>
-                      
+
                       <div className="flex justify-center gap-4 xl:gap-6 relative w-full mb-8">
                         {visibleCards.map(({ card, position, originalIndex }) => (
                           <div key={`${section.id}-${card.title}`} className="w-1/3">
@@ -399,32 +438,29 @@ const EnhancedCards = () => {
                       </button>
                     </div>
 
-                    {/* Mobile/Tablet View - Single card carousel with arrows */}
+                    {/* Mobile/Tablet View - Single card carousel with SWIPE ONLY (no auto-scroll) */}
                     <div className="lg:hidden relative px-4">
-                      {/* Navigation Arrows - Mobile/Tablet */}
-                      <div className="flex justify-between items-center mb-4 px-2">
-                        <button
-                          onClick={() => handlePrevious(section.id, section.cards.length)}
-                          className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-slate-800/90 to-slate-700/90 border border-slate-600/50 flex items-center justify-center hover:border-purple-500/50 transition-all duration-300"
-                          aria-label="Previous slide"
-                        >
-                          <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5 text-slate-400" />
-                        </button>
-                        
-                        <span className="text-xs sm:text-sm text-slate-500 font-medium">
-                          {activeIndex + 1} / {section.cards.length}
+                      {/* Swipe Indicator */}
+                      <div className="flex justify-center items-center mb-3 text-slate-500 text-xs">
+                        <span className="flex items-center gap-2">
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16l-4-4m0 0l4-4m-4 4h18" />
+                          </svg>
+                          Swipe to navigate
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                          </svg>
                         </span>
-
-                        <button
-                          onClick={() => handleNext(section.id, section.cards.length)}
-                          className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-slate-800/90 to-slate-700/90 border border-slate-600/50 flex items-center justify-center hover:border-purple-500/50 transition-all duration-300"
-                          aria-label="Next slide"
-                        >
-                          <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 text-slate-400" />
-                        </button>
                       </div>
 
-                      <div className="min-h-[380px] sm:min-h-[400px] relative mb-6 sm:mb-8">
+                      {/* Counter */}
+                      <div className="flex justify-center items-center mb-4">
+                        <span className="text-xs sm:text-sm text-slate-500 font-medium px-4 py-1.5 rounded-full bg-slate-800/50 border border-slate-700/50">
+                          {activeIndex + 1} / {section.cards.length}
+                        </span>
+                      </div>
+
+                      <div className="min-h-[380px] sm:min-h-[400px] relative mb-6 sm:mb-8 overflow-hidden">
                         <AnimatePresence initial={false} mode="wait" custom={sectionDirection}>
                           <motion.div
                             key={`mobile-${section.id}-${activeIndex}`}
@@ -433,7 +469,11 @@ const EnhancedCards = () => {
                             initial="enter"
                             animate="center"
                             exit="exit"
-                            className="absolute inset-0"
+                            drag="x"
+                            dragConstraints={{ left: 0, right: 0 }}
+                            dragElastic={1}
+                            onDragEnd={(e, info) => handleDragEnd(section.id, section.cards.length, e, info)}
+                            className="absolute inset-0 cursor-grab active:cursor-grabbing"
                           >
                             {renderCard(visibleCards[0].card, 'center', section.id, visibleCards[0].originalIndex)}
                           </motion.div>
@@ -447,15 +487,14 @@ const EnhancedCards = () => {
                         <motion.button
                           key={idx}
                           onClick={() => {
-                            setDirection(prev => ({ 
-                              ...prev, 
-                              [section.id]: idx > activeIndex ? 1 : -1 
+                            setDirection(prev => ({
+                              ...prev,
+                              [section.id]: idx > activeIndex ? 1 : -1
                             }));
                             setActiveIndices(prev => ({ ...prev, [section.id]: idx }));
                           }}
-                          className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full transition-all duration-300 ${
-                            activeIndex === idx ? 'bg-purple-500' : 'bg-slate-600'
-                          }`}
+                          className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full transition-all duration-300 ${activeIndex === idx ? 'bg-purple-500' : 'bg-slate-600'
+                            }`}
                           whileHover={{ scale: 1.2 }}
                           whileTap={{ scale: 0.9 }}
                           animate={{
@@ -472,9 +511,8 @@ const EnhancedCards = () => {
                     {section.cards.map((api, index) => (
                       <div
                         key={index}
-                        className={`transition-all duration-700 ease-out ${
-                          isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'
-                        }`}
+                        className={`transition-all duration-700 ease-out ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'
+                          }`}
                         style={{ transitionDelay: `${index * 80}ms` }}
                       >
                         {renderCard(api, 'center', section.id, index)}

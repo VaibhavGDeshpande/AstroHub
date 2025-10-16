@@ -11,6 +11,7 @@ export interface CardAPI {
   glow: string;
   ctaText: string;
   external?: boolean;
+  status: string;
 }
 
 export interface CardSection {
@@ -52,7 +53,8 @@ export const cardSections: CardSection[] = [
         path: '/apod',
         features: ['Daily updates', 'HD images', 'Expert explanations'],
         glow: 'purple',
-        ctaText: 'Explore Data'
+        ctaText: 'Explore Data',
+        status:'Temporary closed'
       },
       // {
       //   title: 'Mars Rover Photos',
@@ -72,7 +74,8 @@ export const cardSections: CardSection[] = [
         path: '/neo',
         features: ['Orbital data', 'Size estimates', 'Approach dates'],
         glow: 'blue',
-        ctaText: 'Explore Data'
+        ctaText: 'Explore Data',
+        status:'Live'
       },
       {
         title: 'EPIC Earth Images',
@@ -82,7 +85,8 @@ export const cardSections: CardSection[] = [
         path: '/epic',
         features: ['Full disk images', 'Weather patterns', 'Daily updates'],
         glow: 'cyan',
-        ctaText: 'Explore Data'
+        ctaText: 'Explore Data',
+        status:'Live'
       },
       {
         title: 'NASA Image Library',
@@ -92,7 +96,8 @@ export const cardSections: CardSection[] = [
         path: '/images',
         features: ['Media search', 'High resolution', 'Metadata'],
         glow: 'pink',
-        ctaText: 'Explore Data'
+        ctaText: 'Explore Data',
+        status:'Live'
       },
       {
         title: 'NASA Eyes',
@@ -103,6 +108,7 @@ export const cardSections: CardSection[] = [
         features: ['3D interactive models', 'Planetary exploration', 'Real-time data'],
         glow: 'blue',
         ctaText: 'Visit NASA Eyes',
+        status:'Live',
       }
     ]
   },
@@ -140,7 +146,8 @@ export const cardSections: CardSection[] = [
         path: '/solar-system',
         features: ['All 8 planets', 'Orbital mechanics', 'Interactive navigation', 'Scale accuracy'],
         glow: 'orange',
-        ctaText: 'Explore System'
+        ctaText: 'Explore System',
+        status:'Temporary closed'
       },
       {
         title: '3D View of Earth',
@@ -150,7 +157,8 @@ export const cardSections: CardSection[] = [
         path: '/3d-earth',
         features: ['Interactive 3D', 'Real-time rotation', 'Atmospheric effects', 'Day/Night cycle'],
         glow: 'blue',
-        ctaText: 'Explore 3D'
+        ctaText: 'Explore 3D',
+        status:'Live'
       },
       {
         title: '3D View of Moon',
@@ -160,7 +168,8 @@ export const cardSections: CardSection[] = [
         path: '/3d-moon',
         features: ['Moon surface', 'Important landmarks', 'Crater details', '3D exploration'],
         glow: 'gray',
-        ctaText: 'Explore 3D'
+        ctaText: 'Explore 3D',
+        status:'Live'
       },
       {
         title: '3D View of Mars',
@@ -170,7 +179,8 @@ export const cardSections: CardSection[] = [
         path: '/3d-mars',
         features: ['Mars surface', 'Important landmarks', 'Rover locations', 'Geological features'],
         glow: 'red',
-        ctaText: 'Explore 3D'
+        ctaText: 'Explore 3D',
+        status:"Live"
       }
     ]
   },
@@ -189,7 +199,8 @@ export const cardSections: CardSection[] = [
         path: '/stellarium',
         features: ['Real-time sky', 'Constellation maps', 'Planet positions', 'Time control'],
         glow: 'indigo',
-        ctaText: 'View Sky'
+        ctaText: 'View Sky',
+        status:"Live"
       },
       {
         title: 'Sky Charts',
@@ -199,7 +210,8 @@ export const cardSections: CardSection[] = [
         path: '/sky-charts',
         features: ['Monthly updates', 'Printable charts', 'Constellation guides'],
         glow: 'yellow',
-        ctaText: 'View Charts'
+        ctaText: 'View Charts',
+        status:"Live"
       }
     ]
   },
@@ -218,7 +230,8 @@ export const cardSections: CardSection[] = [
         path: '/space-news',
         features: ['Latest articles', 'Mission updates', 'Scientific discoveries', 'Breaking news'],
         glow: 'emerald',
-        ctaText: 'Read News'
+        ctaText: 'Read News',
+        status:"Live"
       },
       {
         title: 'Space Quiz',
@@ -228,7 +241,8 @@ export const cardSections: CardSection[] = [
         path: '/space-quiz',
         features: ['Quiz', 'MCQ\'s', 'Test knowledge', '100+ questions'],
         glow: 'emerald',
-        ctaText: 'Start Quiz'
+        ctaText: 'Start Quiz',
+        status:"Live"
       }
     ]
   }
