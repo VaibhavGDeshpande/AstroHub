@@ -28,7 +28,7 @@ export default function SkyMapsPage() {
         >
           <Link
             href="/"
-            className="flex items-center gap-2 px-3 py-2 rounded-lg bg-slate-800/50 hover:bg-slate-700/50 border border-slate-600/40 backdrop-blur-sm transition duration-300 group"
+            className="flex items-center gap-2 px-3 py-2 rounded-lg bg-slate-800/50 hover:bg-slate-700/50 border border-slate-600/40 backdrop-blur-sm transition duration-300 group text-white"
           >
             <ArrowLeftIcon className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
             <HomeIcon className="h-4 w-4 hidden sm:block" />

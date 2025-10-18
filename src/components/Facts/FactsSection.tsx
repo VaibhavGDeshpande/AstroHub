@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
+
 const FactsSection = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const sectionRef = useRef<HTMLDivElement>(null);
@@ -11,6 +12,7 @@ const FactsSection = () => {
   const [videoLoaded, setVideoLoaded] = useState(false);
   const [currentFactIndex, setCurrentFactIndex] = useState(0);
   const [isInView, setIsInView] = useState(false);
+
 
   const astronomyFacts = [
     {
@@ -63,18 +65,22 @@ const FactsSection = () => {
     }
   ];
 
+
   // Video loading and setup
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
 
+
     const handleCanPlay = () => {
       setVideoLoaded(true);
     };
 
+
     const handleLoadedData = () => {
       setVideoLoaded(true);
     };
+
 
     video.addEventListener('canplay', handleCanPlay);
     video.addEventListener('loadeddata', handleLoadedData);
@@ -85,12 +91,14 @@ const FactsSection = () => {
     };
   }, []);
 
+
   // Intersection Observer for video and text control
   useEffect(() => {
     const video = videoRef.current;
     const section = sectionRef.current;
     
     if (!video || !section) return;
+
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -118,12 +126,15 @@ const FactsSection = () => {
       }
     );
 
+
     observer.observe(section);
+
 
     return () => {
       observer.disconnect();
     };
   }, [videoLoaded]);
+
 
   // Fact rotation - only when in view
   useEffect(() => {
@@ -132,17 +143,21 @@ const FactsSection = () => {
       intervalRef.current = null;
     }
 
+
     if (!isInView || !videoLoaded) {
       return;
     }
 
+
     setCurrentFactIndex(0);
+
 
     intervalRef.current = setInterval(() => {
       setCurrentFactIndex((prevIndex) => 
         (prevIndex + 1) % astronomyFacts.length
       );
     }, 4000);
+
 
     return () => {
       if (intervalRef.current) {
@@ -151,6 +166,7 @@ const FactsSection = () => {
       }
     };
   }, [isInView, videoLoaded, astronomyFacts.length]);
+
 
   useEffect(() => {
     return () => {
@@ -161,11 +177,14 @@ const FactsSection = () => {
     };
   }, []);
 
+
   const currentFact = astronomyFacts[currentFactIndex];
+
 
   const handleVideoClick = () => {
     const video = videoRef.current;
     if (!video) return;
+
 
     if (isPlaying) {
       video.pause();
@@ -179,17 +198,15 @@ const FactsSection = () => {
     }
   };
 
+
   return (
     <motion.section 
       ref={sectionRef}
       className="relative min-h-dvh md:min-h-screen flex items-center justify-center overflow-hidden bg-slate-900"
-      initial={{ opacity: 0 }}
-      whileInView={{ opacity: 1 }}
       viewport={{ 
         once: false,
         amount: 0.3
       }}
-      transition={{ duration: 0.6 }}
     >
       {/* Background Video */}
       <div className="absolute inset-0 w-full h-full">
@@ -212,14 +229,15 @@ const FactsSection = () => {
         <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/40" />
       </div>
 
+
       {/* Facts Section - Repositioned for Desktop */}
       <AnimatePresence>
         {isInView && videoLoaded && (
           <motion.div
             key={`facts-container-${isInView}`}
-            initial={{ opacity: 0, y: 50, scale: 0.9 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -50, scale: 0.9 }}
+            initial={{ y: 50, scale: 0.9 }}
+            animate={{ y: 0, scale: 1 }}
+            exit={{ y: -50, scale: 0.9 }}
             transition={{ 
               duration: 0.8, 
               ease: "easeOut",
@@ -230,8 +248,8 @@ const FactsSection = () => {
             {/* Clean Header - Top on Desktop */}
             <motion.div 
               className="text-center mb-8 sm:mb-10 md:mb-16 lg:mb-20"
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
+              initial={{ y: -20 }}
+              animate={{ y: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
             >
               <div className="flex items-center justify-center mb-3 sm:mb-4">
@@ -243,19 +261,19 @@ const FactsSection = () => {
               </div>
             </motion.div>
 
+
             {/* Content Card - Centered on Desktop */}
             <div className="relative">
               <div className="relative px-4 py-8 sm:px-8 sm:py-10 md:px-12 md:py-14">
                 <AnimatePresence mode="wait">
                   <motion.div
                     key={`fact-${currentFactIndex}-${isInView}`}
-                    initial={{ opacity: 0, y: 30, rotateX: -15 }}
-                    animate={{ opacity: 1, y: 0, rotateX: 0 }}
-                    exit={{ opacity: 0, y: -30, rotateX: 15 }}
+                    initial={{ y: 30, rotateX: -15 }}
+                    animate={{ y: 0, rotateX: 0 }}
+                    exit={{ y: -30, rotateX: 15 }}
                     transition={{ 
                       duration: 0.7, 
                       ease: "easeOut",
-                      opacity: { duration: 0.4 },
                       y: { duration: 0.6 },
                       rotateX: { duration: 0.6 }
                     }}
@@ -279,10 +297,11 @@ const FactsSection = () => {
                       </div>
                     </motion.div>
 
+
                     {/* Professional Typography with enhanced animations */}
                     <motion.p
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
+                      initial={{ y: 20 }}
+                      animate={{ y: 0 }}
                       transition={{ 
                         duration: 0.6, 
                         delay: 0.3,
@@ -298,11 +317,12 @@ const FactsSection = () => {
                   </motion.div>
                 </AnimatePresence>
 
+
                 {/* Professional Progress Bar */}
                 <motion.div 
                   className="mt-8 sm:mt-10 flex justify-center"
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
+                  initial={{ scale: 0.8 }}
+                  animate={{ scale: 1 }}
                   transition={{ duration: 0.5, delay: 0.4 }}
                 >
                   <div className="flex space-x-1 bg-black/20 rounded-full p-1 backdrop-blur-sm">
@@ -330,11 +350,12 @@ const FactsSection = () => {
         )}
       </AnimatePresence>
 
+
       {/* Enhanced scroll indicator */}
       <motion.div 
         className="absolute bottom-6 sm:bottom-8 left-1/2 transform -translate-x-1/2 z-20"
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
+        initial={{ y: 20 }}
+        whileInView={{ y: 0 }}
         transition={{ duration: 0.6, delay: 1 }}
         viewport={{ once: false }}
       >
@@ -352,33 +373,35 @@ const FactsSection = () => {
         </motion.div>
       </motion.div>
 
+
       {/* Transparent bottom fade */}
       <div className="absolute bottom-0 left-0 right-0 h-24 sm:h-32 bg-gradient-to-t from-black/60 to-transparent z-5" />
       
       {/* Minimal corner accents with animations */}
       <motion.div 
         className="absolute top-4 sm:top-6 left-4 sm:left-6 w-6 h-6 sm:w-8 sm:h-8 border-l border-t border-slate-400/20 z-10"
-        initial={{ opacity: 0, scale: 0 }}
-        whileInView={{ opacity: 1, scale: 1 }}
+        initial={{ scale: 0 }}
+        whileInView={{ scale: 1 }}
         transition={{ duration: 0.5, delay: 0.8 }}
         viewport={{ once: false }}
       />
       <motion.div 
         className="absolute bottom-4 sm:bottom-6 left-4 sm:left-6 w-6 h-6 sm:w-8 sm:h-8 border-l border-b border-slate-400/20 z-10"
-        initial={{ opacity: 0, scale: 0 }}
-        whileInView={{ opacity: 1, scale: 1 }}
+        initial={{ scale: 0 }}
+        whileInView={{ scale: 1 }}
         transition={{ duration: 0.5, delay: 1.0 }}
         viewport={{ once: false }}
       />
       <motion.div 
         className="absolute bottom-4 sm:bottom-6 right-4 sm:right-6 w-6 h-6 sm:w-8 sm:h-8 border-r border-b border-slate-400/20 z-10"
-        initial={{ opacity: 0, scale: 0 }}
-        whileInView={{ opacity: 1, scale: 1 }}
+        initial={{ scale: 0 }}
+        whileInView={{ scale: 1 }}
         transition={{ duration: 0.5, delay: 1.1 }}
         viewport={{ once: false }}
       />
     </motion.section>
   );
 };
+
 
 export default FactsSection;

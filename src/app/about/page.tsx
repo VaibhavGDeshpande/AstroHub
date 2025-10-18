@@ -22,7 +22,7 @@ export default function AboutPage() {
       isVisible={isLoading} 
       minDuration={1000}
     >
-      <div className="fixed top-4 left-4 z-50">
+      <div className="fixed top-4 left-4 z-50 hidden md:block">
           {/* Back Button */}
           <motion.div
             initial={{ opacity: 0, x: -20 }}
