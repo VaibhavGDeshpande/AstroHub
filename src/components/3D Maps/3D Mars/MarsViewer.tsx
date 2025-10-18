@@ -14,18 +14,18 @@ Cesium.Ion.defaultAccessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOi
 // Device detection utility
 const isMobileDevice = (): boolean => {
   if (typeof window === 'undefined') return false;
-  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) 
+  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
     || window.innerWidth < 768;
 };
 
 // Performance configuration based on device
 const getPerformanceConfig = () => {
   const isMobile = isMobileDevice();
-  
+
   return {
     viewer: {
-      resolutionScale: isMobile ? 0.7 : 1.0,
-      targetFrameRate: isMobile ? 30 : 60,
+      resolutionScale: isMobile ? 0.9 : 1.0,
+      targetFrameRate: isMobile ? 60 : 60,
       requestRenderMode: true,
       maximumRenderTimeChange: Infinity,
     },
@@ -333,7 +333,7 @@ const MarsRoverExplorer: React.FC = () => {
   const sceneRef = useRef<Cesium.Scene | null>(null);
   const clockRef = useRef<Cesium.Clock | null>(null);
   const navHelpRef = useRef<Cesium.NavigationHelpButton | null>(null);
-  
+
   const curiosityRef = useRef<RoverEntity | null>(null);
   const perseveranceRef = useRef<RoverEntity | null>(null);
   const theMartianJourneyRef = useRef<Cesium.Entity | null>(null);
@@ -341,7 +341,7 @@ const MarsRoverExplorer: React.FC = () => {
 
   // Store references to GLB model entities
   const roverModelsRef = useRef<Map<string, Cesium.Entity>>(new Map());
-  
+
   // Performance config ref
   const perfConfigRef = useRef(getPerformanceConfig());
 
@@ -358,14 +358,14 @@ const MarsRoverExplorer: React.FC = () => {
       console.log('Skipping model preloading for mobile');
       return;
     }
-    
+
     setLoadingMessage('Preloading rover models...');
-    
+
     // Preload rover models
     const roverPromises = Object.keys(ROVER_MODELS).map(async (roverName) => {
       try {
         const modelConfig = ROVER_MODELS[roverName];
-        
+
         // Create a hidden entity to preload the model
         const preloadEntity = viewerRef.current!.entities.add({
           name: `${roverName}_preload`,
@@ -377,17 +377,17 @@ const MarsRoverExplorer: React.FC = () => {
             minimumPixelSize: 1,
           }
         });
-        
+
         return preloadEntity;
       } catch (error) {
         console.error(`Failed to preload ${roverName} model:`, error);
         return null;
       }
     });
-    
+
     await Promise.all(roverPromises);
     console.log('All rover models preloaded');
-    
+
     // Preload CZML data
     setLoadingMessage('Preloading rover data...');
     try {
@@ -399,7 +399,7 @@ const MarsRoverExplorer: React.FC = () => {
     } catch (error) {
       console.error('Failed to preload CZML:', error);
     }
-    
+
     // Preload GeoJSON data
     setLoadingMessage('Preloading landmark data...');
     try {
@@ -419,12 +419,12 @@ const MarsRoverExplorer: React.FC = () => {
       console.log('Skipping asset caching for mobile');
       return;
     }
-    
+
     setLoadingMessage('Caching assets for faster loading...');
-    
+
     // Cache rover models
     const modelUrls = Object.values(ROVER_MODELS).map(model => model.modelPath);
-    
+
     const cachePromises = modelUrls.map(async (url) => {
       try {
         const response = await fetch(url);
@@ -435,7 +435,7 @@ const MarsRoverExplorer: React.FC = () => {
         console.error(`Failed to cache ${url}:`, error);
       }
     });
-    
+
     await Promise.all(cachePromises);
   };
 
@@ -516,36 +516,36 @@ const MarsRoverExplorer: React.FC = () => {
     const initializeWithPreloading = async (viewer: Cesium.Viewer): Promise<void> => {
       setIsLoading(true);
       setLoadingProgress(0);
-      
+
       // Step 1: Cache assets (10% of progress)
       await cacheAssets();
       setLoadingProgress(10);
-      
+
       // Step 2: Preload assets (20% of progress)  
       await preloadAssets();
       setLoadingProgress(30);
-      
+
       // Step 3: Load tileset (40% of progress)
       setLoadingMessage('Loading Mars terrain...');
       await loadTileset();
       setLoadingProgress(70);
-      
+
       // Step 4: Load rovers (20% of progress)
       setLoadingMessage('Loading rover data...');
       await loadRovers();
       setLoadingProgress(85);
-      
+
       // Step 5: Load landmarks (10% of progress)
       setLoadingMessage('Loading landmarks...');
       await loadLandmarks();
       setLoadingProgress(95);
-      
+
       // Step 6: Complete setup
       setLoadingMessage('Finalizing setup...');
       setupRotation();
       addRoverInstructionsToNavMenu();
       setLoadingProgress(100);
-      
+
       // Add a listener for when the home button is clicked.
       if (viewer.homeButton) {
         viewer.homeButton.viewModel.command.beforeExecute.addEventListener(
@@ -562,7 +562,7 @@ const MarsRoverExplorer: React.FC = () => {
           if (curiosityRef.current && roverModelsRef.current.has('Curiosity')) {
             updateRoverModelPosition('Curiosity', curiosityRef.current);
           }
-          
+
           // Update Perseverance model position
           if (perseveranceRef.current && roverModelsRef.current.has('Perseverance')) {
             updateRoverModelPosition('Perseverance', perseveranceRef.current);
@@ -585,7 +585,7 @@ const MarsRoverExplorer: React.FC = () => {
         viewer.destroy();
       }
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // For changing the width of polylines based on distance from the camera
@@ -623,7 +623,7 @@ const MarsRoverExplorer: React.FC = () => {
 
     const modelConfig = ROVER_MODELS[name];
     const perfConfig = perfConfigRef.current;
-    
+
     try {
       const entity = viewerRef.current.entities.add({
         name: `${name} Model`,
@@ -662,7 +662,7 @@ const MarsRoverExplorer: React.FC = () => {
 
     const currentTime = clockRef.current.currentTime;
     const position = roverEntity.position?.getValue(currentTime);
-    
+
     if (position) {
       modelEntity.position = new Cesium.CallbackProperty(() => {
         const time = clockRef.current?.currentTime;
@@ -739,12 +739,12 @@ const MarsRoverExplorer: React.FC = () => {
       "#animation_pathPlay",
     );
     if (!playPath) return;
-    
+
     const playButton = playPath.closest("g.cesium-animation-rectButton");
     const ringG = viewerRef.current?.animation.container.querySelector(
       ".cesium-animation-shuttleRingG",
     );
-    
+
     if (playButton && ringG) {
       playButton.classList.add("highlight-animation");
       ringG.classList.add("highlight-animation");
@@ -759,12 +759,12 @@ const MarsRoverExplorer: React.FC = () => {
       "#animation_pathPlay",
     );
     if (!playPath) return;
-    
+
     const playButton = playPath.closest("g.cesium-animation-rectButton");
     const ringG = viewerRef.current?.animation.container.querySelector(
       ".cesium-animation-shuttleRingG",
     );
-    
+
     if (playButton && ringG) {
       playButton.classList.remove("highlight-animation");
       ringG.classList.remove("highlight-animation");
@@ -773,7 +773,7 @@ const MarsRoverExplorer: React.FC = () => {
 
   const reset = (): void => {
     if (!viewerRef.current || !clockRef.current) return;
-    
+
     clockRef.current.multiplier = 1;
     viewerRef.current.selectedEntity = undefined;
     viewerRef.current.trackedEntity = undefined;
@@ -788,7 +788,7 @@ const MarsRoverExplorer: React.FC = () => {
   // Spin Mars on first load but disable the spinning upon any input
   const setupRotation = (): void => {
     if (!viewerRef.current) return;
-    
+
     const rotationSpeed = Cesium.Math.toRadians(0.1);
     removeRotationRef.current = viewerRef.current.scene.postRender.addEventListener(
       function () {
@@ -892,9 +892,9 @@ const MarsRoverExplorer: React.FC = () => {
   // Load Mars tileset with device-specific optimizations
   const loadTileset = async (): Promise<void> => {
     if (!viewerRef.current) return;
-    
+
     const perfConfig = perfConfigRef.current;
-    
+
     try {
       const tileset = await Cesium.Cesium3DTileset.fromIonAssetId(3644333, {
         enableCollision: true,
@@ -916,17 +916,17 @@ const MarsRoverExplorer: React.FC = () => {
         foveatedConeSize: perfConfig.tileset.foveatedConeSize,
         foveatedMinimumScreenSpaceErrorRelaxation: perfConfig.tileset.foveatedMinimumScreenSpaceErrorRelaxation,
       });
-      
+
       // Apply memory usage setting on the tileset instance (not in constructor options)
       // tileset.maximumMemoryUsage = perfConfig.tileset.maximumMemoryUsage;
-      
+
       viewerRef.current.scene.primitives.add(tileset);
-      
+
       // Set up tile loading event listener
       tileset.allTilesLoaded.addEventListener(() => {
         console.log('All visible tiles loaded');
       });
-      
+
     } catch (error) {
       console.log(error);
     }
@@ -935,12 +935,12 @@ const MarsRoverExplorer: React.FC = () => {
   // Load the rovers and path from The Martian
   const loadRovers = async (): Promise<void> => {
     if (!viewerRef.current) return;
-    
+
     try {
       // Try to load from cache first
       let czmlData;
       const cachedData = sessionStorage.getItem('Mars.czml');
-      
+
       if (cachedData) {
         czmlData = JSON.parse(cachedData);
         console.log('Loading CZML from cache');
@@ -948,7 +948,7 @@ const MarsRoverExplorer: React.FC = () => {
         const response = await fetch("../../SampleData/Mars.czml");
         czmlData = await response.json();
       }
-      
+
       const dataSource = await Cesium.CzmlDataSource.load(czmlData);
       viewerRef.current.dataSources.add(dataSource);
 
@@ -972,7 +972,7 @@ const MarsRoverExplorer: React.FC = () => {
           if (!modelEntity) {
             modelEntity = createRoverModel(roverName, roverPosition) || undefined;
           }
-          
+
           if (modelEntity) {
             updateRoverModelPosition(roverName, rover);
             showRoverModel(roverName, true);
@@ -980,7 +980,7 @@ const MarsRoverExplorer: React.FC = () => {
         }
 
         if (!roverPosition) return;
-        
+
         const boundingSphere = new Cesium.BoundingSphere(
           roverPosition as Cesium.Cartesian3,
           5000.0,
@@ -1039,13 +1039,13 @@ const MarsRoverExplorer: React.FC = () => {
       curiosityRef.current = setupRover("Curiosity", 3, curiosityRef.current);
       perseveranceRef.current = setupRover("Perseverance", 13, perseveranceRef.current);
       theMartianJourneyRef.current = dataSource.entities.getById("TheMartianJourney") || null;
-      
+
       if (theMartianJourneyRef.current && theMartianJourneyRef.current.polyline) {
         theMartianJourneyRef.current.polyline.width = createWidthCallbackProperty(
           new Cesium.NearFarScalar(0.0, 10.0, 1.0e7, 0.0),
         );
       }
-      
+
       if (theMartianJourneyRef.current && theMartianJourneyRef.current.rectangle) {
         theMartianJourneyRef.current.rectangle.material = new Cesium.ImageMaterialProperty({
           image: createCanvasAsTexture('Mark Watney\'s Journey in "The Martian"'),
@@ -1070,12 +1070,12 @@ const MarsRoverExplorer: React.FC = () => {
   // Load points of interest from GeoJSON data source
   const loadLandmarks = async (): Promise<void> => {
     if (!viewerRef.current) return;
-    
+
     try {
       // Try to load from cache first
       let geoJsonData;
       const cachedData = sessionStorage.getItem('MarsPointsofInterest.geojson');
-      
+
       if (cachedData) {
         geoJsonData = JSON.parse(cachedData);
         console.log('Loading GeoJSON from cache');
@@ -1083,7 +1083,7 @@ const MarsRoverExplorer: React.FC = () => {
         const response = await fetch("../../SampleData/MarsPointsofInterest.geojson");
         geoJsonData = await response.json();
       }
-      
+
       const dataSource = await Cesium.GeoJsonDataSource.load(geoJsonData);
       viewerRef.current.dataSources.add(dataSource);
 
@@ -1188,7 +1188,7 @@ const MarsRoverExplorer: React.FC = () => {
     <div className="relative w-full h-screen">
       <style>{styles}</style>
       <div ref={cesiumContainer} className="fullSize" />
-      
+
       {/* Loading Overlay */}
       {isLoading && (
         <div id="loadingOverlay">
@@ -1196,7 +1196,7 @@ const MarsRoverExplorer: React.FC = () => {
             <div className="text-2xl mb-4 font-bold">🚀 Mars Explorer</div>
             <div className="text-lg mb-2">{loadingMessage}</div>
             <div className="progress-bar">
-              <div 
+              <div
                 className="progress-fill"
                 style={{ width: `${loadingProgress}%` }}
               ></div>
@@ -1210,13 +1210,13 @@ const MarsRoverExplorer: React.FC = () => {
           </div>
         </div>
       )}
-      
+
       {/* Toolbar */}
       <div id="toolbar" style={{ opacity: isLoading ? 0 : 1, transition: 'opacity 0.5s' }}>
-        <div className="stratakit-mimic-select-root">
-          <select 
-            className="stratakit-mimic-button stratakit-mimic-select" 
-            data-kiwi-variant="solid" 
+        <div className="stratakit-mimic-select-root max-w-[120px] sm:max-w-none">
+          <select
+            className="stratakit-mimic-button stratakit-mimic-select w-full text-xs sm:text-sm px-2 sm:px-3"
+            data-kiwi-variant="solid"
             data-kiwi-tone="neutral"
             onChange={handleRoverSelection}
             value=""
@@ -1233,10 +1233,10 @@ const MarsRoverExplorer: React.FC = () => {
             <path fill="currentColor" fillRule="evenodd" d="M8 10 5 7h6l-3 3Z" clipRule="evenodd"></path>
           </svg>
         </div>
-        <div className="stratakit-mimic-select-root">
-          <select 
-            className="stratakit-mimic-button stratakit-mimic-select" 
-            data-kiwi-variant="solid" 
+        <div className="stratakit-mimic-select-root max-w-[120px] sm:max-w-none">
+          <select
+            className="stratakit-mimic-button stratakit-mimic-select w-full text-xs sm:text-sm px-2 sm:px-3"
+            data-kiwi-variant="solid"
             data-kiwi-tone="neutral"
             onChange={handleLandmarkSelection}
             value=""
@@ -1254,6 +1254,7 @@ const MarsRoverExplorer: React.FC = () => {
           </svg>
         </div>
       </div>
+
     </div>
   );
 };
