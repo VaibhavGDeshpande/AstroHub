@@ -24,7 +24,7 @@ const getPerformanceConfig = () => {
 
   return {
     viewer: {
-      resolutionScale: isMobile ? 0.9 : 1.0,
+      resolutionScale: isMobile ? 0.8 : 1.0,
       targetFrameRate: isMobile ? 60 : 60,
       requestRenderMode: true,
       maximumRenderTimeChange: Infinity,
@@ -316,12 +316,12 @@ interface LandmarkFlyToOptions {
 // Rover model configurations
 const ROVER_MODELS: { [key: string]: { modelPath: string; scale: number; heading?: number } } = {
   'Curiosity': {
-    modelPath: '../../SampleData/Models/Curiosity.glb',
+    modelPath: '/models/Mars/Curiosity.glb',
     scale: 1.0,
     heading: 0
   },
   'Perseverance': {
-    modelPath: '../../SampleData/Models/Perseverance.glb',
+    modelPath: '/models/Mars/Perseverance.glb',
     scale: 1.0,
     heading: 0
   }
