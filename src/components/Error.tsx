@@ -13,7 +13,7 @@ export default function ErrorMessage({ error, onRetry }: ErrorMessageProps) {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-red-900/20 to-slate-900 flex items-center justify-center p-4">
       {/* Back Button - Error State */}
-      <div className="fixed top-4 left-4 z-50">
+      <div className="fixed top-4 left-4 z-50 hidden md:block">
         <Link
           href="/"
           className="flex items-center space-x-2 px-3 py-2 bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 text-white rounded-lg hover:bg-slate-700/50 transition-all duration-300 hover:scale-105"

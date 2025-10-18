@@ -13,17 +13,17 @@ export default function PrivacyPolicyPage() {
       <div className="container mx-auto px-4 max-w-5xl">
         {/* Header */}
         <div className="text-center mb-12">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">
+          <h1 className="text-4xl md:text-5xl font-bold mb-4 pt-15">
             <span className="bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
               Privacy Policy
             </span>
           </h1>
           <p className="text-gray-400 text-sm">
-            Last updated: October 10, 2025
+            Last updated: October 17, 2025
           </p>
         </div>
         
-        <div className="fixed top-4 left-4 z-50">
+        <div className="fixed top-4 left-4 z-50 hidden md:block">
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
@@ -36,7 +36,7 @@ export default function PrivacyPolicyPage() {
               <HomeIcon className="h-4 w-4 hidden sm:block" />
               <span className="text-sm">Back</span>
             </Link>
-          </motion.div> 
+          </motion.div>
         </div>
 
         {/* Content */}

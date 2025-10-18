@@ -25,7 +25,7 @@ export default function SolarSystemPage() {
     <ToastProvider>
       <LoaderWrapper>
         {/* Header with Navigation only */}
-        <div className="fixed top-4 left-4 z-50">
+        <div className="fixed top-4 left-4 z-50 hidden md:block">
           {/* Back Button */}
           <motion.div
             initial={{ opacity: 0, x: -20 }}

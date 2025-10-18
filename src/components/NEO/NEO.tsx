@@ -147,7 +147,7 @@ const NEOExplorer = () => {
       <motion.div 
         initial={{ opacity: 0, x: -20 }}
         animate={{ opacity: 1, x: 0 }}
-        className="fixed top-3 left-3 sm:top-4 sm:left-4 z-50"
+        className="fixed top-3 left-3 sm:top-4 sm:left-4 z-50 hidden md:block"
       >
         <Link
           href="/"

@@ -127,7 +127,7 @@ export default function QuizContent() {
         </div>
 
         {/* Back Button */}
-        <div className="fixed top-4 left-4 z-50">
+        <div className="fixed top-4 left-4 z-50 hidden md:block">
           <button
             onClick={resetQuiz}
             className="flex items-center gap-2 px-3 py-2 rounded-lg bg-slate-800/50 hover:bg-slate-700/50 border border-slate-600/40 backdrop-blur-sm transition duration-300"
@@ -218,7 +218,7 @@ export default function QuizContent() {
       </div>
 
       {/* Back Button */}
-      <div className="fixed top-4 left-4 z-50">
+      <div className="fixed top-4 left-4 z-50 hidden md:block">
         <button
           onClick={resetQuiz}
           className="flex items-center gap-2 px-3 py-2 rounded-lg bg-slate-800/50 hover:bg-slate-700/50 border border-slate-600/40 backdrop-blur-sm transition duration-300"

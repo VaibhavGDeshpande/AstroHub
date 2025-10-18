@@ -169,7 +169,7 @@ export default function Home() {
         }
       `}</style>
 
-      <div className="min-h-screen bg-gradient-to-br">
+      <div className="min-h-screen bg-black">
         <Header />
         <HeroSection />
         <FactsSection />

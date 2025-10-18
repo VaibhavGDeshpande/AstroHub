@@ -100,7 +100,7 @@ export default function MarsPhotosPage() {
         </div>
 
         {/* Header with Navigation and Controls - matching APOD layout */}
-        <div className="fixed top-4 left-4 right-4 z-50 flex justify-between items-center">
+        <div className="fixed top-4 left-4 right-4 z-50 flex justify-between items-center hidden md:block">
           {/* Back Button - APOD style */}
           <motion.div
             initial={{ opacity: 0, x: -20 }}

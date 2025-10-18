@@ -55,7 +55,7 @@ export default function QuizSelectionPage() {
       </div>
 
       {/* Back Button */}
-      <div className="fixed top-4 left-4 z-50">
+      <div className="fixed top-4 left-4 z-50 hidden md:block">
         <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
           <Link
             href="/"

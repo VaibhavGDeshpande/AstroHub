@@ -88,7 +88,7 @@ export default function ContactPage() {
     <div className="h-screen overflow-hidden bg-gradient-to-b from-black via-blue-950/20 to-black">
       <div className="container mx-auto px-4 max-w-5xl h-full flex flex-col justify-center py-8">
         {/* Back Button */}
-        <div className="fixed top-4 left-4 z-50">
+        <div className="fixed top-4 left-4 z-50 hidden md:block">
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
@@ -101,7 +101,7 @@ export default function ContactPage() {
               <HomeIcon className="h-4 w-4 hidden sm:block" />
               <span className="text-sm">Back</span>
             </Link>
-          </motion.div> 
+          </motion.div>
         </div>
 
         {/* Header */}
