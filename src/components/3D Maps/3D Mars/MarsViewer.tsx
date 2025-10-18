@@ -1,331 +1,26 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import * as Cesium from 'cesium';
-import "cesium/Build/Cesium/Widgets/widgets.css";
+import "./styles.css";
 
+// Import types and utilities
+import { RoverMenuEntry, LandmarkMenuEntry, RoverEntity, CameraFlyToOptions } from './types';
+import { CESIUM_BASE_URL, CESIUM_ION_TOKEN, ROVER_MODELS, DATA_URLS, CACHE_KEYS, TILESET_ION_ASSET_ID } from './constants';
+import { getPerformanceConfig } from './performanceConfig';
+import {
+  createWidthCallbackProperty,
+  createJulianDateToSolConverter,
+  createRoverModel,
+  updateRoverModelPosition,
+  getCachedCanvasTexture
+} from './utils';
+
+// Initialize Cesium configuration
 if (typeof window !== 'undefined') {
-  (window as Window & { CESIUM_BASE_URL?: string }).CESIUM_BASE_URL = "/cesium";
+  (window as Window & { CESIUM_BASE_URL?: string }).CESIUM_BASE_URL = CESIUM_BASE_URL;
 }
-
-// Set the Cesium Ion access token
-Cesium.Ion.defaultAccessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI3ZmUyMDU3NS0wYTk5LTQ0ZjQtYmEzNi04NjllYTU3ZmE4ZTkiLCJpZCI6MzQwOTc4LCJpYXQiOjE3NTc3NzE3MDh9.p9lg0P5Rb9zgLUib_NE5qEYNCWwt_FyDFW5Ok2EQgUw"
-
-// Device detection utility
-const isMobileDevice = (): boolean => {
-  if (typeof window === 'undefined') return false;
-  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
-    || window.innerWidth < 768;
-};
-
-// Performance configuration based on device
-const getPerformanceConfig = () => {
-  const isMobile = isMobileDevice();
-
-  return {
-    viewer: {
-      resolutionScale: isMobile ? 0.8 : 1.0,
-      targetFrameRate: isMobile ? 60 : 60,
-      requestRenderMode: true,
-      maximumRenderTimeChange: Infinity,
-    },
-    tileset: {
-      maximumScreenSpaceError: isMobile ? 32 : 16,
-      maximumMemoryUsage: isMobile ? 512 : 1024,
-      foveatedConeSize: isMobile ? 0.5 : 0.3,
-      cullRequestsWhileMoving: true,
-      cullRequestsWhileMovingMultiplier: isMobile ? 30.0 : 60.0,
-      skipLevelOfDetail: isMobile,
-      baseScreenSpaceError: isMobile ? 2048 : 1024,
-      skipScreenSpaceErrorFactor: isMobile ? 32 : 16,
-      skipLevels: isMobile ? 2 : 1,
-      immediatelyLoadDesiredLevelOfDetail: !isMobile,
-      loadSiblings: !isMobile,
-      preloadWhenHidden: !isMobile,
-      preloadFlightDestinations: !isMobile,
-      preferLeaves: true,
-      progressiveResolutionHeightFraction: isMobile ? 0.3 : 0.5,
-      foveatedScreenSpaceError: true,
-      foveatedMinimumScreenSpaceErrorRelaxation: 0.0,
-    },
-    model: {
-      minimumPixelSize: isMobile ? 48 : 64,
-      maximumScale: isMobile ? 15000 : 20000,
-    },
-    postProcessing: {
-      bloom: !isMobile,
-      hdr: !isMobile,
-      exposure: isMobile ? 1.3 : 1.5,
-      bloomBrightness: isMobile ? 0 : -0.5,
-    },
-    atmosphere: {
-      perFragmentAtmosphere: !isMobile,
-    },
-    preloading: {
-      enableAssetCaching: !isMobile,
-      enableModelPreloading: !isMobile,
-    }
-  };
-};
-
-// Add the CSS styles
-const styles = `
-  @import url(https://cesium.com/downloads/cesiumjs/releases/1.107/Build/Cesium/Widgets/widgets.css);
-  
-  .fullSize {
-    position: absolute;
-    top: 0;
-    left: 0;
-    border: none;
-    height: 100%;
-    width: 100%;
-  }
-  
-  #loadingOverlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 100%;
-    width: 100%;
-    background: rgba(0, 0, 0, 0.8);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-family: sans-serif;
-    z-index: 1000;
-    backdrop-filter: blur(5px);
-  }
-
-  .loading-container {
-    text-align: center;
-    background: rgba(42, 42, 42, 0.95);
-    padding: 40px;
-    border-radius: 12px;
-    border: 1px solid #555;
-    min-width: 320px;
-  }
-
-  .progress-bar {
-    width: 280px;
-    height: 8px;
-    background: #333;
-    border-radius: 4px;
-    overflow: hidden;
-    margin: 20px auto;
-    position: relative;
-  }
-
-  .progress-fill {
-    height: 100%;
-    background: linear-gradient(90deg, #ff4444, #ff6666);
-    border-radius: 4px;
-    transition: width 0.3s ease;
-    position: relative;
-  }
-
-  .progress-fill::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 100%;
-    width: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-    animation: shimmer 2s infinite;
-  }
-
-  @keyframes shimmer {
-    0% { transform: translateX(-100%); }
-    100% { transform: translateX(100%); }
-  }
-  
-  #toolbar {
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    background: rgba(42, 42, 42, 0.9);
-    padding: 10px;
-    border-radius: 8px;
-    z-index: 100;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    min-width: 200px;
-  }
-  
-  .stratakit-mimic-select-root {
-    position: relative;
-    display: inline-block;
-    width: 100%;
-  }
-  
-  .stratakit-mimic-select {
-    appearance: none;
-    background: #2a2a2a;
-    border: 1px solid #555;
-    border-radius: 4px;
-    color: white;
-    padding: 8px 32px 8px 12px;
-    width: 100%;
-    font-size: 14px;
-    cursor: pointer;
-    outline: none;
-  }
-  
-  .stratakit-mimic-select:hover {
-    background: #333;
-    border-color: #666;
-  }
-  
-  .stratakit-mimic-select:focus {
-    border-color: #4CAF50;
-    box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
-  }
-  
-  .stratakit-mimic-select-arrow {
-    position: absolute;
-    right: 8px;
-    top: 50%;
-    transform: translateY(-50%);
-    pointer-events: none;
-    color: #ccc;
-  }
-  
-  /* Styles for indicating to the user to press the play button */
-  .cesium-animation-rectButton.highlight-animation .cesium-animation-buttonGlow {
-    display: block;
-    fill: #fff;
-    filter: url(#animation_blurred) drop-shadow(0 0 3px #aef) drop-shadow(0 0 3px #fff);
-    animation: highlight-animation-button 1.2s ease-in-out infinite;
-  }
-  
-  .cesium-animation-rectButton.highlight-animation .cesium-animation-buttonMain {
-    stroke: #fff;
-    stroke-width: 3;
-  }
-  
-  .cesium-animation-rectButton.highlight-animation .cesium-animation-buttonPath {
-    fill: #fff;
-  }
-  
-  .cesium-animation-shuttleRingG.highlight-animation .cesium-animation-shuttleRingBack {
-    stroke: #fff;
-    stroke-width: 6;
-    filter: drop-shadow(0 0 3px #aef) drop-shadow(0 0 3px rgba(174, 238, 255, 0.95));
-    animation: highlight-animation-ring 1.2s ease-in-out infinite;
-  }
-  
-  .cesium-animation-shuttleRingG.highlight-animation .cesium-animation-shuttleRingSwoosh line {
-    stroke: #fff;
-    stroke-opacity: 0.8;
-  }
-  
-  @keyframes highlight-animation-button {
-    0% {
-      opacity: 0.3;
-      stroke-width: 0;
-    }
-    50% {
-      opacity: 1;
-      stroke-width: 4;
-    }
-    100% {
-      opacity: 0.3;
-      stroke-width: 0;
-    }
-  }
-  
-  @keyframes highlight-animation-ring {
-    0% {
-      stroke-opacity: 0.25;
-      stroke: #333;
-    }
-    50% {
-      stroke-opacity: 1;
-      stroke: #fff;
-    }
-    100% {
-      stroke-opacity: 0.25;
-      stroke: #333;
-    }
-  }
-
-  /* Fix for mobile navigation bar overlap */
-  @media (max-width: 768px) {
-    .cesium-viewer-timelineContainer {
-      bottom: env(safe-area-inset-bottom, 0px) !important;
-    }
-    
-    .cesium-viewer-animationContainer {
-      bottom: env(safe-area-inset-bottom, 0px) !important;
-    }
-    
-    .cesium-viewer-bottom {
-      bottom: env(safe-area-inset-bottom, 0px) !important;
-    }
-    
-    #toolbar {
-      min-width: 160px;
-    }
-    
-    .loading-container {
-      padding: 20px;
-      min-width: 280px;
-    }
-  }
-`;
-
-// Define interfaces for better type safety
-interface RoverMenuEntry {
-  text: string;
-  onselect: () => void;
-}
-
-interface LandmarkMenuEntry {
-  text: string;
-  onselect: () => void;
-}
-
-interface RoverEntity {
-  id?: string;
-  name?: string;
-  description?: string;
-  position?: Cesium.PositionProperty;
-  orientation?: Cesium.Property;
-  availability?: Cesium.TimeInterval;
-  properties?: {
-    animationStartTime: Cesium.Property;
-  };
-  model?: Cesium.ModelGraphics & {
-    lightColor: Cesium.Property;
-  };
-  label?: Cesium.LabelGraphics;
-}
-
-interface LandmarkFlyToOptions {
-  destination: Cesium.Cartesian3;
-  orientation: Cesium.HeadingPitchRoll;
-  easingFunction: typeof Cesium.EasingFunction;
-  maximumHeight: number;
-  pitchAdjustHeight: number;
-  duration: number;
-  complete: () => void;
-}
-
-// Rover model configurations
-const ROVER_MODELS: { [key: string]: { modelPath: string; scale: number; heading?: number } } = {
-  'Curiosity': {
-    modelPath: '/models/Mars/Curiosity.glb',
-    scale: 1.0,
-    heading: 0
-  },
-  'Perseverance': {
-    modelPath: '/models/Mars/Perseverance.glb',
-    scale: 1.0,
-    heading: 0
-  }
-};
+Cesium.Ion.defaultAccessToken = CESIUM_ION_TOKEN;
 
 const MarsRoverExplorer: React.FC = () => {
   const cesiumContainer = useRef<HTMLDivElement>(null);
@@ -339,10 +34,10 @@ const MarsRoverExplorer: React.FC = () => {
   const theMartianJourneyRef = useRef<Cesium.Entity | null>(null);
   const removeRotationRef = useRef<Cesium.Event.RemoveCallback | null>(null);
 
-  // Store references to GLB model entities
+  // Store references to GLB model entities - using Map for better memory management
   const roverModelsRef = useRef<Map<string, Cesium.Entity>>(new Map());
 
-  // Performance config ref
+  // Performance config ref - memoized
   const perfConfigRef = useRef(getPerformanceConfig());
 
   // State for menu entries and loading
@@ -352,8 +47,8 @@ const MarsRoverExplorer: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [loadingMessage, setLoadingMessage] = useState('Initializing Mars Explorer...');
 
-  // Preload assets function
-  const preloadAssets = async (): Promise<void> => {
+  // Memoized functions to prevent recreation
+  const preloadAssets = useCallback(async (): Promise<void> => {
     if (!viewerRef.current || !perfConfigRef.current.preloading.enableModelPreloading) {
       console.log('Skipping model preloading for mobile');
       return;
@@ -361,23 +56,19 @@ const MarsRoverExplorer: React.FC = () => {
 
     setLoadingMessage('Preloading rover models...');
 
-    // Preload rover models
     const roverPromises = Object.keys(ROVER_MODELS).map(async (roverName) => {
       try {
         const modelConfig = ROVER_MODELS[roverName];
-
-        // Create a hidden entity to preload the model
         const preloadEntity = viewerRef.current!.entities.add({
           name: `${roverName}_preload`,
-          position: Cesium.Cartesian3.fromDegrees(0, 0, -10000), // Hidden underground
-          show: false, // Hide while preloading
+          position: Cesium.Cartesian3.fromDegrees(0, 0, -10000),
+          show: false,
           model: {
             uri: modelConfig.modelPath,
             scale: modelConfig.scale,
             minimumPixelSize: 1,
           }
         });
-
         return preloadEntity;
       } catch (error) {
         console.error(`Failed to preload ${roverName} model:`, error);
@@ -391,10 +82,9 @@ const MarsRoverExplorer: React.FC = () => {
     // Preload CZML data
     setLoadingMessage('Preloading rover data...');
     try {
-      const czmlResponse = await fetch("../../SampleData/Mars.czml");
+      const czmlResponse = await fetch(DATA_URLS.CZML);
       const czmlData = await czmlResponse.json();
-      // Cache in sessionStorage
-      sessionStorage.setItem('Mars.czml', JSON.stringify(czmlData));
+      sessionStorage.setItem(CACHE_KEYS.CZML, JSON.stringify(czmlData));
       console.log('CZML data preloaded and cached');
     } catch (error) {
       console.error('Failed to preload CZML:', error);
@@ -403,28 +93,23 @@ const MarsRoverExplorer: React.FC = () => {
     // Preload GeoJSON data
     setLoadingMessage('Preloading landmark data...');
     try {
-      const geoJsonResponse = await fetch("../../SampleData/MarsPointsofInterest.geojson");
+      const geoJsonResponse = await fetch(DATA_URLS.GEOJSON);
       const geoJsonData = await geoJsonResponse.json();
-      // Cache in sessionStorage
-      sessionStorage.setItem('MarsPointsofInterest.geojson', JSON.stringify(geoJsonData));
+      sessionStorage.setItem(CACHE_KEYS.GEOJSON, JSON.stringify(geoJsonData));
       console.log('GeoJSON data preloaded and cached');
     } catch (error) {
       console.error('Failed to preload GeoJSON:', error);
     }
-  };
+  }, []);
 
-  // Cache assets function
-  const cacheAssets = async (): Promise<void> => {
+  const cacheAssets = useCallback(async (): Promise<void> => {
     if (!perfConfigRef.current.preloading.enableAssetCaching) {
       console.log('Skipping asset caching for mobile');
       return;
     }
 
     setLoadingMessage('Caching assets for faster loading...');
-
-    // Cache rover models
     const modelUrls = Object.values(ROVER_MODELS).map(model => model.modelPath);
-
     const cachePromises = modelUrls.map(async (url) => {
       try {
         const response = await fetch(url);
@@ -437,341 +122,33 @@ const MarsRoverExplorer: React.FC = () => {
     });
 
     await Promise.all(cachePromises);
-  };
-
-  useEffect(() => {
-    if (!cesiumContainer.current) return;
-
-    const perfConfig = perfConfigRef.current;
-
-    // Initialize Cesium
-    Cesium.Ellipsoid.default = Cesium.Ellipsoid.MARS;
-    const viewer = new Cesium.Viewer(cesiumContainer.current, {
-      terrainProvider: false as unknown as Cesium.TerrainProvider,
-      baseLayer: false as unknown as Cesium.ImageryLayer,
-      baseLayerPicker: false,
-      geocoder: false,
-      shadows: false,
-      globe: new Cesium.Globe(Cesium.Ellipsoid.MARS),
-      skyBox: Cesium.SkyBox.createEarthSkyBox(),
-      skyAtmosphere: new Cesium.SkyAtmosphere(Cesium.Ellipsoid.MARS),
-      // Performance optimizations based on device
-      requestRenderMode: perfConfig.viewer.requestRenderMode,
-      maximumRenderTimeChange: perfConfig.viewer.maximumRenderTimeChange,
-    });
-
-    if (!viewer) {
-      console.error('Failed to create Cesium viewer');
-      return;
-    }
-
-    if (!viewer.scene) {
-      console.error('Failed to create Cesium scene');
-      return;
-    }
-
-    // Apply performance settings
-    viewer.resolutionScale = perfConfig.viewer.resolutionScale;
-    viewer.scene.fog.enabled = false;
-    viewer.targetFrameRate = perfConfig.viewer.targetFrameRate;
-
-    viewer.scene.globe.show = false;
-    viewerRef.current = viewer;
-    sceneRef.current = viewer.scene;
-    clockRef.current = viewer.clock;
-    navHelpRef.current = viewer.navigationHelpButton;
-
-    // Adjust the default atmosphere coefficients to be more Mars-like
-    const scene = viewer.scene;
-    if (scene.skyAtmosphere) {
-      scene.skyAtmosphere.atmosphereMieCoefficient = new Cesium.Cartesian3(
-        9.0e-5,
-        2.0e-5,
-        1.0e-5,
-      );
-      scene.skyAtmosphere.atmosphereRayleighCoefficient = new Cesium.Cartesian3(
-        9.0e-6,
-        2.0e-6,
-        1.0e-6,
-      );
-      scene.skyAtmosphere.atmosphereRayleighScaleHeight = 9000;
-      scene.skyAtmosphere.atmosphereMieScaleHeight = 2700.0;
-      scene.skyAtmosphere.saturationShift = -0.1;
-      scene.skyAtmosphere.perFragmentAtmosphere = perfConfig.atmosphere.perFragmentAtmosphere;
-    }
-
-    // Adjust postprocess settings for brighter and richer features
-    const bloom = viewer.scene.postProcessStages.bloom;
-    bloom.enabled = perfConfig.postProcessing.bloom;
-    if (perfConfig.postProcessing.bloom) {
-      bloom.uniforms.brightness = perfConfig.postProcessing.bloomBrightness;
-      bloom.uniforms.stepSize = 1.0;
-      bloom.uniforms.sigma = 3.0;
-      bloom.uniforms.delta = 1.5;
-    }
-    scene.highDynamicRange = perfConfig.postProcessing.hdr;
-    viewer.scene.postProcessStages.exposure = perfConfig.postProcessing.exposure;
-
-    // Main initialization function with preloading
-    const initializeWithPreloading = async (viewer: Cesium.Viewer): Promise<void> => {
-      setIsLoading(true);
-      setLoadingProgress(0);
-
-      // Step 1: Cache assets (10% of progress)
-      await cacheAssets();
-      setLoadingProgress(10);
-
-      // Step 2: Preload assets (20% of progress)  
-      await preloadAssets();
-      setLoadingProgress(30);
-
-      // Step 3: Load tileset (40% of progress)
-      setLoadingMessage('Loading Mars terrain...');
-      await loadTileset();
-      setLoadingProgress(70);
-
-      // Step 4: Load rovers (20% of progress)
-      setLoadingMessage('Loading rover data...');
-      await loadRovers();
-      setLoadingProgress(85);
-
-      // Step 5: Load landmarks (10% of progress)
-      setLoadingMessage('Loading landmarks...');
-      await loadLandmarks();
-      setLoadingProgress(95);
-
-      // Step 6: Complete setup
-      setLoadingMessage('Finalizing setup...');
-      setupRotation();
-      addRoverInstructionsToNavMenu();
-      setLoadingProgress(100);
-
-      // Add a listener for when the home button is clicked.
-      if (viewer.homeButton) {
-        viewer.homeButton.viewModel.command.beforeExecute.addEventListener(
-          function () {
-            reset();
-          },
-        );
-      }
-
-      // Add event listener to update model positions during animation
-      viewer.scene.preUpdate.addEventListener(() => {
-        if (viewer.clock.shouldAnimate) {
-          // Update Curiosity model position
-          if (curiosityRef.current && roverModelsRef.current.has('Curiosity')) {
-            updateRoverModelPosition('Curiosity', curiosityRef.current);
-          }
-
-          // Update Perseverance model position
-          if (perseveranceRef.current && roverModelsRef.current.has('Perseverance')) {
-            updateRoverModelPosition('Perseverance', perseveranceRef.current);
-          }
-        }
-      });
-
-      // Complete loading
-      setTimeout(() => {
-        setIsLoading(false);
-      }, 1000);
-    };
-
-    // Initialize the application
-    initializeWithPreloading(viewer).catch(console.error);
-
-    // Cleanup function
-    return () => {
-      if (viewer && !viewer.isDestroyed()) {
-        viewer.destroy();
-      }
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // For changing the width of polylines based on distance from the camera
-  const createWidthCallbackProperty = (nearFarScalar: Cesium.NearFarScalar): Cesium.CallbackProperty => {
-    return new Cesium.CallbackProperty(function () {
-      const distance = viewerRef.current!.camera.positionCartographic.height;
-      let t =
-        (distance - nearFarScalar.near) /
-        (nearFarScalar.far - nearFarScalar.near);
-      t = Cesium.Math.clamp(t, 0.0, 1.0);
-      return Cesium.Math.lerp(nearFarScalar.nearValue, nearFarScalar.farValue, t);
-    }, false);
-  };
-
-  // Converts a Julian date to a Mars Sol number, given a start date / sol number
-  const createJulianDateToSolConverter = (
-    startJulianDate: Cesium.JulianDate,
-    startSol: number
-  ): ((julianDate: Cesium.JulianDate) => string) => {
-    return function (julianDate: Cesium.JulianDate): string {
-      const secondsPerSol = 24 * 60 * 60 + 39 * 60 + 35;
-      const differenceInSeconds = Cesium.JulianDate.secondsDifference(
-        julianDate,
-        startJulianDate,
-      );
-      const solNumber =
-        Math.floor(differenceInSeconds / secondsPerSol) + startSol;
-      return `Sol ${solNumber}`;
-    };
-  };
-
-  // Create GLB model for rover
-  const createRoverModel = (name: string, position: Cesium.Cartesian3): Cesium.Entity | null => {
-    if (!viewerRef.current || !ROVER_MODELS[name]) return null;
-
-    const modelConfig = ROVER_MODELS[name];
-    const perfConfig = perfConfigRef.current;
-
-    try {
-      const entity = viewerRef.current.entities.add({
-        name: `${name} Model`,
-        position: position,
-        orientation: Cesium.Transforms.headingPitchRollQuaternion(
-          position,
-          new Cesium.HeadingPitchRoll(
-            Cesium.Math.toRadians(modelConfig.heading || 0),
-            0,
-            0
-          )
-        ),
-        model: {
-          uri: modelConfig.modelPath,
-          minimumPixelSize: perfConfig.model.minimumPixelSize,
-          maximumScale: perfConfig.model.maximumScale,
-          scale: modelConfig.scale,
-          lightColor: Cesium.Color.WHITE,
-          shadows: Cesium.ShadowMode.DISABLED,
-          heightReference: Cesium.HeightReference.CLAMP_TO_GROUND,
-        }
-      });
-
-      roverModelsRef.current.set(name, entity);
-      return entity;
-    } catch (error) {
-      console.error(`Error creating model for ${name}:`, error);
-      return null;
-    }
-  };
-
-  // Update rover model position to follow the rover entity
-  const updateRoverModelPosition = (roverName: string, roverEntity: RoverEntity): void => {
-    const modelEntity = roverModelsRef.current.get(roverName);
-    if (!modelEntity || !roverEntity || !clockRef.current) return;
-
-    const currentTime = clockRef.current.currentTime;
-    const position = roverEntity.position?.getValue(currentTime);
-
-    if (position) {
-      modelEntity.position = new Cesium.CallbackProperty(() => {
-        const time = clockRef.current?.currentTime;
-        if (time && roverEntity.position) {
-          return roverEntity.position.getValue(time);
-        }
-        return position;
-      }, false) as unknown as Cesium.PositionProperty;
-
-      // Also update orientation if the rover has orientation data
-      if (roverEntity.orientation) {
-        modelEntity.orientation = new Cesium.CallbackProperty(() => {
-          const time = clockRef.current?.currentTime;
-          if (time && roverEntity.orientation) {
-            return roverEntity.orientation.getValue(time);
-          }
-          return Cesium.Transforms.headingPitchRollQuaternion(
-            position,
-            new Cesium.HeadingPitchRoll(0, 0, 0)
-          );
-        }, false);
-      }
-    }
-  };
-
-  // Show/hide rover models
-  const showRoverModel = (roverName: string, show: boolean = true): void => {
-    const modelEntity = roverModelsRef.current.get(roverName);
-    if (modelEntity && modelEntity.model) {
-      modelEntity.show = show;
-    }
-  };
-
-  // Hide all rover models
-  const hideAllRoverModels = (): void => {
-    roverModelsRef.current.forEach((entity) => {
-      entity.show = false;
-    });
-  };
-
-  // To create a rectangle with text that conforms to the terrain
-  const createCanvasAsTexture = (text: string): HTMLCanvasElement => {
-    const canvas = document.createElement("canvas");
-    canvas.width = 1024;
-    canvas.height = 256;
-
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return canvas;
-
-    // Background
-    ctx.fillStyle = "rgba(0, 0, 0, 0)";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-    // Text
-    ctx.font = "36px sans-serif";
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-    ctx.strokeStyle = "rgba(0,0,0,0.1)";
-    ctx.lineWidth = 1;
-    ctx.fillStyle = "#ffffff";
-
-    ctx.strokeText(text, canvas.width / 2, canvas.height / 2);
-    ctx.fillText(text, canvas.width / 2, canvas.height / 2);
-
-    return canvas;
-  };
-
-  // For drawing attention to the play button in the animation view model
-  const highlightAnimationViewModel = (): void => {
+  const highlightAnimationViewModel = useCallback((): void => {
     const clock = clockRef.current;
     if (!clock || clock.shouldAnimate) return;
 
-    const playPath = viewerRef.current?.animation.container.querySelector(
-      "#animation_pathPlay",
-    );
+    const playPath = viewerRef.current?.animation.container.querySelector("#animation_pathPlay");
     if (!playPath) return;
 
     const playButton = playPath.closest("g.cesium-animation-rectButton");
-    const ringG = viewerRef.current?.animation.container.querySelector(
-      ".cesium-animation-shuttleRingG",
-    );
+    const ringG = viewerRef.current?.animation.container.querySelector(".cesium-animation-shuttleRingG");
 
     if (playButton && ringG) {
       playButton.classList.add("highlight-animation");
       ringG.classList.add("highlight-animation");
 
+      const removeHighlight = () => {
+        playButton.classList.remove("highlight-animation");
+        ringG.classList.remove("highlight-animation");
+      };
+
       playButton.addEventListener("click", removeHighlight, { once: true });
-      setTimeout(removeHighlight, 30000); // Remove after 30 seconds if not clicked
+      setTimeout(removeHighlight, 30000);
     }
-  };
+  }, []);
 
-  const removeHighlight = (): void => {
-    const playPath = viewerRef.current?.animation.container.querySelector(
-      "#animation_pathPlay",
-    );
-    if (!playPath) return;
-
-    const playButton = playPath.closest("g.cesium-animation-rectButton");
-    const ringG = viewerRef.current?.animation.container.querySelector(
-      ".cesium-animation-shuttleRingG",
-    );
-
-    if (playButton && ringG) {
-      playButton.classList.remove("highlight-animation");
-      ringG.classList.remove("highlight-animation");
-    }
-  };
-
-  const reset = (): void => {
+  const reset = useCallback((): void => {
     if (!viewerRef.current || !clockRef.current) return;
 
     clockRef.current.multiplier = 1;
@@ -781,57 +158,38 @@ const MarsRoverExplorer: React.FC = () => {
     if (removeRotationRef.current) {
       removeRotationRef.current();
     }
-    hideAllRoverModels();
-    removeHighlight();
-  };
+    roverModelsRef.current.forEach(entity => { entity.show = false; });
+  }, []);
 
-  // Spin Mars on first load but disable the spinning upon any input
-  const setupRotation = (): void => {
+  const setupRotation = useCallback((): void => {
     if (!viewerRef.current) return;
 
     const rotationSpeed = Cesium.Math.toRadians(0.1);
-    removeRotationRef.current = viewerRef.current.scene.postRender.addEventListener(
-      function () {
-        viewerRef.current!.scene.camera.rotateRight(rotationSpeed);
-      },
-    );
+    removeRotationRef.current = viewerRef.current.scene.postRender.addEventListener(() => {
+      viewerRef.current!.scene.camera.rotateRight(rotationSpeed);
+    });
 
     const handler = new Cesium.ScreenSpaceEventHandler(viewerRef.current.scene.canvas);
-    handler.setInputAction(
-      () => removeRotationRef.current?.(),
-      Cesium.ScreenSpaceEventType.LEFT_DOWN,
-    );
-    handler.setInputAction(
-      () => removeRotationRef.current?.(),
-      Cesium.ScreenSpaceEventType.RIGHT_DOWN,
-    );
-    handler.setInputAction(
-      () => removeRotationRef.current?.(),
-      Cesium.ScreenSpaceEventType.MIDDLE_DOWN,
-    );
-    handler.setInputAction(
-      () => removeRotationRef.current?.(),
-      Cesium.ScreenSpaceEventType.WHEEL,
-    );
-  };
+    const removeRotation = () => removeRotationRef.current?.();
 
-  // Inject instructions for interacting with the rovers into the navigation help menu
-  const addRoverInstructionsToNavMenu = (): void => {
-    const div = document.querySelector(
-      ".cesium-click-navigation-help.cesium-navigation-help-instructions",
-    );
+    handler.setInputAction(removeRotation, Cesium.ScreenSpaceEventType.LEFT_DOWN);
+    handler.setInputAction(removeRotation, Cesium.ScreenSpaceEventType.RIGHT_DOWN);
+    handler.setInputAction(removeRotation, Cesium.ScreenSpaceEventType.MIDDLE_DOWN);
+    handler.setInputAction(removeRotation, Cesium.ScreenSpaceEventType.WHEEL);
+  }, []);
+
+  const addRoverInstructionsToNavMenu = useCallback((): void => {
+    const div = document.querySelector(".cesium-click-navigation-help.cesium-navigation-help-instructions");
     if (!div) return;
 
     const table = div.querySelector("table");
     if (!table) return;
 
-    // Ensure there's at least one tbody to append into
     if (table.tBodies.length === 0) {
       table.createTBody();
     }
     const targetTbody = table.tBodies[0];
 
-    // Create templates for rover help instructions
     const roverHelpRowTemplate1 = document.createElement('template');
     roverHelpRowTemplate1.innerHTML = `
       <tr>
@@ -879,26 +237,22 @@ const MarsRoverExplorer: React.FC = () => {
     `;
 
     if (roverHelpRowTemplate1.content) {
-      const instructions1Clone = roverHelpRowTemplate1.content.cloneNode(true);
-      targetTbody.appendChild(instructions1Clone);
+      targetTbody.appendChild(roverHelpRowTemplate1.content.cloneNode(true));
     }
-
     if (roverHelpRowTemplate2.content) {
-      const instructions2Clone = roverHelpRowTemplate2.content.cloneNode(true);
-      targetTbody.appendChild(instructions2Clone);
+      targetTbody.appendChild(roverHelpRowTemplate2.content.cloneNode(true));
     }
-  };
+  }, []);
 
-  // Load Mars tileset with device-specific optimizations
-  const loadTileset = async (): Promise<void> => {
+  const loadTileset = useCallback(async (): Promise<void> => {
     if (!viewerRef.current) return;
 
     const perfConfig = perfConfigRef.current;
 
     try {
-      const tileset = await Cesium.Cesium3DTileset.fromIonAssetId(3644333, {
+      const tileset = await Cesium.Cesium3DTileset.fromIonAssetId(TILESET_ION_ASSET_ID, {
         enableCollision: true,
-        // Performance and preloading optimizations based on device
+        // ... other options from perfConfig.tileset except maximumMemoryUsage
         maximumScreenSpaceError: perfConfig.tileset.maximumScreenSpaceError,
         cullRequestsWhileMoving: perfConfig.tileset.cullRequestsWhileMoving,
         cullRequestsWhileMovingMultiplier: perfConfig.tileset.cullRequestsWhileMovingMultiplier,
@@ -917,35 +271,32 @@ const MarsRoverExplorer: React.FC = () => {
         foveatedMinimumScreenSpaceErrorRelaxation: perfConfig.tileset.foveatedMinimumScreenSpaceErrorRelaxation,
       });
 
-      // Apply memory usage setting on the tileset instance (not in constructor options)
+      // Set the maximumMemoryUsage on the tileset instance
       // tileset.maximumMemoryUsage = perfConfig.tileset.maximumMemoryUsage;
 
       viewerRef.current.scene.primitives.add(tileset);
 
-      // Set up tile loading event listener
       tileset.allTilesLoaded.addEventListener(() => {
         console.log('All visible tiles loaded');
       });
 
     } catch (error) {
-      console.log(error);
+      console.log('Tileset loading error:', error);
     }
-  };
+  }, []);
 
-  // Load the rovers and path from The Martian
-  const loadRovers = async (): Promise<void> => {
+  const loadRovers = useCallback(async (): Promise<void> => {
     if (!viewerRef.current) return;
 
     try {
-      // Try to load from cache first
       let czmlData;
-      const cachedData = sessionStorage.getItem('Mars.czml');
+      const cachedData = sessionStorage.getItem(CACHE_KEYS.CZML);
 
       if (cachedData) {
         czmlData = JSON.parse(cachedData);
         console.log('Loading CZML from cache');
       } else {
-        const response = await fetch("../../SampleData/Mars.czml");
+        const response = await fetch(DATA_URLS.CZML);
         czmlData = await response.json();
       }
 
@@ -956,61 +307,48 @@ const MarsRoverExplorer: React.FC = () => {
 
       const onSelectRover = (rover: RoverEntity, roverName: string): void => {
         reset();
-        const roverAnimStartIso = rover.properties?.animationStartTime.getValue(
-          Cesium.JulianDate.now(),
-        ) as string;
+        const roverAnimStartIso = rover.properties?.animationStartTime.getValue(Cesium.JulianDate.now()) as string;
         clockRef.current!.multiplier = 604800;
         clockRef.current!.currentTime = Cesium.JulianDate.fromIso8601(roverAnimStartIso);
         if (rover.availability) {
           viewerRef.current!.timeline.zoomTo(rover.availability.start, rover.availability.stop);
         }
 
-        // Create or show the GLB model for this rover
         const roverPosition = rover.position?.getValue(clockRef.current!.currentTime);
         if (roverPosition) {
           let modelEntity = roverModelsRef.current.get(roverName);
           if (!modelEntity) {
-            modelEntity = createRoverModel(roverName, roverPosition) || undefined;
+            modelEntity = createRoverModel(roverName, roverPosition, viewerRef.current!) || undefined;
+            if (modelEntity) roverModelsRef.current.set(roverName, modelEntity);
           }
 
           if (modelEntity) {
-            updateRoverModelPosition(roverName, rover);
-            showRoverModel(roverName, true);
+            updateRoverModelPosition(roverName, rover, modelEntity, clockRef.current!);
+            modelEntity.show = true;
           }
         }
 
         if (!roverPosition) return;
 
-        const boundingSphere = new Cesium.BoundingSphere(
-          roverPosition as Cesium.Cartesian3,
-          5000.0,
-        );
-
+        const boundingSphere = new Cesium.BoundingSphere(roverPosition as Cesium.Cartesian3, 5000.0);
         sceneRef.current!.camera.flyToBoundingSphere(boundingSphere, {
           offset: new Cesium.HeadingPitchRange(4.9791, -0.5294, 0.0),
           easingFunction: Cesium.EasingFunction.CUBIC_IN_OUT,
           maximumHeight: 5e6,
           pitchAdjustHeight: 2.5e6,
           duration: 3.0,
-          complete: function () {
+          complete: () => {
             highlightAnimationViewModel();
             navHelpRef.current!.viewModel.showInstructions = true;
           },
         });
       };
 
-      const setupRover = function (
-        entityId: string,
-        startSol: number,
-        outRover: RoverEntity | null
-      ): RoverEntity {
+      const setupRover = function (entityId: string, startSol: number, outRover: RoverEntity | null): RoverEntity {
         outRover = dataSource.entities.getById(entityId) as unknown as RoverEntity;
 
         if (outRover.availability) {
-          const julianDateToSol = createJulianDateToSolConverter(
-            outRover.availability.start,
-            startSol,
-          );
+          const julianDateToSol = createJulianDateToSolConverter(outRover.availability.start, startSol);
           if (outRover.label) {
             outRover.label.text = new Cesium.CallbackProperty(function (time: Cesium.JulianDate | undefined) {
               if (time) {
@@ -1025,6 +363,7 @@ const MarsRoverExplorer: React.FC = () => {
         if (roverPath && roverPath.polyline) {
           roverPath.polyline.width = createWidthCallbackProperty(
             new Cesium.NearFarScalar(0.0, 15.0, 1.0e5, 0.0),
+            viewerRef.current!
           );
         }
 
@@ -1043,12 +382,13 @@ const MarsRoverExplorer: React.FC = () => {
       if (theMartianJourneyRef.current && theMartianJourneyRef.current.polyline) {
         theMartianJourneyRef.current.polyline.width = createWidthCallbackProperty(
           new Cesium.NearFarScalar(0.0, 10.0, 1.0e7, 0.0),
+          viewerRef.current!
         );
       }
 
       if (theMartianJourneyRef.current && theMartianJourneyRef.current.rectangle) {
         theMartianJourneyRef.current.rectangle.material = new Cesium.ImageMaterialProperty({
-          image: createCanvasAsTexture('Mark Watney\'s Journey in "The Martian"'),
+          image: getCachedCanvasTexture('Mark Watney\'s Journey in "The Martian"'),
           transparent: true,
         });
       }
@@ -1065,32 +405,29 @@ const MarsRoverExplorer: React.FC = () => {
     } catch (error) {
       console.log(`Error loading CZML: ${error}`);
     }
-  };
+  }, [reset, highlightAnimationViewModel]);
 
-  // Load points of interest from GeoJSON data source
-  const loadLandmarks = async (): Promise<void> => {
+  const loadLandmarks = useCallback(async (): Promise<void> => {
     if (!viewerRef.current) return;
 
     try {
-      // Try to load from cache first
       let geoJsonData;
-      const cachedData = sessionStorage.getItem('MarsPointsofInterest.geojson');
+      const cachedData = sessionStorage.getItem(CACHE_KEYS.GEOJSON);
 
       if (cachedData) {
         geoJsonData = JSON.parse(cachedData);
         console.log('Loading GeoJSON from cache');
       } else {
-        const response = await fetch("../../SampleData/MarsPointsofInterest.geojson");
+        const response = await fetch(DATA_URLS.GEOJSON);
         geoJsonData = await response.json();
       }
 
       const dataSource = await Cesium.GeoJsonDataSource.load(geoJsonData);
       viewerRef.current.dataSources.add(dataSource);
 
-      const onSelectLandmark = (landmark: LandmarkFlyToOptions): void => {
+      const onSelectLandmark = (landmark: CameraFlyToOptions): void => {
         reset();
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        sceneRef.current!.camera.flyTo(landmark as any);
+        sceneRef.current!.camera.flyTo(landmark);
       };
 
       const landmarkMenuTemp: LandmarkMenuEntry[] = [];
@@ -1128,16 +465,10 @@ const MarsRoverExplorer: React.FC = () => {
 
         entity.name = entity.properties.text.getValue() as string;
 
-        const flyToDestination = Cesium.Cartesian3.fromArray(
-          entity.properties.destination.getValue() as number[]
-        );
+        const flyToDestination = Cesium.Cartesian3.fromArray(entity.properties.destination.getValue() as number[]);
         const orientationArray = entity.properties.orientation.getValue() as number[];
         const [heading = 0, pitch = 0, roll = 0] = orientationArray;
-        const flyToOrientation = new Cesium.HeadingPitchRoll(
-          heading,
-          pitch,
-          roll,
-        );
+        const flyToOrientation = new Cesium.HeadingPitchRoll(heading, pitch, roll);
 
         landmarkMenuTemp.push({
           text: entity.properties.text.getValue() as string,
@@ -1145,8 +476,7 @@ const MarsRoverExplorer: React.FC = () => {
             onSelectLandmark({
               destination: flyToDestination,
               orientation: flyToOrientation,
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              easingFunction: Cesium.EasingFunction.CUBIC_IN_OUT as any,
+              easingFunction: Cesium.EasingFunction.CUBIC_IN_OUT,
               maximumHeight: 5e6,
               pitchAdjustHeight: 2.5e6,
               duration: 3.0,
@@ -1162,31 +492,156 @@ const MarsRoverExplorer: React.FC = () => {
     } catch (error) {
       console.log(`Error loading GeoJSON: ${error}`);
     }
-  };
+  }, [reset]);
 
-  // Handle rover selection
-  const handleRoverSelection = (e: React.ChangeEvent<HTMLSelectElement>) => {
+  // Handle selections
+  const handleRoverSelection = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedIndex = parseInt(e.target.value);
     if (selectedIndex >= 0 && selectedIndex < roverMenuEntries.length) {
       roverMenuEntries[selectedIndex].onselect();
     }
-    // Reset select to default
     e.target.value = "";
-  };
+  }, [roverMenuEntries]);
 
-  // Handle landmark selection
-  const handleLandmarkSelection = (e: React.ChangeEvent<HTMLSelectElement>) => {
+  const handleLandmarkSelection = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedIndex = parseInt(e.target.value);
     if (selectedIndex >= 0 && selectedIndex < landmarkMenuEntries.length) {
       landmarkMenuEntries[selectedIndex].onselect();
     }
-    // Reset select to default
     e.target.value = "";
-  };
+  }, [landmarkMenuEntries]);
+
+  // Main useEffect
+  useEffect(() => {
+    if (!cesiumContainer.current) return;
+
+    const perfConfig = perfConfigRef.current;
+
+    // Initialize Cesium
+    Cesium.Ellipsoid.default = Cesium.Ellipsoid.MARS;
+    const viewer = new Cesium.Viewer(cesiumContainer.current, {
+      terrainProvider: false as unknown as Cesium.TerrainProvider,
+      baseLayer: false as unknown as Cesium.ImageryLayer,
+      baseLayerPicker: false,
+      geocoder: false,
+      shadows: false,
+      globe: new Cesium.Globe(Cesium.Ellipsoid.MARS),
+      skyBox: Cesium.SkyBox.createEarthSkyBox(),
+      skyAtmosphere: new Cesium.SkyAtmosphere(Cesium.Ellipsoid.MARS),
+      requestRenderMode: perfConfig.viewer.requestRenderMode,
+      maximumRenderTimeChange: perfConfig.viewer.maximumRenderTimeChange,
+    });
+
+    if (!viewer || !viewer.scene) {
+      console.error('Failed to create Cesium viewer or scene');
+      return;
+    }
+
+    // Apply performance settings
+    viewer.resolutionScale = perfConfig.viewer.resolutionScale;
+    viewer.scene.fog.enabled = false;
+    viewer.targetFrameRate = perfConfig.viewer.targetFrameRate;
+    viewer.scene.globe.show = false;
+
+    viewerRef.current = viewer;
+    sceneRef.current = viewer.scene;
+    clockRef.current = viewer.clock;
+    navHelpRef.current = viewer.navigationHelpButton;
+
+    // Capture the current rover models map so the cleanup uses the same object
+    const roverModels = roverModelsRef.current;
+
+    // Adjust atmosphere
+    if (viewer.scene.skyAtmosphere) {
+      viewer.scene.skyAtmosphere.atmosphereMieCoefficient = new Cesium.Cartesian3(9.0e-5, 2.0e-5, 1.0e-5);
+      viewer.scene.skyAtmosphere.atmosphereRayleighCoefficient = new Cesium.Cartesian3(9.0e-6, 2.0e-6, 1.0e-6);
+      viewer.scene.skyAtmosphere.atmosphereRayleighScaleHeight = 9000;
+      viewer.scene.skyAtmosphere.atmosphereMieScaleHeight = 2700.0;
+      viewer.scene.skyAtmosphere.saturationShift = -0.1;
+      viewer.scene.skyAtmosphere.perFragmentAtmosphere = perfConfig.atmosphere.perFragmentAtmosphere;
+    }
+
+    // Adjust post-processing
+    const bloom = viewer.scene.postProcessStages.bloom;
+    bloom.enabled = perfConfig.postProcessing.bloom;
+    if (perfConfig.postProcessing.bloom) {
+      bloom.uniforms.brightness = perfConfig.postProcessing.bloomBrightness;
+      bloom.uniforms.stepSize = 1.0;
+      bloom.uniforms.sigma = 3.0;
+      bloom.uniforms.delta = 1.5;
+    }
+    viewer.scene.highDynamicRange = perfConfig.postProcessing.hdr;
+    viewer.scene.postProcessStages.exposure = perfConfig.postProcessing.exposure;
+
+    // Main initialization
+    const initializeWithPreloading = async (viewer: Cesium.Viewer): Promise<void> => {
+      setIsLoading(true);
+      setLoadingProgress(0);
+
+      await cacheAssets();
+      setLoadingProgress(10);
+
+      await preloadAssets();
+      setLoadingProgress(30);
+
+      setLoadingMessage('Loading Mars terrain...');
+      await loadTileset();
+      setLoadingProgress(70);
+
+      setLoadingMessage('Loading rover data...');
+      await loadRovers();
+      setLoadingProgress(85);
+
+      setLoadingMessage('Loading landmarks...');
+      await loadLandmarks();
+      setLoadingProgress(95);
+
+      setLoadingMessage('Finalizing setup...');
+      setupRotation();
+      addRoverInstructionsToNavMenu();
+      setLoadingProgress(100);
+
+      // Add home button listener
+      if (viewer.homeButton) {
+        viewer.homeButton.viewModel.command.beforeExecute.addEventListener(() => {
+          reset();
+        });
+      }
+
+      // Add pre-update event listener for rover positions
+      viewer.scene.preUpdate.addEventListener(() => {
+        if (viewer.clock.shouldAnimate) {
+          if (curiosityRef.current && roverModelsRef.current.has('Curiosity')) {
+            const modelEntity = roverModelsRef.current.get('Curiosity')!;
+            updateRoverModelPosition('Curiosity', curiosityRef.current, modelEntity, clockRef.current!);
+          }
+
+          if (perseveranceRef.current && roverModelsRef.current.has('Perseverance')) {
+            const modelEntity = roverModelsRef.current.get('Perseverance')!;
+            updateRoverModelPosition('Perseverance', perseveranceRef.current, modelEntity, clockRef.current!);
+          }
+        }
+      });
+
+      setTimeout(() => {
+        setIsLoading(false);
+      }, 1000);
+    };
+
+    initializeWithPreloading(viewer).catch(console.error);
+
+    // Cleanup
+    return () => {
+      if (viewer && !viewer.isDestroyed()) {
+        viewer.destroy();
+      }
+      // Clear caches using the captured map reference
+      roverModels.clear();
+    };
+  }, [cacheAssets, preloadAssets, loadTileset, loadRovers, loadLandmarks, setupRotation, addRoverInstructionsToNavMenu, reset]);
 
   return (
     <div className="relative w-full h-screen">
-      <style>{styles}</style>
       <div ref={cesiumContainer} className="fullSize" />
 
       {/* Loading Overlay */}
@@ -1204,7 +659,7 @@ const MarsRoverExplorer: React.FC = () => {
             <div className="text-sm mt-2 opacity-75">{loadingProgress}% Complete</div>
             {loadingProgress < 100 && (
               <div className="text-xs mt-3 opacity-60">
-                {isMobileDevice() ? 'Optimizing for mobile...' : 'Preloading assets for optimal performance...'}
+                {getPerformanceConfig().viewer.resolutionScale < 1 ? 'Optimizing for mobile...' : 'Preloading assets for optimal performance...'}
               </div>
             )}
           </div>
@@ -1254,7 +709,6 @@ const MarsRoverExplorer: React.FC = () => {
           </svg>
         </div>
       </div>
-
     </div>
   );
 };

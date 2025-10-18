@@ -1,0 +1,204 @@
+@import url(https://cesium.com/downloads/cesiumjs/releases/1.107/Build/Cesium/Widgets/widgets.css);
+
+.fullSize {
+  position: absolute;
+  top: 0;
+  left: 0;
+  border: none;
+  height: 100%;
+  width: 100%;
+}
+
+#loadingOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-family: sans-serif;
+  z-index: 1000;
+  backdrop-filter: blur(5px);
+}
+
+.loading-container {
+  text-align: center;
+  background: rgba(42, 42, 42, 0.95);
+  padding: 40px;
+  border-radius: 12px;
+  border: 1px solid #555;
+  min-width: 320px;
+}
+
+.progress-bar {
+  width: 280px;
+  height: 8px;
+  background: #333;
+  border-radius: 4px;
+  overflow: hidden;
+  margin: 20px auto;
+  position: relative;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #ff4444, #ff6666);
+  border-radius: 4px;
+  transition: width 0.3s ease;
+  position: relative;
+}
+
+.progress-fill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+#toolbar {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: rgba(42, 42, 42, 0.9);
+  padding: 10px;
+  border-radius: 8px;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 200px;
+}
+
+.stratakit-mimic-select-root {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+}
+
+.stratakit-mimic-select {
+  appearance: none;
+  background: #2a2a2a;
+  border: 1px solid #555;
+  border-radius: 4px;
+  color: white;
+  padding: 8px 32px 8px 12px;
+  width: 100%;
+  font-size: 14px;
+  cursor: pointer;
+  outline: none;
+}
+
+.stratakit-mimic-select:hover {
+  background: #333;
+  border-color: #666;
+}
+
+.stratakit-mimic-select:focus {
+  border-color: #4CAF50;
+  box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
+}
+
+.stratakit-mimic-select-arrow {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: #ccc;
+}
+
+/* Styles for indicating to the user to press the play button */
+.cesium-animation-rectButton.highlight-animation .cesium-animation-buttonGlow {
+  display: block;
+  fill: #fff;
+  filter: url(#animation_blurred) drop-shadow(0 0 3px #aef) drop-shadow(0 0 3px #fff);
+  animation: highlight-animation-button 1.2s ease-in-out infinite;
+}
+
+.cesium-animation-rectButton.highlight-animation .cesium-animation-buttonMain {
+  stroke: #fff;
+  stroke-width: 3;
+}
+
+.cesium-animation-rectButton.highlight-animation .cesium-animation-buttonPath {
+  fill: #fff;
+}
+
+.cesium-animation-shuttleRingG.highlight-animation .cesium-animation-shuttleRingBack {
+  stroke: #fff;
+  stroke-width: 6;
+  filter: drop-shadow(0 0 3px #aef) drop-shadow(0 0 3px rgba(174, 238, 255, 0.95));
+  animation: highlight-animation-ring 1.2s ease-in-out infinite;
+}
+
+.cesium-animation-shuttleRingG.highlight-animation .cesium-animation-shuttleRingSwoosh line {
+  stroke: #fff;
+  stroke-opacity: 0.8;
+}
+
+@keyframes highlight-animation-button {
+  0% {
+    opacity: 0.3;
+    stroke-width: 0;
+  }
+  50% {
+    opacity: 1;
+    stroke-width: 4;
+  }
+  100% {
+    opacity: 0.3;
+    stroke-width: 0;
+  }
+}
+
+@keyframes highlight-animation-ring {
+  0% {
+    stroke-opacity: 0.25;
+    stroke: #333;
+  }
+  50% {
+    stroke-opacity: 1;
+    stroke: #fff;
+  }
+  100% {
+    stroke-opacity: 0.25;
+    stroke: #333;
+  }
+}
+
+/* Fix for mobile navigation bar overlap */
+@media (max-width: 768px) {
+  .cesium-viewer-timelineContainer {
+    bottom: env(safe-area-inset-bottom, 0px) !important;
+  }
+  
+  .cesium-viewer-animationContainer {
+    bottom: env(safe-area-inset-bottom, 0px) !important;
+  }
+  
+  .cesium-viewer-bottom {
+    bottom: env(safe-area-inset-bottom, 0px) !important;
+  }
+  
+  #toolbar {
+    min-width: 160px;
+  }
+  
+  .loading-container {
+    padding: 20px;
+    min-width: 280px;
+  }
+}
