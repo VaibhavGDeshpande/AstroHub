@@ -155,7 +155,7 @@ const NASAEyesCards = () => {
 
                         {/* Content - responsive text sizing */}
                         <div className="relative flex-grow flex flex-col">
-                          <h3 className="text-lg sm:text-xl font-bold text-white mb-2 sm:mb-3 group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:bg-clip-text transition-all duration-300 leading-tight" 
+                          <h3 className="text-lg sm:text-xl font-bold text-white mb-2 sm:mb-3  group-hover:bg-gradient-to-r group-hover:bg-clip-text transition-all duration-300 leading-tight" 
                               style={{backgroundImage: `linear-gradient(to right, var(--tw-gradient-stops))`}}>
                             {card.title}
                           </h3>
