@@ -42,7 +42,7 @@ export const cardSections: CardSection[] = [
     id: 'nasa-data',
     badgeColor: 'blue',
     badgeText: 'NASA Data',
-    titleGradient: 'from-blue-400 to-purple-500',
+    titleGradient: 'from-yellow-400 via-red-500 to-yellow-500',
     subtitle: 'Real-time access to NASA\'s comprehensive space data APIs',
     cards: [
       {
@@ -50,11 +50,11 @@ export const cardSections: CardSection[] = [
         description: 'Discover a new astronomy picture each day with detailed explanations from professional astronomers.',
         icon: Star,
         color: 'from-purple-500 to-pink-500',
-        path: '/apod',
+        path: '/', //apod
         features: ['Daily updates', 'HD images', 'Expert explanations'],
         glow: 'purple',
         ctaText: 'Explore Data',
-        status:'Temporary closed'
+        status:'closed'
       },
       // {
       //   title: 'Mars Rover Photos',
@@ -143,11 +143,11 @@ export const cardSections: CardSection[] = [
         description: 'Navigate through our solar system with all planets, moons, and celestial bodies in real-time 3D visualization.',
         icon: Sparkles,
         color: 'from-orange-500 via-yellow-500 to-purple-500',
-        path: '/solar-system',
+        path: '/', //solar-system
         features: ['All 8 planets', 'Orbital mechanics', 'Interactive navigation', 'Scale accuracy'],
         glow: 'orange',
         ctaText: 'Explore System',
-        status:'Temporary closed'
+        status:'closed'
       },
       {
         title: '3D View of Earth',
@@ -188,7 +188,7 @@ export const cardSections: CardSection[] = [
     id: 'sky-tools',
     badgeColor: 'indigo',
     badgeText: 'Observation',
-    titleGradient: 'from-indigo-400 to-purple-500',
+    titleGradient: 'from-green-400 to-blue-500',
     subtitle: 'Professional tools for mapping and observing the night sky',
     cards: [
       {
