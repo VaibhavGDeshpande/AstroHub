@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     type: 'website',
     images: [
       {
-        url: '/nasa-apod-preview.jpg', // You can add a preview image
+        url: '/assets/AstroHub.png', // You can add a preview image
         width: 1200,
         height: 630,
         alt: 'NASA APOD Explorer Preview'

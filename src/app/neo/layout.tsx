@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     type: 'website',
     images: [
       {
-        url: '/neo-preview.jpg',
+        url: '/assets/AstroHub.png',
         width: 1200,
         height: 630,
         alt: 'NASA NEO Explorer Preview - Asteroid Tracking'

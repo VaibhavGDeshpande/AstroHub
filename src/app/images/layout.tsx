@@ -9,11 +9,11 @@ export const metadata: Metadata = {
 		title: 'NASA Images & Videos | NIVL Explorer',
 		description:
 			"Explore NASA's Image and Video Library with rich filters and previews.",
-		url: 'https://yourdomain.com/images',
+		url: 'https://astrohub-live.vercel.app/images',
 		siteName: 'AstroHub',
 		images: [
 			{
-				url: '/images-og.png',
+				url: '/assets/Astrohub.png',
 				width: 1200,
 				height: 630,
 				alt: 'NASA Images & Videos',
