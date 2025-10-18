@@ -27,16 +27,16 @@ export const getPerformanceConfig = (): PerformanceConfig => {
   performanceConfig = {
     viewer: {
       resolutionScale: isMobile ? 0.8 : 1.0,
-      targetFrameRate: isMobile ? 60 : 60,
+      targetFrameRate: isMobile ? 30 : 40,
       requestRenderMode: true,
       maximumRenderTimeChange: Infinity,
     },
     tileset: {
-      maximumScreenSpaceError: isMobile ? 48 : 16, // Increased for mobile to reduce tiles
-      maximumMemoryUsage: isMobile ? 256 : 1024, // Reduced for mobile
+      maximumScreenSpaceError: isMobile ? 48 : 32, // Increased for mobile to reduce tiles
+      maximumMemoryUsage: isMobile ? 256 : 512, // Reduced for mobile
       foveatedConeSize: isMobile ? 0.7 : 0.3, // Increased for mobile to reduce high detail area
       cullRequestsWhileMoving: true,
-      cullRequestsWhileMovingMultiplier: isMobile ? 30.0 : 60.0,
+      cullRequestsWhileMovingMultiplier: isMobile ? 30.0 : 30.0,
       skipLevelOfDetail: isMobile,
       baseScreenSpaceError: isMobile ? 1024 : 1024, // Reduced for mobile
       skipScreenSpaceErrorFactor: isMobile ? 48 : 16, // Increased for mobile
