@@ -17,7 +17,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "AstroHub - One-Stop Space Platform with professional observation tools",
+    default: "AstroHub - One-Stop Space Platform with Professional Observation Tools",
     template: "%s | AstroHub"
   },
   icons: {
@@ -53,16 +53,16 @@ export const metadata: Metadata = {
     address: false,
     telephone: false,
   },
-  metadataBase: new URL("https://explorenasa.vercel.app"), // Replace with your actual domain
+  metadataBase: new URL("https://astrohub-live.vercel.app"), // Replace with your actual domain
   alternates: {
     canonical: "/",
   },
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://explorenasa.vercel.app", // Replace with your actual domain
+    url: "https://astrohub-live.vercel.app", // Replace with your actual domain
     siteName: "AstoHub",
-    title: "AstroHub - Astronomy Hub for Astrophiles and young astronomers",
+    title: "AstroHub - Astronomy Hub for Astrophiles and Amateur Astronomers",
     description: "Explore the cosmos with NASA's public APIs including APOD, EPIC, and more stunning space imagery and data.",
     images: [
       {

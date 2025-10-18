@@ -5,11 +5,14 @@ import { motion, AnimatePresence, MotionConfig, PanInfo } from 'framer-motion';
 import { ArrowRight, Sparkles, Star, ChevronLeft, ChevronRight } from 'lucide-react';
 import { cardSections, CardAPI } from './cardData';
 
+
 const EnhancedCards = () => {
   const [isVisible, setIsVisible] = useState(false);
   const [activeIndices, setActiveIndices] = useState<{ [key: string]: number }>({});
   const [isMobile, setIsMobile] = useState(false);
   const [direction, setDirection] = useState<{ [key: string]: number }>({});
+  const [isPaused, setIsPaused] = useState<{ [key: string]: boolean }>({});
+
 
   useEffect(() => {
     setIsVisible(true);
@@ -17,13 +20,17 @@ const EnhancedCards = () => {
     // Initialize active indices for each section
     const initialIndices: { [key: string]: number } = {};
     const initialDirections: { [key: string]: number } = {};
+    const initialPaused: { [key: string]: boolean } = {};
     cardSections.forEach(section => {
       initialIndices[section.id] = 0;
       initialDirections[section.id] = 1;
+      initialPaused[section.id] = false;
     });
     setActiveIndices(initialIndices);
     setDirection(initialDirections);
+    setIsPaused(initialPaused);
   }, []);
+
 
   useEffect(() => {
     const handleResize = () => {
@@ -34,27 +41,32 @@ const EnhancedCards = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Auto-rotate cards every 4 seconds - ONLY FOR DESKTOP
+
+  // Auto-rotate cards every 4 seconds - ONLY FOR DESKTOP and when NOT paused
   useEffect(() => {
-    if (isMobile) return; // Skip auto-rotation on mobile
+    if (isMobile) return;
 
     const intervals: NodeJS.Timeout[] = [];
 
     cardSections.forEach(section => {
       if (section.cards.length >= 3) {
         const interval = setInterval(() => {
-          setDirection(prev => ({ ...prev, [section.id]: 1 }));
-          setActiveIndices(prev => ({
-            ...prev,
-            [section.id]: (prev[section.id] + 1) % section.cards.length
-          }));
+          // Only rotate if not paused
+          if (!isPaused[section.id]) {
+            setDirection(prev => ({ ...prev, [section.id]: 1 }));
+            setActiveIndices(prev => ({
+              ...prev,
+              [section.id]: (prev[section.id] + 1) % section.cards.length
+            }));
+          }
         }, 4000);
         intervals.push(interval);
       }
     });
 
     return () => intervals.forEach(interval => clearInterval(interval));
-  }, [isMobile]); // Added isMobile dependency
+  }, [isMobile, isPaused]);
+
 
   // Navigation handlers
   const handlePrevious = (sectionId: string, cardsLength: number) => {
@@ -65,6 +77,7 @@ const EnhancedCards = () => {
     }));
   };
 
+
   const handleNext = (sectionId: string, cardsLength: number) => {
     setDirection(prev => ({ ...prev, [sectionId]: 1 }));
     setActiveIndices(prev => ({
@@ -73,11 +86,13 @@ const EnhancedCards = () => {
     }));
   };
 
+
   // Swipe handlers
   const swipeConfidenceThreshold = 10000;
   const swipePower = (offset: number, velocity: number) => {
     return Math.abs(offset) * velocity;
   };
+
 
   const handleDragEnd = (
     sectionId: string,
@@ -88,13 +103,12 @@ const EnhancedCards = () => {
     const swipe = swipePower(offset.x, velocity.x);
 
     if (swipe < -swipeConfidenceThreshold) {
-      // Swiped left - go to next
       handleNext(sectionId, cardsLength);
     } else if (swipe > swipeConfidenceThreshold) {
-      // Swiped right - go to previous
       handlePrevious(sectionId, cardsLength);
     }
   };
+
 
   const getBadgeColor = (color: string) => {
     const colors: { [key: string]: string } = {
@@ -106,6 +120,7 @@ const EnhancedCards = () => {
     };
     return colors[color] || colors.blue;
   };
+
 
   const getVisibleCards = (sectionId: string, cards: CardAPI[]) => {
     if (isMobile || cards.length < 3) {
@@ -123,7 +138,8 @@ const EnhancedCards = () => {
     ];
   };
 
-  // Smoother animation variants for desktop cards
+
+  // Circular transition variants for desktop
   const cardVariants = {
     center: {
       scale: 1,
@@ -131,8 +147,9 @@ const EnhancedCards = () => {
       zIndex: 3,
       filter: 'blur(0px)',
       x: 0,
+      rotateY: 0,
       transition: {
-        duration: 0.5,
+        duration: 0.6
       }
     },
     side: {
@@ -140,11 +157,13 @@ const EnhancedCards = () => {
       opacity: 0.4,
       zIndex: 1,
       filter: 'blur(2px)',
+      rotateY: 0,
       transition: {
-        duration: 0.5,
+        duration: 0.6
       }
     }
   };
+
 
   // Enhanced mobile card variants with swipe support
   const mobileCardVariants = {
@@ -176,7 +195,7 @@ const EnhancedCards = () => {
     })
   };
 
-  // Faster, smoother content animation
+
   const contentVariants = {
     hidden: {
       opacity: 0,
@@ -193,6 +212,7 @@ const EnhancedCards = () => {
     }
   };
 
+
   const itemVariants = {
     hidden: {
       opacity: 0,
@@ -207,6 +227,7 @@ const EnhancedCards = () => {
     }
   };
 
+
   const renderCard = (api: CardAPI, position: string, sectionId: string, originalIndex: number) => {
     const Icon = api.icon;
     const isCenter = position === 'center';
@@ -216,6 +237,8 @@ const EnhancedCards = () => {
         layoutId={isMobile ? undefined : `card-${sectionId}-${api.title}`}
         variants={isMobile ? undefined : cardVariants}
         animate={isCenter ? "center" : "side"}
+        onMouseEnter={() => !isMobile && setIsPaused(prev => ({ ...prev, [sectionId]: true }))}
+        onMouseLeave={() => !isMobile && setIsPaused(prev => ({ ...prev, [sectionId]: false }))}
         className="h-full"
       >
         <div className="relative h-full bg-gradient-to-br from-slate-900/90 to-slate-800/90 backdrop-blur-xl border border-slate-700/50 rounded-2xl sm:rounded-3xl p-5 sm:p-7 overflow-hidden transition-all duration-300 hover:border-slate-500/70 hover:shadow-2xl hover:shadow-purple-500/20 hover:-translate-y-2 flex flex-col min-h-[380px] sm:min-h-[400px] cursor-pointer group">
@@ -312,16 +335,16 @@ const EnhancedCards = () => {
                 <div className="relative">
                   <div className={`w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full ${api.status === 'Live'
                       ? 'bg-emerald-400 animate-pulse'
-                      : 'bg-orange-400 animate-pulse'
+                      : 'bg-red-400 animate-pulse'
                     }`} />
                   <div className={`absolute inset-0 w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full ${api.status === 'Live'
                       ? 'bg-emerald-400 animate-ping'
-                      : 'bg-orange-400 animate-ping'
+                      : 'bg-red-400 animate-ping'
                     }`} />
                 </div>
                 <span className={`text-xs font-semibold ${api.status === 'Live'
                     ? 'text-emerald-400'
-                    : 'text-orange-400'
+                    : 'text-red-400'
                   }`}>
                   {api.status}
                 </span>
@@ -349,8 +372,9 @@ const EnhancedCards = () => {
     }
   };
 
+
   return (
-    <MotionConfig transition={{ duration: 0.4, ease: 'easeInOut' }}>
+    <MotionConfig transition={{ duration: 0.4 }}>
       <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-black py-12 sm:py-16 md:py-20 px-4 relative overflow-hidden">
         {/* Enhanced background effects */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -369,7 +393,7 @@ const EnhancedCards = () => {
         <div className="container mx-auto max-w-7xl relative z-10">
           {/* Main header */}
           <div className={`text-center mb-16 sm:mb-20 md:mb-24 transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-8xl font-black text-transparent bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text mb-6 sm:mb-8 leading-tight tracking-tight px-4">
+            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-8xl font-black text-transparent bg-gradient-to-r from-yellow-400 via-red-500 to-yellow-500 bg-clip-text mb-6 sm:mb-8 leading-tight tracking-tight px-4">
               Explore the Universe
             </h1>
             <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-slate-400 max-w-3xl mx-auto leading-relaxed font-light px-4">
@@ -410,7 +434,7 @@ const EnhancedCards = () => {
 
                 {shouldShowCarousel ? (
                   <>
-                    {/* Desktop View - Three cards carousel with arrows and auto-scroll */}
+                    {/* Desktop View - Three cards carousel with arrows */}
                     <div className="hidden lg:block relative px-12 xl:px-16">
                       {/* Navigation Arrows - Desktop */}
                       <button
@@ -438,26 +462,36 @@ const EnhancedCards = () => {
                       </button>
                     </div>
 
-                    {/* Mobile/Tablet View - Single card carousel with SWIPE ONLY (no auto-scroll) */}
+                    {/* Mobile/Tablet View - Single card with navigation arrows */}
                     <div className="lg:hidden relative px-4">
-                      {/* Swipe Indicator */}
-                      <div className="flex justify-center items-center mb-3 text-slate-500 text-xs">
-                        <span className="flex items-center gap-2">
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16l-4-4m0 0l4-4m-4 4h18" />
-                          </svg>
-                          Swipe to navigate
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                          </svg>
-                        </span>
-                      </div>
-
                       {/* Counter */}
                       <div className="flex justify-center items-center mb-4">
                         <span className="text-xs sm:text-sm text-slate-500 font-medium px-4 py-1.5 rounded-full bg-slate-800/50 border border-slate-700/50">
                           {activeIndex + 1} / {section.cards.length}
                         </span>
+                      </div>
+
+                      {/* Navigation Arrows - Mobile */}
+                      <div className="flex items-center justify-center gap-3 mb-4">
+                        <button
+                          onClick={() => handlePrevious(section.id, section.cards.length)}
+                          className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br from-slate-800/90 to-slate-700/90 border border-slate-600/50 flex items-center justify-center hover:border-purple-500/50 hover:shadow-lg hover:shadow-purple-500/20 transition-all duration-300 group active:scale-95"
+                          aria-label="Previous card"
+                        >
+                          <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6 text-slate-400 group-hover:text-white transition-colors" />
+                        </button>
+                        
+                        <span className="text-xs sm:text-sm text-slate-500 font-medium">
+                          Tap or Swipe
+                        </span>
+
+                        <button
+                          onClick={() => handleNext(section.id, section.cards.length)}
+                          className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br from-slate-800/90 to-slate-700/90 border border-slate-600/50 flex items-center justify-center hover:border-purple-500/50 hover:shadow-lg hover:shadow-purple-500/20 transition-all duration-300 group active:scale-95"
+                          aria-label="Next card"
+                        >
+                          <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6 text-slate-400 group-hover:text-white transition-colors" />
+                        </button>
                       </div>
 
                       <div className="min-h-[380px] sm:min-h-[400px] relative mb-6 sm:mb-8 overflow-hidden">

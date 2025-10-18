@@ -118,13 +118,13 @@ const HeroSection = () => {
                 NASA APIs
               </span>
               <span className="px-2.5 sm:px-3 py-1 sm:py-1.5 bg-purple-500/20 text-purple-300 rounded-full text-xs font-medium backdrop-blur-sm border border-purple-400/30 hover:bg-purple-500/30 transition-colors duration-300">
-                Sky Maps
+                3D Models
               </span>
               <span className="px-2.5 sm:px-3 py-1 sm:py-1.5 bg-green-500/20 text-green-300 rounded-full text-xs font-medium backdrop-blur-sm border border-green-400/30 hover:bg-green-500/30 transition-colors duration-300">
-                Planets
+                Space Observations
               </span>
               <span className="px-2.5 sm:px-3 py-1 sm:py-1.5 bg-orange-500/20 text-orange-300 rounded-full text-xs font-medium backdrop-blur-sm border border-orange-400/30 hover:bg-orange-500/30 transition-colors duration-300">
-                Mars Rovers
+                Space Updates
               </span>
             </div>
           </div>

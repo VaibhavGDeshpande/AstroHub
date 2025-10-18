@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { ChevronDownIcon, Bars3Icon, XMarkIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 
+
 const Header = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -13,39 +14,48 @@ const Header = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const dropdownRef = useRef<HTMLDivElement>(null);
 
+
   useEffect(() => {
     const updateScrollDirection = () => {
       const currentScrollY = window.pageYOffset;
 
+
       setScrollY(currentScrollY);
+
 
       if (Math.abs(currentScrollY - lastScrollY) > 10) {
         const direction = currentScrollY > lastScrollY ? "down" : "up";
+
 
         if (direction !== scrollDirection) {
           setScrollDirection(direction);
         }
 
+
         setLastScrollY(currentScrollY > 0 ? currentScrollY : 0);
       }
     };
+
 
     window.addEventListener("scroll", updateScrollDirection);
     return () => window.removeEventListener("scroll", updateScrollDirection);
   }, [scrollDirection, lastScrollY]);
 
+
   // Close mobile menu on resize to desktop
   useEffect(() => {
     const handleResize = () => {
-      if (window.innerWidth >= 768 && isMobileMenuOpen) {
+      if (window.innerWidth >= 1024 && isMobileMenuOpen) {
         setIsMobileMenuOpen(false);
         setSearchQuery('');
       }
     };
 
+
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, [isMobileMenuOpen]);
+
 
   // Prevent body scroll when mobile menu is open
   useEffect(() => {
@@ -59,46 +69,90 @@ const Header = () => {
     };
   }, [isMobileMenuOpen]);
 
-  // Categorized data from cardData.ts
-  const exploreCategories = [
-    {
-      id: 'nasa-data',
-      title: 'NASA Data',
-      items: [
-        { name: 'Astronomy Picture of the Day', path: '/apod' },
-        { name: 'Near Earth Objects', path: '/neo' },
-        { name: 'EPIC Earth Images', path: '/epic' },
-        { name: 'NASA Image Library', path: '/images' },
-        { name: 'NASA Eyes', path: '/nasa-eyes' }
-      ]
-    },
-    {
-      id: '3d-models',
-      title: '3D Models',
-      items: [
-        { name: 'Solar System Explorer', path: '/solar-system' },
-        { name: '3D View of Earth', path: '/3d-earth' },
-        { name: '3D View of Moon', path: '/3d-moon' },
-        { name: '3D View of Mars', path: '/3d-mars' }
-      ]
-    },
-    {
-      id: 'sky-tools',
-      title: 'Sky Tools',
-      items: [
-        { name: 'Stellarium Sky Map', path: '/stellarium' },
-        { name: 'Sky Charts', path: '/sky-charts' }
-      ]
-    },
-    {
-      id: 'news',
-      title: 'News & Learning',
-      items: [
-        { name: 'Space News & Updates', path: '/space-news' },
-        { name: 'Space Quiz', path: '/space-quiz' }
-      ]
-    }
-  ];
+
+  // Categorized data with status indicators
+    type Status = 'live' | 'temporarily-closed';
+    type ExploreItem = {
+      name: string;
+      path: string;
+      status: Status;
+    };
+    type ExploreCategory = {
+      id: string;
+      title: string;
+      items: ExploreItem[];
+    };
+  
+    const exploreCategories: ExploreCategory[] = [
+      {
+        id: 'nasa-data',
+        title: 'NASA Data',
+        items: [
+          { name: 'Astronomy Picture of the Day', path: '/apod', status: 'temporarily-closed' },
+          { name: 'Near Earth Objects', path: '/neo', status: 'live' },
+          { name: 'EPIC Earth Images', path: '/epic', status: 'live' },
+          { name: 'NASA Image Library', path: '/images', status: 'live' },
+          { name: 'NASA Eyes', path: '/nasa-eyes', status: 'live' }
+        ]
+      },
+      {
+        id: '3d-models',
+        title: '3D Models',
+        items: [
+          { name: 'Solar System Explorer', path: '/solar-system', status: 'temporarily-closed' },
+          { name: '3D View of Earth', path: '/3d-earth', status: 'live' },
+          { name: '3D View of Moon', path: '/3d-moon', status: 'live' },
+          { name: '3D View of Mars', path: '/3d-mars', status: 'live' }
+        ]
+      },
+      {
+        id: 'sky-tools',
+        title: 'Sky Tools',
+        items: [
+          { name: 'Stellarium Sky Map', path: '/stellarium', status: 'live' },
+          { name: 'Sky Charts', path: '/sky-charts', status: 'live' }
+        ]
+      },
+      {
+        id: 'news',
+        title: 'News & Learning',
+        items: [
+          { name: 'Space News & Updates', path: '/space-news', status: 'live' },
+          { name: 'Space Quiz', path: '/space-quiz', status: 'live' }
+        ]
+      }
+    ];
+
+
+  // Status Badge Component
+  const StatusBadge = ({ status }: { status: 'live' | 'temporarily-closed' }) => {
+    const statusConfig = {
+      'live': {
+        text: 'Live',
+        bgColor: 'bg-green-500/20',
+        textColor: 'text-green-400',
+        borderColor: 'border-green-500/30',
+        dotColor: 'bg-green-400'
+      },
+      'temporarily-closed': {
+        text: 'Closed',
+        bgColor: 'bg-red-500/20',
+        textColor: 'text-red-400',
+        borderColor: 'border-red-500/30',
+        dotColor: 'bg-red-400'
+      }
+    };
+
+    const config = statusConfig[status];
+
+    return (
+      <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium border ${config.bgColor} ${config.textColor} ${config.borderColor}`}>
+        <span className={`w-1 h-1 rounded-full ${config.dotColor} animate-pulse`}></span>
+        {config.text}
+      </span>
+    );
+  };
+
 
   // Filter categories and items based on search query
   const filteredCategories = exploreCategories.map(category => ({
@@ -109,8 +163,10 @@ const Header = () => {
     )
   })).filter(category => category.items.length > 0);
 
+
   const SpaceLogo = () => {
     const isCompact = scrollY > 50;
+
 
     return (
       <div className="flex items-center" style={{ minHeight: '48px' }}>
@@ -144,20 +200,25 @@ const Header = () => {
     );
   };
 
+
   const getHeaderClasses = () => {
     let transformClass = 'translate-y-0';
     let heightClass = 'h-16';
+
 
     if (scrollDirection === 'down' && scrollY > 100) {
       transformClass = '-translate-y-full';
     }
 
+
     if (scrollY > 50) {
       heightClass = 'h-14';
     }
 
+
     return `${transformClass} ${heightClass}`;
   };
+
 
   return (
     <>
@@ -168,8 +229,10 @@ const Header = () => {
               <SpaceLogo />
             </Link>
 
+
             {/* Desktop Navigation */}
-            <nav className="hidden md:flex items-center space-x-4 lg:space-x-8 relative z-10">
+            <nav className="hidden lg:flex items-center space-x-4 xl:space-x-8 relative z-10">
+
 
               {/* Explore Dropdown with Hover */}
               <div
@@ -189,8 +252,9 @@ const Header = () => {
                   <div className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-cyan-400 to-blue-500 group-hover:w-full transition-all duration-300" />
                 </button>
 
+
                 {/* Dropdown Menu */}
-                <div className={`absolute right-0 pt-2 w-[90vw] max-w-[600px] z-50 transition-all duration-300 ease-out origin-top-right ${isDropdownOpen
+                <div className={`absolute right-0 pt-2 w-[90vw] max-w-[650px] z-50 transition-all duration-300 ease-out origin-top-right ${isDropdownOpen
                   ? 'opacity-100 visible'
                   : 'opacity-0 invisible pointer-events-none'
                   }`}>
@@ -209,6 +273,7 @@ const Header = () => {
                       </div>
                     </div>
 
+
                     {/* Categorized Menu Items */}
                     <div
                       className="p-4 max-h-[480px] overflow-y-auto hide-scrollbar"
@@ -222,6 +287,7 @@ const Header = () => {
                           display: none;
                         }
                       `}</style>
+
 
                       {filteredCategories.length > 0 ? (
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -243,21 +309,35 @@ const Header = () => {
                                 </h3>
                               </div>
 
+
                               {/* Category Items */}
                               <div className="space-y-1">
                                 {category.items.map((item, itemIndex) => (
                                   <Link
                                     key={itemIndex}
                                     href={item.path}
-                                    className="block px-3 py-2.5 text-sm text-white hover:bg-gradient-to-r hover:from-cyan-500/20 hover:to-blue-500/20 hover:text-cyan-100 rounded-lg transition-all duration-200 hover:translate-x-1"
-                                    onClick={() => {
+                                    className={`block px-3 py-2.5 text-sm rounded-lg transition-all duration-200 hover:translate-x-1 ${
+                                      item.status === 'temporarily-closed'
+                                        ? 'text-gray-400 hover:bg-red-500/10 hover:text-red-300 cursor-not-allowed opacity-75'
+                                        : 'text-white hover:bg-gradient-to-r hover:from-cyan-500/20 hover:to-blue-500/20 hover:text-cyan-100'
+                                    }`}
+                                    onClick={(e) => {
+                                      if (item.status === 'temporarily-closed') {
+                                        e.preventDefault();
+                                        return;
+                                      }
                                       setIsDropdownOpen(false);
                                       setSearchQuery('');
                                     }}
                                   >
-                                    <div className="flex items-center space-x-2">
-                                      <div className="w-1.5 h-1.5 bg-cyan-400 rounded-full flex-shrink-0" />
-                                      <span className="line-clamp-1">{item.name}</span>
+                                    <div className="flex items-center justify-between gap-2">
+                                      <div className="flex items-center space-x-2 flex-1 min-w-0">
+                                        <div className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${
+                                          item.status === 'live' ? 'bg-cyan-400' : 'bg-red-400'
+                                        }`} />
+                                        <span className="line-clamp-1">{item.name}</span>
+                                      </div>
+                                      <StatusBadge status={item.status} />
                                     </div>
                                   </Link>
                                 ))}
@@ -278,31 +358,35 @@ const Header = () => {
                 </div>
               </div>
 
+
               <Link href="/about" className="relative group text-white hover:text-cyan-400 transition-colors drop-shadow-lg">
                 <span className={`transition-all duration-300 font-medium whitespace-nowrap ${scrollY > 50 ? 'text-sm' : 'text-base'}`}>About</span>
                 <div className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-cyan-400 to-blue-500 group-hover:w-full transition-all duration-300" />
               </Link>
 
-              {/* Additional Links */}
+
               <Link href="/contact-us" className="relative group text-white hover:text-cyan-400 transition-colors drop-shadow-lg">
                 <span className={`transition-all duration-300 font-medium whitespace-nowrap ${scrollY > 50 ? 'text-sm' : 'text-base'}`}>Contact</span>
                 <div className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-cyan-400 to-blue-500 group-hover:w-full transition-all duration-300" />
               </Link>
 
-              <Link href="/privacy-policy" className="relative group text-white hover:text-cyan-400 transition-colors drop-shadow-lg hidden lg:block">
+
+              <Link href="/privacy-policy" className="relative group text-white hover:text-cyan-400 transition-colors drop-shadow-lg">
                 <span className={`transition-all duration-300 font-medium whitespace-nowrap ${scrollY > 50 ? 'text-sm' : 'text-base'}`}>Privacy Policy</span>
                 <div className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-cyan-400 to-blue-500 group-hover:w-full transition-all duration-300" />
               </Link>
 
-              <Link href="/terms-and-conditions" className="relative group text-white hover:text-cyan-400 transition-colors drop-shadow-lg hidden xl:block">
+
+              <Link href="/terms-and-conditions" className="relative group text-white hover:text-cyan-400 transition-colors drop-shadow-lg">
                 <span className={`transition-all duration-300 font-medium whitespace-nowrap ${scrollY > 50 ? 'text-sm' : 'text-base'}`}>Terms & Conditions</span>
                 <div className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-cyan-400 to-blue-500 group-hover:w-full transition-all duration-300" />
               </Link>
             </nav>
 
-            {/* Mobile menu button */}
+
+            {/* Mobile/Tablet menu button */}
             <button
-              className="md:hidden text-white hover:text-cyan-400 transition-colors relative z-10 drop-shadow-lg p-2"
+              className="lg:hidden text-white hover:text-cyan-400 transition-colors relative z-10 drop-shadow-lg p-2"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               aria-label="Toggle menu"
             >
@@ -316,8 +400,9 @@ const Header = () => {
         </div>
       </header>
 
-      {/* Mobile Menu */}
-      <div className={`md:hidden fixed top-[64px] left-0 right-0 bottom-0 bg-black/95 backdrop-blur-xl transition-all duration-300 ease-out z-40 ${isMobileMenuOpen
+
+      {/* Mobile/Tablet Menu */}
+      <div className={`lg:hidden fixed top-[64px] left-0 right-0 bottom-0 bg-black/95 backdrop-blur-xl transition-all duration-300 ease-out z-40 ${isMobileMenuOpen
         ? 'opacity-100 visible translate-y-0'
         : 'opacity-0 invisible -translate-y-4'
         }`}>
@@ -332,14 +417,15 @@ const Header = () => {
                 placeholder="Search tools..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 bg-black/50 border border-cyan-400/30 rounded-lg text-white text-sm placeholder-gray-400 focus:outline-none focus:border-cyan-400"
+                className="w-full pl-10 pr-4 py-2.5 bg-black/50 border border-cyan-400/30 rounded-lg text-white text-sm placeholder-gray-400 focus:outline-none focus:border-cyan-400"
               />
             </div>
           </div>
 
+
           {/* Mobile Categorized Items */}
           <div
-            className={`space-y-4 max-h-[calc(100vh-200px)] overflow-y-auto hide-scrollbar transition-all duration-300 ${isMobileMenuOpen ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4'
+            className={`space-y-4 max-h-[calc(100vh-240px)] overflow-y-auto hide-scrollbar transition-all duration-300 ${isMobileMenuOpen ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4'
               }`}
             style={{
               transitionDelay: '200ms',
@@ -353,55 +439,92 @@ const Header = () => {
               }
             `}</style>
 
+
             {filteredCategories.map((category) => (
               <div key={category.id} className="space-y-2">
-                <div className="text-cyan-300 text-sm font-semibold uppercase tracking-wide">
+                <div className="text-cyan-300 text-sm font-semibold uppercase tracking-wide px-2">
                   {category.title}
                 </div>
                 {category.items.map((item, itemIndex) => (
                   <Link
                     key={itemIndex}
                     href={item.path}
-                    className="block pl-4 text-sm text-white hover:text-cyan-400 transition-all duration-300"
-                    onClick={() => {
+                    className={`block pl-4 pr-2 py-2.5 text-sm rounded-lg transition-all duration-300 ${
+                      item.status === 'temporarily-closed'
+                        ? 'text-gray-400 cursor-not-allowed opacity-75'
+                        : 'text-white hover:text-cyan-400 hover:bg-cyan-500/10'
+                    }`}
+                    onClick={(e) => {
+                      if (item.status === 'temporarily-closed') {
+                        e.preventDefault();
+                        return;
+                      }
                       setIsMobileMenuOpen(false);
                       setSearchQuery('');
                     }}
                   >
-                    <div className="flex items-center space-x-2">
-                      <div className="w-1 h-1 bg-cyan-400 rounded-full" />
-                      <span>{item.name}</span>
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex items-center space-x-2 flex-1 min-w-0">
+                        <div className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${
+                          item.status === 'live' ? 'bg-cyan-400' : 'bg-red-400'
+                        }`} />
+                        <span className="truncate">{item.name}</span>
+                      </div>
+                      <StatusBadge status={item.status} />
                     </div>
                   </Link>
                 ))}
               </div>
             ))}
 
+
             {filteredCategories.length === 0 && (
-              <div className="pl-4 text-sm text-gray-400 text-center py-8">
-                No tools found
+              <div className="text-center py-8">
+                <div className="text-cyan-400/30 text-4xl mb-3">🔍</div>
+                <p className="text-gray-400 text-sm">
+                  No tools found matching <span className="text-cyan-400">&quot;{searchQuery}&quot;</span>
+                </p>
               </div>
             )}
           </div>
 
+
           {/* Mobile Additional Links */}
-          <div className="pt-4 border-t border-cyan-400/20 space-y-3">
-            <Link href="/contact-us" className={`block text-white hover:text-cyan-400 transition-all duration-300 font-medium ${isMobileMenuOpen ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4'
+          <div className="pt-4 border-t border-cyan-400/20 space-y-2">
+            <Link 
+              href="/about" 
+              className={`block px-2 py-2.5 text-white hover:text-cyan-400 hover:bg-cyan-500/10 rounded-lg transition-all duration-300 font-medium ${isMobileMenuOpen ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4'
+              }`}
+              style={{ transitionDelay: '250ms' }}
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              About
+            </Link>
+            <Link 
+              href="/contact-us" 
+              className={`block px-2 py-2.5 text-white hover:text-cyan-400 hover:bg-cyan-500/10 rounded-lg transition-all duration-300 font-medium ${isMobileMenuOpen ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4'
               }`}
               style={{ transitionDelay: '300ms' }}
-              onClick={() => setIsMobileMenuOpen(false)}>
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
               Contact Us
             </Link>
-            <Link href="/privacy-policy" className={`block text-white hover:text-cyan-400 transition-all duration-300 font-medium ${isMobileMenuOpen ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4'
+            <Link 
+              href="/privacy-policy" 
+              className={`block px-2 py-2.5 text-white hover:text-cyan-400 hover:bg-cyan-500/10 rounded-lg transition-all duration-300 font-medium ${isMobileMenuOpen ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4'
               }`}
               style={{ transitionDelay: '350ms' }}
-              onClick={() => setIsMobileMenuOpen(false)}>
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
               Privacy Policy
             </Link>
-            <Link href="/terms-and-conditions" className={`block text-white hover:text-cyan-400 transition-all duration-300 font-medium ${isMobileMenuOpen ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4'
+            <Link 
+              href="/terms-and-conditions" 
+              className={`block px-2 py-2.5 text-white hover:text-cyan-400 hover:bg-cyan-500/10 rounded-lg transition-all duration-300 font-medium ${isMobileMenuOpen ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4'
               }`}
               style={{ transitionDelay: '400ms' }}
-              onClick={() => setIsMobileMenuOpen(false)}>
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
               Terms & Conditions
             </Link>
           </div>
@@ -410,5 +533,6 @@ const Header = () => {
     </>
   );
 };
+
 
 export default Header;
