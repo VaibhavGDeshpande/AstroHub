@@ -73,7 +73,8 @@ const CesiumViewer: React.FC = () => {
         @import url('https://cesium.com/downloads/cesiumjs/releases/1.107/Build/Cesium/Widgets/widgets.css');
       `}</style>
 
-      <div className="relative w-full h-screen">
+      <div className="relative w-full h-screen pb-16 md:pb-20 lg:pb-0" 
+           style={{ paddingBottom: 'calc(4rem + env(safe-area-inset-bottom, 0px))' }}>
         {/* Cesium Container */}
         <div 
           ref={cesiumContainer}

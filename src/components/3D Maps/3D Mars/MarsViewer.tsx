@@ -47,7 +47,8 @@ const MarsRoverExplorer: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [loadingMessage, setLoadingMessage] = useState('Initializing Mars Explorer...');
 
-  // Memoized functions to prevent recreation
+  // ... [All your existing functions remain the same - preloadAssets, cacheAssets, etc.]
+  // I'm keeping them as is to save space
   const preloadAssets = useCallback(async (): Promise<void> => {
     if (!viewerRef.current || !perfConfigRef.current.preloading.enableModelPreloading) {
       console.log('Skipping model preloading for mobile');
@@ -252,7 +253,6 @@ const MarsRoverExplorer: React.FC = () => {
     try {
       const tileset = await Cesium.Cesium3DTileset.fromIonAssetId(TILESET_ION_ASSET_ID, {
         enableCollision: true,
-        // ... other options from perfConfig.tileset except maximumMemoryUsage
         maximumScreenSpaceError: perfConfig.tileset.maximumScreenSpaceError,
         cullRequestsWhileMoving: perfConfig.tileset.cullRequestsWhileMoving,
         cullRequestsWhileMovingMultiplier: perfConfig.tileset.cullRequestsWhileMovingMultiplier,
@@ -270,9 +270,6 @@ const MarsRoverExplorer: React.FC = () => {
         foveatedConeSize: perfConfig.tileset.foveatedConeSize,
         foveatedMinimumScreenSpaceErrorRelaxation: perfConfig.tileset.foveatedMinimumScreenSpaceErrorRelaxation,
       });
-
-      // Set the maximumMemoryUsage on the tileset instance
-      // tileset.maximumMemoryUsage = perfConfig.tileset.maximumMemoryUsage;
 
       viewerRef.current.scene.primitives.add(tileset);
 
@@ -641,7 +638,10 @@ const MarsRoverExplorer: React.FC = () => {
   }, [cacheAssets, preloadAssets, loadTileset, loadRovers, loadLandmarks, setupRotation, addRoverInstructionsToNavMenu, reset]);
 
   return (
-    <div className="relative w-full h-screen">
+    <div 
+      className="relative w-full h-screen pb-16 md:pb-20 lg:pb-0" 
+      style={{ paddingBottom: 'calc(4rem + env(safe-area-inset-bottom, 0px))' }}
+    >
       <div ref={cesiumContainer} className="fullSize" />
 
       {/* Loading Overlay */}
