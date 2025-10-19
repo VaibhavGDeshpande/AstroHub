@@ -26,7 +26,7 @@ const Footer = () => {
       id: '3d-models',
       title: '3D Models',
       items: [
-        { name: 'Solar System Explorer', path: '/solar-system' },
+        { name: 'Solar System Explorer', path: '/' },
         { name: '3D View of Earth', path: '/3d-earth' },
         { name: '3D View of Moon', path: '/3d-moon' },
         { name: '3D View of Mars', path: '/3d-mars' }
@@ -82,7 +82,6 @@ const Footer = () => {
 
   const resources = [
     { name: 'NASA API', url: 'https://api.nasa.gov' },
-    { name: 'Astronomy Resources', url: '#' },
   ];
 
   const EnvelopeIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (

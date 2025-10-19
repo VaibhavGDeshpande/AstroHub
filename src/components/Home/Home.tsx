@@ -75,20 +75,7 @@ export default function Home() {
   return (
     <>
       {/* Custom CSS for scrollbar and responsive toast positioning */}
-      <style jsx global>{`
-        /* Hide scrollbar for Chrome, Safari and Opera */
-        html::-webkit-scrollbar,
-        body::-webkit-scrollbar {
-          display: none;
-        }
-        
-        /* Hide scrollbar for IE, Edge and Firefox */
-        html,
-        body {
-          -ms-overflow-style: none;  /* IE and Edge */
-          scrollbar-width: none;  /* Firefox */
-        }
-        
+      <style jsx global>{`  
         /* Ensure scrolling still works */
         html,
         body {
