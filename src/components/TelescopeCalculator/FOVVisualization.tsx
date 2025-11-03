@@ -1,4 +1,3 @@
-// components/telescope-calculator/FOVVisualization.tsx - Updated with Multi-Source Support
 
 'use client';
 
@@ -14,9 +13,10 @@ import {
 
 interface FOVVisualizationProps {
   results: Array<{ eyepiece: EyepieceSpecs; results: CalculatedResults }>;
+  size?: number; // canvas size in pixels (width = height)
 }
 
-export default function FOVVisualization({ results }: FOVVisualizationProps) {
+export default function FOVVisualization({ results, size = 600 }: FOVVisualizationProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [selectedObject, setSelectedObject] = useState<SkyObject>(popularObjects[0]);
   const [backgroundImage, setBackgroundImage] = useState<HTMLImageElement | null>(null);
@@ -26,7 +26,7 @@ export default function FOVVisualization({ results }: FOVVisualizationProps) {
   const [loadError, setLoadError] = useState<string | null>(null);
   
   const [imageScale, setImageScale] = useState(12); 
-  const imageSize = 600;
+  const imageSize = size;
 
   // Load sky background image with automatic fallback
   useEffect(() => {
@@ -343,16 +343,10 @@ export default function FOVVisualization({ results }: FOVVisualizationProps) {
           </div>
         )}
 
-        {!loading && backgroundImage && actualImageSource && actualImageSource !== imageSource && (
-          <div className="absolute top-4 left-4 bg-blue-900/80 border border-blue-600 text-blue-200 px-4 py-2 rounded-lg text-sm z-10 max-w-md">
-            ℹ️ Loaded from {imageSources[actualImageSource].name} (fallback)
-          </div>
-        )}
-
         <canvas
           ref={canvasRef}
-          width={600}
-          height={600}
+          width={size}
+          height={size}
           className="w-full h-auto"
         />
       </div>
