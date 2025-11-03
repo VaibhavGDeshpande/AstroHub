@@ -83,7 +83,7 @@ export default function FOVVisualization({ results, size = 600 }: FOVVisualizati
     return () => {
       cancelled = true;
     };
-  }, [selectedObject, imageScale, imageSource]);
+  }, [selectedObject, imageScale, imageSource, imageSize]);
 
   // Draw visualization
   useEffect(() => {

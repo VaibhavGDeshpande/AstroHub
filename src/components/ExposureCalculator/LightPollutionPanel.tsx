@@ -88,10 +88,10 @@ export default function LightPollutionPanel({ bortleScale, adjustedSettings }: L
         </div>
       </div>
 
-      {/* What's Visible */}
+      {/* What is Visible */}
       <div className="p-4 bg-blue-900/20 border border-blue-700 rounded-lg">
         <div className="text-sm text-blue-300">
-          <strong className="text-blue-200">What You'll See:</strong> {data.visible}
+          <strong className="text-blue-200">What You&apos;ll See:</strong> {data.visible}
         </div>
       </div>
 

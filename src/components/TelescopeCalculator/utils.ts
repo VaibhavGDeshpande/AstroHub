@@ -119,14 +119,16 @@ export async function loadSkyImageWithFallback(
   preferredSource: ImageSource = 'skyview'
 ): Promise<{ img: HTMLImageElement; source: ImageSource } | null> {
   // Try preferred source first, then fallbacks in order of reliability
-  const sourcesToTry: ImageSource[] = [
-    preferredSource,
-    'skyview',
-    'eso-dss',
-    'legacy-survey',
-    'sdss',
-    'stsci-dss',
-  ].filter((v, i, a) => a.indexOf(v) === i); // Remove duplicates
+  const sourcesToTry: ImageSource[] = Array.from(
+    new Set<ImageSource>([
+      preferredSource,
+      'skyview',
+      'eso-dss',
+      'legacy-survey',
+      'sdss',
+      'stsci-dss',
+    ])
+  );
 
   for (const source of sourcesToTry) {
     try {

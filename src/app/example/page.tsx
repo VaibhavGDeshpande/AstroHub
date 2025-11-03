@@ -881,7 +881,7 @@ Keep it factual and avoid extra fluff.
 
       const botMessage: ChatMessage = { sender: 'bot', text, ts: Date.now() };
       setMessages(prev => [...prev, botMessage]);
-    } catch (e) {
+    } catch {
       const botMessage: ChatMessage = { sender: 'bot', text: '⚠️ Something went wrong.', ts: Date.now() };
       setMessages(prev => [...prev, botMessage]);
     } finally {

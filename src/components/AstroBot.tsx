@@ -7,6 +7,11 @@ import { MessageCircleIcon } from 'lucide-react'
 import { IoClose } from 'react-icons/io5'
 import { GoogleGenAI } from '@google/genai'
 
+type GenAIContentPart = { text?: string }
+type GenAIContent = { parts?: GenAIContentPart[] }
+type GenAICandidate = { content?: GenAIContent }
+type GenAIResponse = { text?: string; candidates?: GenAICandidate[] }
+
 type ChatMessage = { sender: 'user' | 'bot'; text: string; ts: number }
 
 const STORAGE_KEY = 'astrobot_session_messages_v1'
@@ -49,15 +54,18 @@ export default function AstroBot() {
     setLoading(true)
 
     try {
-      const response = await ai.models.generateContent({
+      const response = (await ai.models.generateContent({
         model: 'gemini-2.5-pro',
         contents: `You are an astronomy expert.\nExplain the term "${term}" concisely in markdown with sections: Term Name, Definition, Key Facts (bullets), Significance.`,
-      })
+      })) as unknown as GenAIResponse
 
-      const text = (response as any)?.text || (response as any)?.candidates?.[0]?.content?.parts?.[0]?.text || 'Sorry, no response.'
+      const text =
+        response?.text ??
+        response?.candidates?.[0]?.content?.parts?.[0]?.text ??
+        'Sorry, no response.'
       const botMessage: ChatMessage = { sender: 'bot', text, ts: Date.now() }
       setMessages(prev => [...prev, botMessage])
-    } catch (e) {
+    } catch {
       const botMessage: ChatMessage = { sender: 'bot', text: 'Something went wrong.', ts: Date.now() }
       setMessages(prev => [...prev, botMessage])
     } finally {

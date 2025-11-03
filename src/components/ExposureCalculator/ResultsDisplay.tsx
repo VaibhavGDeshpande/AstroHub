@@ -10,7 +10,7 @@ interface ResultsDisplayProps {
   target: AstroTarget;
 }
 
-export default function ResultsDisplay({ results, target }: ResultsDisplayProps) {
+export default function ResultsDisplay({ results }: ResultsDisplayProps) {
   return (
     <div className="space-y-6">
       {/* Key Metrics */}
@@ -48,7 +48,7 @@ export default function ResultsDisplay({ results, target }: ResultsDisplayProps)
         <div className="bg-gradient-to-br from-yellow-900/50 to-yellow-800/30 p-6 rounded-lg border border-yellow-700">
           <div className="text-yellow-400 text-sm font-medium mb-2">Image Scale</div>
           <div className="text-3xl font-bold text-white mb-1">
-            {results.imageScale}"
+            {results.imageScale}&quot;
           </div>
           <div className="text-xs text-gray-400">
             arcsec/pixel
@@ -102,7 +102,7 @@ export default function ResultsDisplay({ results, target }: ResultsDisplayProps)
               <tr>
                 <td className="py-3 px-4 text-gray-400">Image Scale</td>
                 <td className="py-3 px-4 text-white font-semibold text-right">
-                  {results.imageScale}" per pixel
+                  {results.imageScale}&quot; per pixel
                 </td>
               </tr>
               <tr>
