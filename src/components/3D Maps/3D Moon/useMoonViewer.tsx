@@ -1,14 +1,12 @@
 'use client';
 
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback} from 'react';
 import * as Cesium from 'cesium';
 import { ViewerWithControls } from '@/types/moonviewer';
 import { pointsOfInterest, locationConfigs } from '@/app/3d-moon/config/moonConfig';
 
 export const useMoonViewer = () => {
   const [isLoading, setIsLoading] = useState(true);
-  // Add ref to store boundary data source
-  const boundarySourceRef = useRef<Cesium.GeoJsonDataSource | null>(null);
 
   const initializeMoonViewer = useCallback(
     (
@@ -16,8 +14,9 @@ export const useMoonViewer = () => {
       viewerRef: React.MutableRefObject<ViewerWithControls | null>
     ) => {
       // Set Cesium Ion access token BEFORE creating viewer
-      Cesium.Ion.defaultAccessToken = process.env.NEXT_PUBLIC_CESIUM_TOKEN || 'YOUR_ACCESS_TOKEN';
-      
+      Cesium.Ion.defaultAccessToken =
+        process.env.NEXT_PUBLIC_CESIUM_TOKEN || 'YOUR_ACCESS_TOKEN';
+
       // Set Moon ellipsoid
       Cesium.Ellipsoid.default = Cesium.Ellipsoid.MOON;
 
@@ -44,53 +43,10 @@ export const useMoonViewer = () => {
           });
           scene.primitives.add(tileset);
 
-          // Load boundary resource once
-          const boundariesResource = await Cesium.IonResource.fromAssetId(2683531);
-          
-          // Create first data source (mare boundaries)
-          const boundarySource = await Cesium.GeoJsonDataSource.load(boundariesResource, {
-            clampToGround: true,
-            fill: Cesium.Color.fromBytes(26, 108, 113, 102),
-            stroke: Cesium.Color.CYAN.withAlpha(0.8),
-            strokeWidth: 2,
-          });
-
-          // Ensure boundaries render over both terrain and 3D tiles
-          boundarySource.entities.values.forEach((entity) => {
-            if (entity.polygon) {
-              // Classify against both terrain and 3D Tiles so the overlay is visible
-              entity.polygon.classificationType = new Cesium.ConstantProperty(Cesium.ClassificationType.BOTH);
-            }
-            if (entity.polyline) {
-              // Keep lines draped on the surface for visibility
-              entity.polyline.clampToGround = new Cesium.ConstantProperty(true);
-              if (!entity.polyline.width) {
-                entity.polyline.width = new Cesium.ConstantProperty(2);
-              }
-            }
-          });
-
-          // Clone the resource URL for second data source (Artemis 3)
-          const artemis3Resource = boundariesResource.clone();
-          const artemis3Source = await Cesium.GeoJsonDataSource.load(artemis3Resource, {
-            clampToGround: true,
-            fill: Cesium.Color.fromBytes(243, 242, 99, 102),
-          });
-
-          // Hide both by default
-          boundarySource.show = false;
-          artemis3Source.show = false;
-          
-          // Add to viewer
-          viewer.dataSources.add(boundarySource);
-          viewer.dataSources.add(artemis3Source);
-
-          // Store reference to boundary source for toggle function
-          boundarySourceRef.current = boundarySource;
-
           // Cache camera position for reuse
-          const cameraPositionCallback = new Cesium.CallbackProperty(() => 
-            Cesium.Cartesian3.magnitude(scene.camera.positionWC), false
+          const cameraPositionCallback = new Cesium.CallbackProperty(
+            () => Cesium.Cartesian3.magnitude(scene.camera.positionWC),
+            false
           );
 
           // Add points of interest with optimized properties
@@ -99,7 +55,7 @@ export const useMoonViewer = () => {
               position: Cesium.Cartesian3.fromDegrees(poi.longitude, poi.latitude),
               label: {
                 text: poi.text,
-                font: "14pt Verdana",
+                font: '14pt Verdana',
                 outlineColor: Cesium.Color.DARKSLATEGRAY,
                 outlineWidth: 2,
                 style: Cesium.LabelStyle.FILL_AND_OUTLINE,
@@ -107,7 +63,8 @@ export const useMoonViewer = () => {
                 scaleByDistance: new Cesium.NearFarScalar(1.5e2, 1.0, 1.5e7, 0.5),
                 translucencyByDistance: new Cesium.NearFarScalar(2.5e7, 1.0, 4.0e7, 0.0),
                 heightReference: Cesium.HeightReference.CLAMP_TO_GROUND,
-                disableDepthTestDistance: cameraPositionCallback,
+                // disableDepthTestDistance expects a number; using callback value pattern
+                disableDepthTestDistance: cameraPositionCallback as unknown as number,
               },
               point: {
                 pixelSize: 10,
@@ -116,7 +73,7 @@ export const useMoonViewer = () => {
                 outlineWidth: 2,
                 scaleByDistance: new Cesium.NearFarScalar(1.5e3, 1.0, 4.0e7, 0.1),
                 heightReference: Cesium.HeightReference.CLAMP_TO_GROUND,
-                disableDepthTestDistance: cameraPositionCallback,
+                disableDepthTestDistance: cameraPositionCallback as unknown as number,
               },
             });
           });
@@ -130,13 +87,13 @@ export const useMoonViewer = () => {
           // Single handler for all interaction events
           const handler = new Cesium.ScreenSpaceEventHandler(scene.canvas);
           const stopRotation = () => removeRotation();
-          
+
           [
             Cesium.ScreenSpaceEventType.LEFT_DOWN,
             Cesium.ScreenSpaceEventType.RIGHT_DOWN,
             Cesium.ScreenSpaceEventType.MIDDLE_DOWN,
             Cesium.ScreenSpaceEventType.WHEEL,
-          ].forEach(eventType => handler.setInputAction(stopRotation, eventType));
+          ].forEach((eventType) => handler.setInputAction(stopRotation, eventType));
 
           // Setup fly-to locations with shared logic
           type CameraFlyToOptions = {
@@ -156,18 +113,18 @@ export const useMoonViewer = () => {
             easingFunction?: (time: number) => number;
           };
 
-          const createFlyToFunction = (config: CameraFlyToOptions, showArtemis: boolean) => () => {
+          // This version keeps the moving camera behavior and only flies camera; no Artemis toggle
+          const createFlyToFunction = (config: CameraFlyToOptions) => () => {
             removeRotation();
             scene.camera.flyTo(config);
-            artemis3Source.show = showArtemis;
           };
 
           viewer.flyToLocations = {
-            seaOfTranquility: createFlyToFunction(locationConfigs.seaOfTranquility, false),
-            apollo11: createFlyToFunction(locationConfigs.apollo11, false),
-            copernicus: createFlyToFunction(locationConfigs.copernicus, false),
-            tycho: createFlyToFunction(locationConfigs.tycho, false),
-            shackleton: createFlyToFunction(locationConfigs.shackleton, true),
+            seaOfTranquility: createFlyToFunction(locationConfigs.seaOfTranquility),
+            apollo11: createFlyToFunction(locationConfigs.apollo11),
+            copernicus: createFlyToFunction(locationConfigs.copernicus),
+            tycho: createFlyToFunction(locationConfigs.tycho),
+            shackleton: createFlyToFunction(locationConfigs.shackleton),
           };
 
           setIsLoading(false);
@@ -185,8 +142,6 @@ export const useMoonViewer = () => {
           viewerRef.current.destroy();
           viewerRef.current = null;
         }
-        // Clear the ref
-        boundarySourceRef.current = null;
       };
     },
     []
