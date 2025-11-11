@@ -107,7 +107,7 @@ export default function AstronomyWidget() {
   const [showEvening, setShowEvening] = useState(false);
   const [displayTime, setDisplayTime] = useState<string | undefined>(undefined); // mirrors API local time at change events
 
-  // Prevent background scroll when modal is open
+  // Prevent background scroll when modal is open but allow modal content scrolling
   useEffect(() => {
     if (open) {
       const originalOverflow = document.body.style.overflow;
@@ -287,19 +287,29 @@ export default function AstronomyWidget() {
           className="fixed inset-0 z-[2147483648] flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm animate-[fadeIn_0.2s_ease-out] overflow-hidden"
           onClick={() => {
             setOpen(false);
-            fetchData(location, { force: true }); // refresh on close as requested
+            fetchData(location, { force: true }); 
           }}
         >
           <div
             className="w-full sm:max-w-lg sm:rounded-2xl 
-                       bg-white/10 backdrop-blur-md 
-                       text-white shadow-2xl 
-                       p-5 sm:p-7 
-                       max-h-[92vh] overflow-y-auto
-                       border border-white/10
-                       animate-[slideUp_0.3s_ease-out] sm:animate-[scaleIn_0.3s_ease-out]
-                       scrollbar-thin scrollbar-thumb-purple-600 scrollbar-track-transparent"
+           bg-white/10 backdrop-blur-md 
+           text-white shadow-2xl 
+           p-5 sm:p-7 
+           max-h-[92vh] overflow-y-auto
+           border border-white/10
+           animate-[slideUp_0.3s_ease-out] sm:animate-[scaleIn_0.3s_ease-out]
+           scrollbar-thin scrollbar-thumb-purple-600 scrollbar-track-transparent
+           touch-pan-y overscroll-contain" // Enhanced scroll properties
+
             onClick={(e) => e.stopPropagation()}
+            onWheel={(e) => {
+              // Allow wheel scrolling within the modal
+              e.stopPropagation();
+            }}
+            onTouchMove={(e) => {
+              // Allow touch scrolling within the modal
+              e.stopPropagation();
+            }}
           >
             {/* Header */}
             <div className="flex items-center justify-between mb-5">

@@ -37,7 +37,7 @@ const toolCards: CardData[] = [
     description: "Plan perfect night sky photography with light pollution analysis. Get optimized exposure settings instantly.",
     icon: Camera,
     color: "from-purple-500 to-pink-500",
-    path: "/advanced-tools/astro-exposure",
+    path: "/advanced-tools/exposure-calculator",
     badge: "Imaging",
     features: [
       "Bortle scale (1-9)",

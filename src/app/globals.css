@@ -162,3 +162,8 @@ html.astrobot-open #astronomy-widget-trigger,
 html.astrobot-open #astronomy-widget-modal {
   display: none !important;
 }
+
+/* global.css or styles/globals.css */
+.modal-scrollable {
+-webkit-overflow-scrolling: touch;
+}

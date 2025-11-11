@@ -109,7 +109,7 @@ const Header = () => {
       icon: '',
       items: [
         { name: 'Telescope Calculator', path: '/advanced-tools/telescope-calculator', status: 'live' },
-        { name: 'Astrophotography Exposure Calculator', path: '/advanced-tools/astro-exposure', status: 'live' }
+        { name: 'Astrophotography Exposure Calculator', path: '/advanced-tools/exposure-calculator', status: 'live' }
       ]
     },
     {
