@@ -4,6 +4,8 @@ import "./globals.css";
 import 'react-toastify/dist/ReactToastify.css';
 import ClientLayout from "@/components/provider/NotificationProvider";
 import { Analytics } from "@vercel/analytics/next"
+import NightModeToggle from "@/components/NightModeToggle";
+import AstroBot from "@/components/AstroBot";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -111,6 +113,9 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <ClientLayout>
+          {/* Global floating controls (stacked bottom-right) */}
+          <NightModeToggle />
+          <AstroBot />
           <Analytics/>
         {children}
         </ClientLayout>
