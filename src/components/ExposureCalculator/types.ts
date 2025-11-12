@@ -34,6 +34,9 @@ export interface LightPollutionData {
   description: string;
   visible: string;
   skyGlow: string;
+  skyBrightness: string;
+  nakedEyeLimit: string;
+  opticLimit: string;
   recommendedFilters: string[];
   isoMultiplier: number;
   integrationMultiplier: number;
