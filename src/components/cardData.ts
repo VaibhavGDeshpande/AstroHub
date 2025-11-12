@@ -245,5 +245,67 @@ export const cardSections: CardSection[] = [
         status:"Live"
       }
     ]
+  },
+  {
+    id: 'advanced-tools',
+    badgeColor: 'purple',
+    badgeText: 'Advanced Tools',
+    titleGradient: 'from-purple-500 via-pink-500 to-orange-500',
+    subtitle: 'Precision calculators that help you dial in optical setups and exposures',
+    cards: [
+      {
+        title: 'Telescope Calculator',
+        description: 'Model magnification, field of view, and exit pupil for different telescope and eyepiece combos.',
+        icon: Sparkles,
+        color: 'from-purple-500 to-pink-500',
+        path: '/telescope-calculator',
+        features: ['Magnification', 'FOV', 'Exit pupil'],
+        glow: 'purple',
+        ctaText: 'Open Calculator',
+        status: 'Live'
+      },
+      {
+        title: 'Exposure Calculator',
+        description: 'Plan astrophotography exposures with sensor, optics, and sky-brightness presets.',
+        icon: Sparkles,
+        color: 'from-pink-500 to-orange-500',
+        path: '/exposure-calculator',
+        features: ['Optimal exposure', 'Sensor presets', 'Sky brightness'],
+        glow: 'pink',
+        ctaText: 'Plan Exposure',
+        status: 'Live'
+      }
+    ]
+  },
+  {
+    id: 'earth-tools',
+    badgeColor: 'cyan',
+    badgeText: 'Earth Tools',
+    titleGradient: 'from-blue-400 to-purple-500',
+    subtitle: 'Atmospheric intelligence and local observation planning',
+    cards: [
+      {
+        title: 'Weather Dashboard',
+        description: 'Plan your observing sessions with live conditions, 10-day outlooks, and hourly windows.',
+        icon: Cloud,
+        color: 'from-blue-500 to-purple-500',
+        path: '/weather',
+        features: ['Live metrics', '10-day forecast', 'Hourly insights'],
+        glow: 'blue',
+        ctaText: 'Open Dashboard',
+        status: 'Live'
+      },
+      {
+        title: 'Light Pollution Map',
+        description: 'Explore global light pollution data to find the darkest skies for astrophotography.',
+        icon: Globe,
+        color: 'from-purple-600 to-indigo-500',
+        path: '/light-pollution',
+        features: ['Bortle scale', 'Interactive map', 'Observation planning'],
+        glow: 'purple',
+        ctaText: 'View Map',
+        status: 'Live'
+      }
+    ]
   }
 ];

@@ -108,8 +108,8 @@ const Header = () => {
       title: 'Advanced Tools',
       icon: '',
       items: [
-        { name: 'Telescope Calculator', path: '/advanced-tools/telescope-calculator', status: 'live' },
-        { name: 'Astrophotography Exposure Calculator', path: '/advanced-tools/exposure-calculator', status: 'live' }
+        { name: 'Telescope Calculator', path: '/telescope-calculator', status: 'live' },
+        { name: 'Astrophotography Exposure Calculator', path: '/exposure-calculator', status: 'live' }
       ]
     },
     {
@@ -119,6 +119,15 @@ const Header = () => {
       items: [
         { name: 'Space News & Updates', path: '/space-news', status: 'live' },
         { name: 'Space Quiz', path: '/space-quiz', status: 'live' }
+      ]
+    },
+    {
+      id: 'earth-tools',
+      title: 'Earth Tools',
+      icon: '',
+      items: [
+        { name: 'Weather Dashboard', path: '/weather', status: 'live' },
+        { name: 'Light Pollution Map', path: '/light-pollution', status: 'live' }
       ]
     }
   ];

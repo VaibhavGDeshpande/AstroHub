@@ -35,7 +35,7 @@ export default function TelescopeCalculator() {
           animate={{ opacity: 1, x: 0 }}
         >
           <Link
-            href="/advanced-tools"
+            href="/"
             className="flex items-center gap-2 px-3 py-2 rounded-lg bg-slate-800/50 hover:bg-slate-700/50 border border-slate-600/40 backdrop-blur-sm transition duration-300"
           >
             <ArrowLeftIcon className="h-4 w-4" />

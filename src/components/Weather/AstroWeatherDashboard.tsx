@@ -2,7 +2,7 @@
 
 import { type Dispatch, type ReactNode, type SetStateAction, useCallback, useEffect, useMemo, useState } from 'react';
 import dynamic from 'next/dynamic';
-import { Cloud, CloudRain, MapPin, Moon, Search, Sun } from 'lucide-react';
+import { CloudRain, MapPin, Moon, Search, Sun } from 'lucide-react';
 const LocationPickerMap = dynamic(() => import('./LocationPickerMap'), { ssr: false });
 
 type NumericValue = { value?: number };
