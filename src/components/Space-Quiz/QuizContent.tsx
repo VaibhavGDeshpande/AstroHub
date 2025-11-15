@@ -16,6 +16,25 @@ interface UserAnswer {
   isCorrect: boolean;
 }
 
+const hashString = (value: string) => {
+  let hash = 0;
+  for (let i = 0; i < value.length; i++) {
+    hash = (hash << 5) - hash + value.charCodeAt(i);
+    hash |= 0;
+  }
+  return Math.abs(hash);
+};
+
+const stableShuffle = (answers: string[], seed: string) => {
+  return answers
+    .map((answer, idx) => ({
+      answer,
+      key: hashString(`${seed}-${answer}-${idx}`),
+    }))
+    .sort((a, b) => a.key - b.key)
+    .map(item => item.answer);
+};
+
 export default function QuizContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -41,10 +60,11 @@ export default function QuizContent() {
   // Memoize shuffled answers to prevent re-shuffling on every render
   const allAnswers = useMemo(() => {
     if (!questions[currentQuestionIndex]) return [];
-    
+
     const current = questions[currentQuestionIndex];
-    return [current.correctAnswer, ...current.incorrectAnswers].sort(
-      () => Math.random() - 0.5
+    return stableShuffle(
+      [current.correctAnswer, ...current.incorrectAnswers],
+      current.id
     );
   }, [questions, currentQuestionIndex]);
 

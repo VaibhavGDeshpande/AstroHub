@@ -126,7 +126,7 @@ const Header = () => {
       title: 'Earth Tools',
       icon: '',
       items: [
-        { name: 'Weather Dashboard', path: '/weather', status: 'live' },
+        { name: 'Weather Dashboard', path: '/weather', status: 'temporarily-closed' },
         { name: 'Light Pollution Map', path: '/light-pollution', status: 'live' }
       ]
     }

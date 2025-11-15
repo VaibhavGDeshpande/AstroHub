@@ -106,8 +106,9 @@ export default function AstronomyWidget() {
   const [data, setData] = useState<AstronomyData | null>(null);
   const [showMorning, setShowMorning] = useState(false);
   const [showEvening, setShowEvening] = useState(false);
-  const [displayTime, setDisplayTime] = useState<string | undefined>(undefined); // mirrors API local time at change events
+  const [displayTime, setDisplayTime] = useState<string | undefined>(undefined); 
   const nightMode = useNightMode();
+  console.log(displayTime)
 
   const triggerOrbPalette = nightMode
     ? "bg-gradient-to-br from-red-900/80 to-red-800/70 border-red-500/40 text-red-100 shadow-[0_0_18px_rgba(255,0,0,0.35)]"
@@ -223,7 +224,7 @@ export default function AstronomyWidget() {
         timestamp: getTodayString(),
       };
       localStorage.setItem(CACHE_KEY, JSON.stringify(cacheData));
-    } catch {}
+    } catch { }
   };
 
   // Fetch with force option to bypass cache on changes
@@ -258,9 +259,9 @@ export default function AstronomyWidget() {
       const prettyPhase =
         typeof astro.moon_phase === "string"
           ? astro.moon_phase
-              .replace(/_/g, " ")
-              .toLowerCase()
-              .replace(/\b\w/g, (m: string) => m.toUpperCase())
+            .replace(/_/g, " ")
+            .toLowerCase()
+            .replace(/\b\w/g, (m: string) => m.toUpperCase())
           : astro.moon_phase;
 
       const mapped: AstronomyData = {
@@ -293,8 +294,6 @@ export default function AstronomyWidget() {
       setLoading(false);
     }
   };
-
-  // Initial mount: allow cache for speed
   useEffect(() => {
     fetchData(location); // cached if available
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -302,11 +301,16 @@ export default function AstronomyWidget() {
 
   const illuminationPct = useMemo(() => {
     if (!data?.moon_illumination && data?.moon_illumination !== 0) return undefined;
-    const num = typeof data.moon_illumination === "string" ? parseFloat(data.moon_illumination) : data.moon_illumination;
+
+    const num = typeof data.moon_illumination === "string"
+      ? parseInt(data.moon_illumination)
+      : data.moon_illumination;
+
     if (isNaN(num as number)) return undefined;
-    const clamped = Math.min(100, Math.max(0, Number(num)));
-    return `${clamped}%`;
+
+    return `${num}%`;
   }, [data?.moon_illumination]);
+
 
   const isDay = isDaytime(data?.sunrise, data?.sunset);
 
@@ -319,8 +323,8 @@ export default function AstronomyWidget() {
         className="fixed bottom-36 right-4 z-[2147483648] flex flex-col items-center gap-1 group p-0 hover:scale-110 active:scale-95 transition-all duration-300"
         onClick={() => {
           setOpen(true);
-          fetchData(location, { force: true }); // always call API when opened
-          // displayTime will be set from API by fetchData; no device time mixing
+          fetchData(location, { force: true }); 
+          
         }}
       >
         <div
@@ -341,16 +345,18 @@ export default function AstronomyWidget() {
       {open && (
         <div
           id="astronomy-widget-modal"
-          className={`fixed inset-0 z-[2147483648] flex items-end sm:items-center justify-center ${overlayTint} backdrop-blur-sm animate-[fadeIn_0.2s_ease-out] overflow-hidden`}
+          className={`fixed inset-0 z-[2147483648] flex items-end sm:items-center justify-center ${overlayTint} backdrop-blur-sm animate-[fadeIn_0.2s_ease-out] overflow-hidden
+          .scrollbar-hide`}
           onClick={() => {
             setOpen(false);
-            fetchData(location, { force: true }); 
+            fetchData(location, { force: true });
           }}
         >
           <div
             className={`w-full sm:max-w-lg sm:rounded-2xl 
            backdrop-blur-md 
            p-5 sm:p-7 
+           
            max-h-[92vh] overflow-y-auto
            animate-[slideUp_0.3s_ease-out] sm:animate-[scaleIn_0.3s_ease-out]
            scrollbar-thin scrollbar-thumb-purple-600 scrollbar-track-transparent
@@ -443,12 +449,12 @@ export default function AstronomyWidget() {
 
             {/* Stats Grid */}
             <div className="grid grid-cols-2 gap-3 mb-4">
-              <div className={statCardPalette}>
-                <div className={statLabelClass}>Current Time</div>
+              {/* <div className={statCardPalette}>
+                {/* <div className={statLabelClass}>Current Time</div>
                 <div className={statValueClass}>
                   {displayTime ?? data?.astronomy?.current_time ?? "—"}
-                </div>
-              </div>
+                </div> 
+              </div> */}
               <div className={statCardPalette}>
                 <div className={statLabelClass}>Sunrise</div>
                 <div className={statValueClass}>{data?.sunrise ?? "—"}</div>

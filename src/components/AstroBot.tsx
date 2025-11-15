@@ -74,7 +74,7 @@ export default function AstroBot() {
     listRef.current?.scrollTo({ top: listRef.current.scrollHeight, behavior: 'smooth' })
   }, [messages, loading])
 
-  // Coordinate with other widgets: add class on <html> and notify
+
   useEffect(() => {
     if (open) {
       document.documentElement.classList.add('astrobot-open')
@@ -88,7 +88,6 @@ export default function AstroBot() {
     }
   }, [open])
 
-  // Mirror astronomy widget: lock body scroll but keep underlying position
   useEffect(() => {
     if (!open) return
     const { body } = document
@@ -122,20 +121,16 @@ export default function AstroBot() {
     setLoading(true)
 
     try {
-      const prompt = `You are an astronomy expert.  
-Explain the term: "${term}" in concise Markdown with the following sections:
-
-- **Term**
-- **Definition**
-- **Key Facts** (bullet points)
-- **Significance**
-
-Focus on clarity, accuracy, and essential details only.`
+      const prompt = `Explain the astronomy topic "${term}".Give in less than or equal 20-30 sentences`
 
       const res = await fetch('/api/genai', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ model: 'gemini-2.0-flash', prompt }),
+        body: JSON.stringify({
+          model: 'deepseek/deepseek-chat-v3.1:free',
+          prompt,
+          temperature: 0.4,
+        }),
       })
 
       if (!res.ok) {
@@ -169,7 +164,7 @@ Focus on clarity, accuracy, and essential details only.`
       >
         {hover && (
           <div className={`absolute -top-10 right-10 text-xs px-3 py-1 rounded-md shadow-lg pointer-events-none ${tooltipPalette}`}>
-            Ask astronomy terms
+            Ask astronomy related questions
           </div>
         )}
         <button
@@ -194,7 +189,7 @@ Focus on clarity, accuracy, and essential details only.`
           <div className={`flex items-center justify-between px-4 py-3 border-b ${headerBorderClass}`}>
             <div className="flex items-center gap-2">
               <FaSun className={headerIconClass} />
-              <h2 className="font-semibold">AstroBot — Terms</h2>
+              <h2 className="font-semibold">AstroBot</h2>
             </div>
             <button aria-label="Close" className={`p-2 rounded transition-colors ${closeButtonPalette}`} onClick={() => setOpen(false)}>
               <IoClose className="text-xl" />
@@ -248,7 +243,7 @@ Focus on clarity, accuracy, and essential details only.`
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && send()}
-                placeholder="Ask about any astronomy term..."
+                placeholder="Your astro question here..."
                 className={inputClass}
               />
               <button onClick={send} disabled={loading || !input.trim()} className={sendButtonClass}>Send</button>

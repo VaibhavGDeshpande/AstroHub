@@ -41,6 +41,10 @@ Create a `.env.local` file in the project root with:
 
 ```bash
 NASA_API_KEY=YOUR_KEY
+OPENROUTER_API_KEY=YOUR_OPENROUTER_KEY
+# Optional, but helps OpenRouter rankings/quotas
+OPENROUTER_SITE_URL=https://your-site-url.example
+OPENROUTER_SITE_NAME=Your Site Name
 ```
 
 Notes:

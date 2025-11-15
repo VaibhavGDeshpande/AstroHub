@@ -1,7 +1,7 @@
 'use client'
 
 import dynamic from 'next/dynamic'
-import { LenisProvider } from '@/components/provider/LenisProvider'
+// import { LenisProvider } from '@/components/provider/LenisProvider'
 import ScreenSizeWarningModal from '@/components/BigScreenWarning'
 import PageLoader from '@/components/Loader'
 import AstronomyWidget from '@/components/AstronomyWidget'
@@ -13,9 +13,9 @@ export default function HomePage() {
     <>
       <PageLoader>
         <ScreenSizeWarningModal />
-        <LenisProvider>
+        
           <Home />
-        </LenisProvider>
+        
         <AstronomyWidget />
       </PageLoader>
     </>
