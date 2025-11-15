@@ -1,14 +1,15 @@
-// /app/api/genai/route.ts
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { GoogleGenAI } from '@google/genai';
 
-const API_KEY = process.env.NEXT_GEMINI_API_KEY;
-if (!API_KEY) {
-  console.warn('GENAI_API_KEY is not set.');
+const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
+const OPENROUTER_ENDPOINT = 'https://openrouter.ai/api/v1/chat/completions';
+
+if (!OPENROUTER_API_KEY) {
+  console.warn('OPENROUTER_API_KEY is not set.');
 }
 
-const ai = new GoogleGenAI({ apiKey: API_KEY });
+const DEFAULT_SYSTEM_PROMPT =
+  'You are an astronomy expert. Explain concepts clearly with short, factual responses.Give in 20-30 sentences';
 
 type RetryableError = {
   status?: number | string;
@@ -17,6 +18,14 @@ type RetryableError = {
     status?: number | string;
   };
   message?: string;
+};
+
+type OpenRouterChatResponse = {
+  choices?: Array<{
+    message?: {
+      content?: string | null;
+    } | null;
+  }> | null;
 };
 
 const getStatusCode = (err: unknown): number | undefined => {
@@ -58,18 +67,65 @@ async function withBackoff<T>(fn: () => Promise<T>, attempts = 6, baseMs = 300):
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { model = 'gemini-2.0-flash-lite', prompt } = body;
-    if (!prompt) return NextResponse.json({ error: 'Missing prompt' }, { status: 400 });
+    const {
+      model = 'deepseek/deepseek-chat-v3.1:free',
+      prompt,
+      systemPrompt = DEFAULT_SYSTEM_PROMPT,
+      temperature = 0.5,
+    } = body;
 
-    const result = await withBackoff(() =>
-      ai.models.generateContent({
-        model,
-        contents: prompt,
-      }),
-    );
-    const text =
-      (result && (result.text || result?.candidates?.[0]?.content?.parts?.[0]?.text)) ||
-      null;
+    if (!prompt) {
+      return NextResponse.json({ error: 'Missing prompt' }, { status: 400 });
+    }
+
+    if (!OPENROUTER_API_KEY) {
+      return NextResponse.json({ error: 'OpenRouter API key missing' }, { status: 500 });
+    }
+
+    const extraHeaders: Record<string, string> = {};
+
+    const completion = await withBackoff(async () => {
+      const res = await fetch(OPENROUTER_ENDPOINT, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${OPENROUTER_API_KEY}`,
+          'Content-Type': 'application/json',
+          ...extraHeaders,
+        },
+        body: JSON.stringify({
+          model,
+          temperature,
+          messages: [
+            { role: 'system', content: systemPrompt },
+            { role: 'user', content: prompt },
+          ],
+        }),
+      });
+
+      const payload = (await res.json().catch(() => null)) as
+        | (OpenRouterChatResponse & { error?: string; message?: string })
+        | null;
+
+      if (!res.ok) {
+        const message =
+          (payload && (typeof payload.error === 'string' ? payload.error : undefined)) ||
+          (payload && (typeof payload.message === 'string' ? payload.message : undefined)) ||
+          `${res.status} ${res.statusText}`;
+        const err: RetryableError = { status: res.status, message };
+        throw err;
+      }
+
+      if (!payload) {
+        throw { status: res.status, message: 'Empty response from OpenRouter' } as RetryableError;
+      }
+
+      return payload;
+    });
+
+    const rawText = completion?.choices?.[0]?.message?.content ?? null;
+    const text = rawText
+      ? rawText.replace(/<｜begin▁of▁sentence｜>/g, '').trim()
+      : null;
 
     if (!text) {
       return NextResponse.json({ error: 'No text returned from model' }, { status: 502 });

@@ -293,7 +293,7 @@ export const cardSections: CardSection[] = [
         features: ['Live metrics', '10-day forecast', 'Hourly insights'],
         glow: 'blue',
         ctaText: 'Open Dashboard',
-        status: 'Live'
+        status: 'closed'
       },
       {
         title: 'Light Pollution Map',

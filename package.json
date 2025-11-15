@@ -10,8 +10,6 @@
   },
   "dependencies": {
     "@emailjs/browser": "^4.4.1",
-    "@google/genai": "^1.28.0",
-    "@google/generative-ai": "^0.24.1",
     "@heroicons/react": "^2.0.18",
     "@react-three/drei": "^10.7.6",
     "@react-three/fiber": "^9.3.0",

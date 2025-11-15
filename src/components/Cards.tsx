@@ -5,6 +5,36 @@ import { motion, AnimatePresence, MotionConfig, PanInfo } from 'framer-motion';
 import { ArrowRight, Sparkles, Star, ChevronLeft, ChevronRight } from 'lucide-react';
 import { cardSections, CardAPI } from './cardData';
 
+const hashString = (value: string) => {
+  let hash = 0;
+  for (let i = 0; i < value.length; i++) {
+    hash = (hash << 5) - hash + value.charCodeAt(i);
+    hash |= 0;
+  }
+  return Math.abs(hash);
+};
+
+const createParticleStyles = (sectionId: string, cardId: string) => {
+  const baseSeed = hashString(`${sectionId}-${cardId}`);
+  const seededRandom = (offset: number) => {
+    const x = Math.sin(baseSeed + offset) * 10000;
+    return x - Math.floor(x);
+  };
+
+  return Array.from({ length: 8 }, (_, index) => {
+    const horizontal = 15 + seededRandom(index * 4) * 70;
+    const vertical = 15 + seededRandom(index * 4 + 1) * 70;
+    const duration = 3 + seededRandom(index * 4 + 2) * 3;
+    const delay = seededRandom(index * 4 + 3) * 2;
+
+    return {
+      left: `${horizontal}%`,
+      top: `${vertical}%`,
+      animation: `float ${duration}s ease-in-out infinite`,
+      animationDelay: `${delay}s`,
+    };
+  });
+};
 
 const EnhancedCards = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -231,6 +261,7 @@ const EnhancedCards = () => {
   const renderCard = (api: CardAPI, position: string, sectionId: string, originalIndex: number) => {
     const Icon = api.icon;
     const isCenter = position === 'center';
+    const particleStyles = createParticleStyles(sectionId, `${api.title}-${originalIndex}`);
 
     const cardContent = (
       <motion.div
@@ -253,16 +284,11 @@ const EnhancedCards = () => {
 
           {/* Floating particles */}
           <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700">
-            {[...Array(8)].map((_, i) => (
+            {particleStyles.map((style, i) => (
               <div
                 key={i}
                 className="absolute w-1 h-1 bg-white/60 rounded-full"
-                style={{
-                  left: `${15 + Math.random() * 70}%`,
-                  top: `${15 + Math.random() * 70}%`,
-                  animation: `float ${3 + Math.random() * 3}s ease-in-out infinite`,
-                  animationDelay: `${Math.random() * 2}s`
-                }}
+                style={style}
               />
             ))}
           </div>
