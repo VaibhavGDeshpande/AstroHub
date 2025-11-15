@@ -1,17 +1,11 @@
 'use client'
 
-import React, { useEffect, useMemo, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import { FaSun } from 'react-icons/fa'
 import { MessageCircleIcon } from 'lucide-react'
 import { IoClose } from 'react-icons/io5'
-import { GoogleGenAI } from '@google/genai'
 import { useNightMode } from './Hooks/useNightMode'
-
-type GenAIContentPart = { text?: string }
-type GenAIContent = { parts?: GenAIContentPart[] }
-type GenAICandidate = { content?: GenAIContent }
-type GenAIResponse = { text?: string; candidates?: GenAICandidate[] }
 
 type ChatMessage = { sender: 'user' | 'bot'; text: string; ts: number }
 
@@ -75,40 +69,6 @@ export default function AstroBot() {
     } catch {}
   }, [messages])
 
-  const ai = useMemo(() => {
-    const key = process.env.NEXT_PUBLIC_GEMINI_API_KEY || ' '
-    return new GoogleGenAI({ apiKey: key })
-  }, [])
-
-  const send = async () => {
-    const term = input.trim()
-    if (!term || loading) return
-
-    const newMessage: ChatMessage = { sender: 'user', text: term, ts: Date.now() }
-    setMessages(prev => [...prev, newMessage])
-    setInput('')
-    setLoading(true)
-
-    try {
-      const response = (await ai.models.generateContent({
-        model: 'gemini-2.5-flash',
-        contents: `You are an astronomy expert.\nExplain the term "${term}" concisely in markdown with sections: Term Name, Definition, Key Facts (bullets), Significance.`,
-      })) as unknown as GenAIResponse
-
-      const text =
-        response?.text ??
-        response?.candidates?.[0]?.content?.parts?.[0]?.text ??
-        'Sorry, no response.'
-      const botMessage: ChatMessage = { sender: 'bot', text, ts: Date.now() }
-      setMessages(prev => [...prev, botMessage])
-    } catch {
-      const botMessage: ChatMessage = { sender: 'bot', text: 'Something went wrong.', ts: Date.now() }
-      setMessages(prev => [...prev, botMessage])
-    } finally {
-      setLoading(false)
-    }
-  }
-
   const listRef = useRef<HTMLDivElement>(null)
   useEffect(() => {
     listRef.current?.scrollTo({ top: listRef.current.scrollHeight, behavior: 'smooth' })
@@ -127,6 +87,77 @@ export default function AstroBot() {
       document.documentElement.classList.remove('astrobot-open')
     }
   }, [open])
+
+  // Mirror astronomy widget: lock body scroll but keep underlying position
+  useEffect(() => {
+    if (!open) return
+    const { body } = document
+    const originalOverflow = body.style.overflow
+    const originalPosition = body.style.position
+    const originalTop = body.style.top
+    const originalWidth = body.style.width
+    const scrollY = window.scrollY
+
+    body.style.overflow = 'hidden'
+    body.style.position = 'fixed'
+    body.style.top = `-${scrollY}px`
+    body.style.width = '100%'
+
+    return () => {
+      body.style.overflow = originalOverflow
+      body.style.position = originalPosition
+      body.style.top = originalTop
+      body.style.width = originalWidth
+      window.scrollTo(0, scrollY)
+    }
+  }, [open])
+
+  const send = async () => {
+    const term = input.trim()
+    if (!term || loading) return
+
+    const newMessage: ChatMessage = { sender: 'user', text: term, ts: Date.now() }
+    setMessages(prev => [...prev, newMessage])
+    setInput('')
+    setLoading(true)
+
+    try {
+      const prompt = `You are an astronomy expert.  
+Explain the term: "${term}" in concise Markdown with the following sections:
+
+- **Term**
+- **Definition**
+- **Key Facts** (bullet points)
+- **Significance**
+
+Focus on clarity, accuracy, and essential details only.`
+
+      const res = await fetch('/api/genai', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ model: 'gemini-2.0-flash', prompt }),
+      })
+
+      if (!res.ok) {
+        let payload = null
+        try { payload = await res.json() } catch {}
+        const errMsg = payload?.error || `${res.status} ${res.statusText}`
+        throw new Error(errMsg)
+      }
+
+      const payload = await res.json()
+      const text = payload?.text ?? 'Sorry, no response.'
+      const botMessage: ChatMessage = { sender: 'bot', text, ts: Date.now() }
+      setMessages(prev => [...prev, botMessage])
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (e: any) {
+      console.error('send error', e)
+      const botMessage: ChatMessage = { sender: 'bot', text: `Error: ${e?.message ?? 'Something went wrong.'}`, ts: Date.now() }
+      setMessages(prev => [...prev, botMessage])
+    } finally {
+      setLoading(false)
+    }
+  }
 
   return (
     <>
