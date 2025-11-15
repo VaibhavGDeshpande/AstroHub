@@ -58,7 +58,7 @@ async function withBackoff<T>(fn: () => Promise<T>, attempts = 6, baseMs = 300):
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { model = 'gemini-2.0-flash', prompt } = body;
+    const { model = 'gemini-2.0-flash-lite', prompt } = body;
     if (!prompt) return NextResponse.json({ error: 'Missing prompt' }, { status: 400 });
 
     const result = await withBackoff(() =>

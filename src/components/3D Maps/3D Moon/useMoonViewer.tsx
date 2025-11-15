@@ -2,7 +2,13 @@
 
 import { useState, useCallback} from 'react';
 import * as Cesium from 'cesium';
-import { ViewerWithControls } from '@/types/moonviewer';
+import {
+  ViewerWithControls,
+  MoonLocationId,
+  LocationConfig,
+  FlyToLocationOptions,
+  FlyToLocationHandler,
+} from '@/types/moonviewer';
 import { pointsOfInterest, locationConfigs } from '@/app/3d-moon/config/moonConfig';
 
 export const useMoonViewer = () => {
@@ -95,37 +101,47 @@ export const useMoonViewer = () => {
             Cesium.ScreenSpaceEventType.WHEEL,
           ].forEach((eventType) => handler.setInputAction(stopRotation, eventType));
 
-          // Setup fly-to locations with shared logic
-          type CameraFlyToOptions = {
-            destination: Cesium.Cartesian3 | Cesium.Rectangle;
-            orientation?: {
-              heading?: number;
-              pitch?: number;
-              roll?: number;
-              direction?: Cesium.Cartesian3;
-              up?: Cesium.Cartesian3;
+          const createFlyToFunction =
+            (config: LocationConfig) => (options?: FlyToLocationOptions) => {
+              removeRotation();
+              const target = Cesium.Cartesian3.fromDegrees(
+                config.target.longitude,
+                config.target.latitude,
+                config.target.height ?? 0,
+              Cesium.Ellipsoid.MOON,
+            );
+            const boundingSphere = new Cesium.BoundingSphere(
+              target,
+              config.boundingRadius ?? 45_000,
+            );
+            const offset = new Cesium.HeadingPitchRange(
+              Cesium.Math.toRadians(config.headingDeg ?? 0),
+              Cesium.Math.toRadians(config.pitchDeg ?? -55),
+              config.range ?? 180_000,
+            );
+
+              scene.camera.flyToBoundingSphere(boundingSphere, {
+                duration: config.duration ?? 4,
+                offset,
+                easingFunction: config.easingFunction ?? Cesium.EasingFunction.LINEAR_NONE,
+                complete: () => {
+                  options?.onComplete?.();
+                },
+              });
             };
-            duration?: number;
-            complete?: () => void;
-            cancel?: () => void;
-            endTransform?: Cesium.Matrix4;
-            maximumHeight?: number;
-            easingFunction?: (time: number) => number;
-          };
 
-          // This version keeps the moving camera behavior and only flies camera; no Artemis toggle
-          const createFlyToFunction = (config: CameraFlyToOptions) => () => {
-            removeRotation();
-            scene.camera.flyTo(config);
-          };
+          const flyToEntries = Object.entries(locationConfigs) as [
+            MoonLocationId,
+            LocationConfig,
+          ][];
 
-          viewer.flyToLocations = {
-            seaOfTranquility: createFlyToFunction(locationConfigs.seaOfTranquility),
-            apollo11: createFlyToFunction(locationConfigs.apollo11),
-            copernicus: createFlyToFunction(locationConfigs.copernicus),
-            tycho: createFlyToFunction(locationConfigs.tycho),
-            shackleton: createFlyToFunction(locationConfigs.shackleton),
-          };
+          viewer.flyToLocations = flyToEntries.reduce(
+            (acc, [locationId, config]) => {
+              acc[locationId] = createFlyToFunction(config);
+              return acc;
+            },
+            {} as Record<MoonLocationId, FlyToLocationHandler>,
+          );
 
           setIsLoading(false);
         } catch (error) {

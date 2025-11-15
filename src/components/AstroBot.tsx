@@ -122,20 +122,12 @@ export default function AstroBot() {
     setLoading(true)
 
     try {
-      const prompt = `You are an astronomy expert.  
-Explain the term: "${term}" in concise Markdown with the following sections:
-
-- **Term**
-- **Definition**
-- **Key Facts** (bullet points)
-- **Significance**
-
-Focus on clarity, accuracy, and essential details only.`
+      const prompt = `You are an astronomy expert. Explain the term: "${term}" `
 
       const res = await fetch('/api/genai', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ model: 'gemini-2.0-flash', prompt }),
+        body: JSON.stringify({ model: 'gemini-2.0-flash-lite', prompt }),
       })
 
       if (!res.ok) {

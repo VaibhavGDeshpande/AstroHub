@@ -1,36 +1,43 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
-import { ViewerWithControls } from '@/types/moonviewer';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
+import {
+  ViewerWithControls,
+  MoonLocationId,
+  LocationCategory,
+} from '@/types/moonviewer';
+import { moonLocationOptions } from '@/app/3d-moon/config/moonConfig';
+
+const LOCATION_CATEGORY_ORDER: LocationCategory[] = [
+  'Apollo Missions',
+  'Maria & Basins',
+  'Craters & Highlands',
+  'Polar Regions',
+  'Other Features',
+];
 
 interface MoonControlsProps {
   viewerRef: React.RefObject<ViewerWithControls | null>;
   onLocationClick?: () => void;
+  onLocationReach?: (locationId: MoonLocationId) => void;
 }
 
-export default function MoonControls({ viewerRef, onLocationClick }: MoonControlsProps) {
+export default function MoonControls({
+  viewerRef,
+  onLocationClick,
+  onLocationReach,
+}: MoonControlsProps) {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const handleLocationClick = (location: string) => {
-    const flyToFunctions = viewerRef.current?.flyToLocations;
-    if (!flyToFunctions) return;
-
-    switch (location) {
-      case 'seaOfTranquility':
-        flyToFunctions.seaOfTranquility();
-        break;
-      case 'apollo11':
-        flyToFunctions.apollo11();
-        break;
-      case 'copernicus':
-        flyToFunctions.copernicus();
-        break;
-      case 'tycho':
-        flyToFunctions.tycho();
-        break;
-    }
-
+  const handleLocationClick = (location: MoonLocationId) => {
+    const flyTo = viewerRef.current?.flyToLocations?.[location];
+    if (!flyTo) return;
+    flyTo({
+      onComplete: () => {
+        onLocationReach?.(location);
+      },
+    });
     setIsOpen(false);
     onLocationClick?.();
   };
@@ -61,12 +68,37 @@ export default function MoonControls({ viewerRef, onLocationClick }: MoonControl
     return () => document.removeEventListener('keydown', handleEscape);
   }, [isOpen]);
 
-  const locations = [
-    { id: 'seaOfTranquility', name: 'Sea of Tranquility' },
-    { id: 'apollo11', name: 'Apollo 11' },
-    { id: 'copernicus', name: 'Copernicus' },
-    { id: 'tycho', name: 'Tycho' },
-  ];
+  const locations = moonLocationOptions;
+  const groupedLocations = useMemo(() => {
+    type LocationOption = (typeof moonLocationOptions)[number];
+    const grouped = locations.reduce(
+      (acc, location) => {
+        const category = (location.category ?? 'Other Features') as LocationCategory;
+        if (!acc[category]) {
+          acc[category] = [];
+        }
+        acc[category]!.push(location);
+        return acc;
+      },
+      {} as Partial<Record<LocationCategory, LocationOption[]>>,
+    );
+
+    const ordered: { category: LocationCategory; items: LocationOption[] }[] = [];
+    LOCATION_CATEGORY_ORDER.forEach((category) => {
+      const items = grouped[category];
+      if (items?.length) {
+        ordered.push({ category, items });
+        delete grouped[category];
+      }
+    });
+
+    Object.entries(grouped).forEach(([category, items]) => {
+      if (!items || !items.length) return;
+      ordered.push({ category: category as LocationCategory, items });
+    });
+
+    return ordered;
+  }, [locations]);
 
   return (
     <div ref={dropdownRef} className="moon-controls-dropdown">
@@ -95,17 +127,27 @@ export default function MoonControls({ viewerRef, onLocationClick }: MoonControl
       </button>
 
       <div className={`dropdown-menu ${isOpen ? 'open' : ''}`}>
-        <div className="dropdown-section">
-          {locations.map((location) => (
-            <button
-              key={location.id}
-              onClick={() => handleLocationClick(location.id)}
-              className="dropdown-item location-item"
-            >
-              <span className="item-text">{location.name}</span>
-            </button>
-          ))}
-        </div>
+        {groupedLocations.map((section) => (
+          <div className="dropdown-section" key={section.category}>
+            <div className="section-title">{section.category}</div>
+            <div className="location-grid">
+              {section.items.map((location) => (
+                <button
+                  key={location.id}
+                  onClick={() => handleLocationClick(location.id)}
+                  className="dropdown-item location-item"
+                >
+                  <span className="item-text">
+                    <span className="item-title">{location.name}</span>
+                    {location.description ? (
+                      <span className="item-description">{location.description}</span>
+                    ) : null}
+                  </span>
+                </button>
+              ))}
+            </div>
+          </div>
+        ))}
       </div>
 
       <style jsx>{`
@@ -162,8 +204,7 @@ export default function MoonControls({ viewerRef, onLocationClick }: MoonControl
       position: absolute;
       top: calc(100% + 4px);
       left: 0;
-      width: 220px;
-      max-width: 80vw;
+      width: min(420px, 90vw);
       background: rgba(42, 42, 42, 0.98);
       backdrop-filter: blur(15px);
       border-radius: 12px;
@@ -172,8 +213,9 @@ export default function MoonControls({ viewerRef, onLocationClick }: MoonControl
       visibility: hidden;
       transform: translateY(-8px) scale(0.95);
       transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-      max-height: 400px;
+      max-height: 520px;
       overflow-y: auto;
+      padding: 12px 14px 14px;
     }
 
     .dropdown-menu.open {
@@ -186,18 +228,40 @@ export default function MoonControls({ viewerRef, onLocationClick }: MoonControl
       padding: 8px 0;
     }
 
+    .dropdown-section + .dropdown-section {
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      margin-top: 10px;
+      padding-top: 12px;
+    }
+
+    .section-title {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: rgba(255, 255, 255, 0.7);
+      margin-bottom: 6px;
+    }
+
+    .location-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 6px;
+    }
+
     .dropdown-item {
       display: flex;
-      align-items: center;
+      align-items: flex-start;
+      justify-content: flex-start;
       width: 100%;
-      padding: 12px 16px;
-      background: transparent;
+      padding: 12px;
+      background: rgba(255, 255, 255, 0.02);
       border: none;
       color: white;
       cursor: pointer;
       text-align: left;
       transition: all 0.2s ease;
       font-size: 14px;
+      border-radius: 10px;
     }
 
     .dropdown-item:hover {
@@ -210,11 +274,23 @@ export default function MoonControls({ viewerRef, onLocationClick }: MoonControl
     }
 
     .location-item {
-      gap: 12px;
+      gap: 8px;
     }
 
     .item-text {
       flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .item-title {
+      font-weight: 600;
+    }
+
+    .item-description {
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.7);
+      margin-top: 2px;
     }
 
     .checkbox-item {
