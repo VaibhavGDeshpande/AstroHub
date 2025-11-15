@@ -139,31 +139,27 @@ body {
   display: inline-block;
 }
 
-/* Base hidden overlay */
+
 #night-overlay {
   position: fixed;
   inset: 0;
   pointer-events: none;
   opacity: 0;
   transition: opacity 150ms ease;
-  z-index: 2147483647; /* above everything */
+  z-index: 2147483647; 
 }
 
-/* Preferred: multiply blend for deep red tint + dim */
 html.night #night-overlay {
-  background: rgba(255, 0, 0, 0.6); /* stronger red */
-  mix-blend-mode: multiply;          /* multiplies red over content */
+  background: rgba(255, 0, 0, 0.6); 
+  mix-blend-mode: multiply;          
   opacity: 1;
-  /* optional extra dim: use a second overlay or a backdrop filter on :root */
 }
 
-/* Hide astronomy widget launcher and modal when AstroBot is open */
 html.astrobot-open #astronomy-widget-trigger,
 html.astrobot-open #astronomy-widget-modal {
   display: none !important;
 }
 
-/* global.css or styles/globals.css */
 .modal-scrollable {
 -webkit-overflow-scrolling: touch;
 }

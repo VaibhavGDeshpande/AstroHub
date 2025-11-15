@@ -45,7 +45,9 @@ const Footer = () => {
       title: 'News & Learning',
       items: [
         { name: 'Space News & Updates', path: '/space-news' },
-        { name: 'Space Quiz', path: '/space-quiz' }
+        { name: 'Space Quiz', path: '/space-quiz' },
+        { name: 'Weather Dashboard', path: '/weather/weather' },
+        { name: 'Light Pollution Map', path: '/weather/light-pollution' }
       ]
     }
   ];

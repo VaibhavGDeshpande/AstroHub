@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { getAstronomy } from "@/api_service/astronomy";
+import { useNightMode } from "./Hooks/useNightMode";
 
 type AstronomyAPI = {
   astronomy?: {
@@ -106,6 +107,64 @@ export default function AstronomyWidget() {
   const [showMorning, setShowMorning] = useState(false);
   const [showEvening, setShowEvening] = useState(false);
   const [displayTime, setDisplayTime] = useState<string | undefined>(undefined); // mirrors API local time at change events
+  const nightMode = useNightMode();
+
+  const triggerOrbPalette = nightMode
+    ? "bg-gradient-to-br from-red-900/80 to-red-800/70 border-red-500/40 text-red-100 shadow-[0_0_18px_rgba(255,0,0,0.35)]"
+    : "bg-gradient-to-br from-blue-400/20 to-purple-500/20 border-white/20 text-white";
+  const triggerLabelClass = nightMode
+    ? "text-[10px] sm:text-xs font-medium text-red-200 whitespace-nowrap"
+    : "text-[10px] sm:text-xs font-medium text-white/90 whitespace-nowrap";
+  const overlayTint = nightMode ? "bg-black/80" : "bg-black/60";
+  const modalPalette = nightMode
+    ? "bg-[#12040a]/95 text-red-50 border border-red-500/30 shadow-[0_0_40px_rgba(255,0,0,0.35)]"
+    : "bg-white/10 text-white border border-white/10 shadow-2xl";
+  const headerIconPalette = nightMode
+    ? "bg-gradient-to-br from-red-700 to-red-500"
+    : "bg-gradient-to-br from-blue-500 to-purple-600";
+  const titleGradientClass = nightMode
+    ? "bg-gradient-to-r from-red-300 to-amber-300"
+    : "bg-gradient-to-r from-blue-400 to-purple-400";
+  const inputPalette = nightMode
+    ? "flex-1 rounded-xl border border-red-500/40 bg-red-950/40 px-4 py-2.5 text-red-50 placeholder-red-200/40 focus:outline-none focus:ring-2 focus:ring-red-500/40 focus:border-red-500/40 backdrop-blur-sm transition-all"
+    : "flex-1 rounded-xl border border-white/20 bg-white/5 px-4 py-2.5 text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 backdrop-blur-sm transition-all";
+  const updateButtonPalette = nightMode
+    ? "rounded-xl bg-gradient-to-r from-red-700 to-red-500 text-white px-5 py-2.5 font-medium hover:from-red-600 hover:to-red-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg hover:shadow-xl"
+    : "rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 text-white px-5 py-2.5 font-medium hover:from-blue-500 hover:to-purple-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg hover:shadow-xl";
+  const errorPalette = nightMode
+    ? "mb-4 rounded-xl border border-red-600/40 bg-red-900/40 text-red-200 px-4 py-3 text-sm backdrop-blur-sm"
+    : "mb-4 rounded-xl border border-red-500/30 bg-red-500/10 text-red-300 px-4 py-3 text-sm backdrop-blur-sm";
+  const locationTextClass = nightMode
+    ? "mb-4 text-xs sm:text-sm text-red-200/70 flex items-center gap-2 flex-wrap"
+    : "mb-4 text-xs sm:text-sm text-white/60 flex items-center gap-2 flex-wrap";
+  const statCardPalette = nightMode
+    ? "rounded-xl border border-red-500/30 bg-red-950/40 p-4 backdrop-blur-sm hover:bg-red-900/30 transition-all"
+    : "rounded-xl border border-white/10 bg-white/5 p-4 backdrop-blur-sm hover:bg-white/10 transition-all";
+  const statLabelClass = nightMode
+    ? "text-xs sm:text-sm text-red-200/70 mb-1"
+    : "text-xs sm:text-sm text-white/60 mb-1";
+  const statValueClass = nightMode
+    ? "text-lg sm:text-xl font-bold text-red-50"
+    : "text-lg sm:text-xl font-bold text-white";
+  const moonCardPalette = nightMode
+    ? "flex items-center gap-4 rounded-xl border border-red-500/30 bg-gradient-to-r from-red-950/50 to-amber-900/40 p-4 backdrop-blur-sm"
+    : "flex items-center gap-4 rounded-xl border border-white/10 bg-gradient-to-r from-indigo-900/30 to-purple-900/30 p-4 backdrop-blur-sm";
+  const moonLabelClass = nightMode ? "text-xs sm:text-sm text-red-200/70 mb-1" : "text-xs sm:text-sm text-white/60 mb-1";
+  const moonValueClass = nightMode ? "text-base sm:text-lg font-bold text-red-50" : "text-base sm:text-lg font-bold text-white";
+  const moonMetaClass = nightMode ? "text-xs sm:text-sm text-red-200/80 mt-1" : "text-xs sm:text-sm text-white/70 mt-1";
+  const accordionPanelPalette = nightMode
+    ? "rounded-xl border border-red-500/30 bg-red-950/30 overflow-hidden backdrop-blur-sm"
+    : "rounded-xl border border-white/10 bg-white/5 overflow-hidden backdrop-blur-sm";
+  const accordionButtonPalette = nightMode
+    ? "w-full flex items-center justify-between p-4 hover:bg-red-900/20 transition-all"
+    : "w-full flex items-center justify-between p-4 hover:bg-white/5 transition-all";
+  const accordionToggleClass = nightMode ? "text-red-200/70 text-xl" : "text-white/60 text-xl";
+  const infoRowPalette = nightMode
+    ? "flex items-center justify-between rounded-lg bg-red-950/40 p-3 text-sm"
+    : "flex items-center justify-between rounded-lg bg-white/5 p-3 text-sm";
+  const infoRowLabelClass = nightMode ? "text-red-200/80" : "text-white/70";
+  const footerTextClass = nightMode ? "text-[10px] sm:text-xs text-red-200/50 text-center" : "text-[10px] sm:text-xs text-white/40 text-center";
+  const closeButtonPalette = nightMode ? "text-red-200 hover:text-red-100" : "text-white/60 hover:text-white";
 
   // Prevent background scroll when modal is open but allow modal content scrolling
   useEffect(() => {
@@ -265,17 +324,15 @@ export default function AstronomyWidget() {
         }}
       >
         <div
-          className="w-12 h-12 rounded-full 
+          className={`w-12 h-12 rounded-full 
                      shadow-lg group-hover:shadow-xl transition-shadow
-                     bg-gradient-to-br from-blue-400/20 to-purple-500/20
-                     backdrop-blur-sm border border-white/20
-                     flex items-center justify-center"
+                     backdrop-blur-sm border flex items-center justify-center ${triggerOrbPalette}`}
         >
           <span className={`text-xl ${isDay ? "sun-emoji" : "moon-emoji"}`}>
             {isDay ? "☀️" : getMoonPhaseIcon(data?.moon_phase)}
           </span>
         </div>
-        <span className="text-[10px] sm:text-xs font-medium text-white/90 whitespace-nowrap">
+        <span className={triggerLabelClass}>
           {isDay ? "Day" : data?.moon_phase?.split(" ")[0] || "Moon"}
         </span>
       </button>
@@ -284,22 +341,20 @@ export default function AstronomyWidget() {
       {open && (
         <div
           id="astronomy-widget-modal"
-          className="fixed inset-0 z-[2147483648] flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm animate-[fadeIn_0.2s_ease-out] overflow-hidden"
+          className={`fixed inset-0 z-[2147483648] flex items-end sm:items-center justify-center ${overlayTint} backdrop-blur-sm animate-[fadeIn_0.2s_ease-out] overflow-hidden`}
           onClick={() => {
             setOpen(false);
             fetchData(location, { force: true }); 
           }}
         >
           <div
-            className="w-full sm:max-w-lg sm:rounded-2xl 
-           bg-white/10 backdrop-blur-md 
-           text-white shadow-2xl 
+            className={`w-full sm:max-w-lg sm:rounded-2xl 
+           backdrop-blur-md 
            p-5 sm:p-7 
            max-h-[92vh] overflow-y-auto
-           border border-white/10
            animate-[slideUp_0.3s_ease-out] sm:animate-[scaleIn_0.3s_ease-out]
            scrollbar-thin scrollbar-thumb-purple-600 scrollbar-track-transparent
-           touch-pan-y overscroll-contain" // Enhanced scroll properties
+           touch-pan-y overscroll-contain ${modalPalette}`} // Enhanced scroll properties
 
             onClick={(e) => e.stopPropagation()}
             onWheel={(e) => {
@@ -314,15 +369,15 @@ export default function AstronomyWidget() {
             {/* Header */}
             <div className="flex items-center justify-between mb-5">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center text-2xl">
+                <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center text-2xl ${headerIconPalette}`}>
                   {isDay ? "☀️" : getMoonPhaseIcon(data?.moon_phase)}
                 </div>
-                <h2 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+                <h2 className={`text-xl sm:text-2xl font-bold ${titleGradientClass} bg-clip-text text-transparent`}>
                   Astronomy Today
                 </h2>
               </div>
               <button
-                className="text-white/60 hover:text-white text-2xl transition-colors"
+                className={`text-2xl transition-colors ${closeButtonPalette}`}
                 onClick={() => {
                   setOpen(false);
                   fetchData(location, { force: true }); // refresh on close
@@ -345,17 +400,10 @@ export default function AstronomyWidget() {
                   }
                 }}
                 placeholder="Enter city or place"
-                className="flex-1 rounded-xl border border-white/20 bg-white/5 
-                           px-4 py-2.5 text-white placeholder-white/40
-                           focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50
-                           backdrop-blur-sm transition-all"
+                className={inputPalette}
               />
               <button
-                className="rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 
-                           text-white px-5 py-2.5 font-medium
-                           hover:from-blue-500 hover:to-purple-500 
-                           disabled:opacity-50 disabled:cursor-not-allowed
-                           transition-all shadow-lg hover:shadow-xl"
+                className={updateButtonPalette}
                 onClick={() => {
                   fetchData(location, { force: true }); // call API on Update
                 }}
@@ -376,13 +424,13 @@ export default function AstronomyWidget() {
             </div>
 
             {error && (
-              <div className="mb-4 rounded-xl border border-red-500/30 bg-red-500/10 text-red-300 px-4 py-3 text-sm backdrop-blur-sm">
+              <div className={errorPalette}>
                 {error}
               </div>
             )}
 
             {/* Location Info */}
-            <div className="mb-4 text-xs sm:text-sm text-white/60 flex items-center gap-2 flex-wrap">
+            <div className={locationTextClass}>
               <span className="flex items-center gap-1">📍 {data?.location_label || location}</span>
               {data?.date && (
                 <>
@@ -395,39 +443,39 @@ export default function AstronomyWidget() {
 
             {/* Stats Grid */}
             <div className="grid grid-cols-2 gap-3 mb-4">
-              <div className="rounded-xl border border-white/10 bg-white/5 p-4 backdrop-blur-sm hover:bg-white/10 transition-all">
-                <div className="text-xs sm:text-sm text-white/60 mb-1">Current Time</div>
-                <div className="text-lg sm:text-xl font-bold text-white">
+              <div className={statCardPalette}>
+                <div className={statLabelClass}>Current Time</div>
+                <div className={statValueClass}>
                   {displayTime ?? data?.astronomy?.current_time ?? "—"}
                 </div>
               </div>
-              <div className="rounded-xl border border-white/10 bg-white/5 p-4 backdrop-blur-sm hover:bg-white/10 transition-all">
-                <div className="text-xs sm:text-sm text-white/60 mb-1">Sunrise</div>
-                <div className="text-lg sm:text-xl font-bold text-white">{data?.sunrise ?? "—"}</div>
+              <div className={statCardPalette}>
+                <div className={statLabelClass}>Sunrise</div>
+                <div className={statValueClass}>{data?.sunrise ?? "—"}</div>
               </div>
-              <div className="rounded-xl border border-white/10 bg-white/5 p-4 backdrop-blur-sm hover:bg-white/10 transition-all">
-                <div className="text-xs sm:text-sm text-white/60 mb-1">Sunset</div>
-                <div className="text-lg sm:text-xl font-bold text-white">{data?.sunset ?? "—"}</div>
+              <div className={statCardPalette}>
+                <div className={statLabelClass}>Sunset</div>
+                <div className={statValueClass}>{data?.sunset ?? "—"}</div>
               </div>
-              <div className="rounded-xl border border-white/10 bg-white/5 p-4 backdrop-blur-sm hover:bg-white/10 transition-all">
-                <div className="text-xs sm:text-sm text-white/60 mb-1">Moonrise</div>
-                <div className="text-lg sm:text-xl font-bold text-white">{data?.moonrise ?? "—"}</div>
+              <div className={statCardPalette}>
+                <div className={statLabelClass}>Moonrise</div>
+                <div className={statValueClass}>{data?.moonrise ?? "—"}</div>
               </div>
-              <div className="rounded-xl border border-white/10 bg-white/5 p-4 backdrop-blur-sm hover:bg-white/10 transition-all">
-                <div className="text-xs sm:text-sm text-white/60 mb-1">Moonset</div>
-                <div className="text-lg sm:text-xl font-bold text-white">{data?.moonset ?? "—"}</div>
+              <div className={statCardPalette}>
+                <div className={statLabelClass}>Moonset</div>
+                <div className={statValueClass}>{data?.moonset ?? "—"}</div>
               </div>
             </div>
 
             {/* Moon Phase */}
-            <div className="mb-4 flex items-center gap-4 rounded-xl border border-white/10 bg-gradient-to-r from-indigo-900/30 to-purple-900/30 p-4 backdrop-blur-sm">
+            <div className={`mb-4 ${moonCardPalette}`}>
               <div className="text-4xl sm:text-5xl moon-emoji" aria-hidden>
                 {getMoonPhaseIcon(data?.moon_phase)}
               </div>
               <div className="flex-1">
-                <div className="text-xs sm:text-sm text-white/60 mb-1">Moon Phase</div>
-                <div className="text-base sm:text-lg font-bold text-white">{data?.moon_phase ?? "—"}</div>
-                <div className="text-xs sm:text-sm text-white/70 mt-1">
+                <div className={moonLabelClass}>Moon Phase</div>
+                <div className={moonValueClass}>{data?.moon_phase ?? "—"}</div>
+                <div className={moonMetaClass}>
                   Illumination: <span className="font-semibold">{illuminationPct ?? "—"}</span>
                 </div>
               </div>
@@ -435,52 +483,52 @@ export default function AstronomyWidget() {
 
             {/* Twilights */}
             <div className="space-y-3">
-              <div className="rounded-xl border border-white/10 bg-white/5 overflow-hidden backdrop-blur-sm">
+              <div className={accordionPanelPalette}>
                 <button
-                  className="w-full flex items-center justify-between p-4 hover:bg-white/5 transition-all"
+                  className={accordionButtonPalette}
                   onClick={() => setShowMorning((s) => !s)}
                 >
                   <span className="font-semibold text-sm sm:text-base flex items-center gap-2">Morning Twilights</span>
-                  <span className="text-white/60 text-xl">{showMorning ? "▴" : "▾"}</span>
+                  <span className={accordionToggleClass}>{showMorning ? "▴" : "▾"}</span>
                 </button>
                 {showMorning && (
                   <div className="px-4 pb-4 space-y-2">
-                    <div className="flex items-center justify-between rounded-lg bg-white/5 p-3 text-sm">
-                      <span className="text-white/70">Astronomical Begin</span>
+                    <div className={infoRowPalette}>
+                      <span className={infoRowLabelClass}>Astronomical Begin</span>
                       <span className="font-medium">{data?.astronomical_twilight_begin ?? "—"}</span>
                     </div>
-                    <div className="flex items-center justify-between rounded-lg bg-white/5 p-3 text-sm">
-                      <span className="text-white/70">Nautical Begin</span>
+                    <div className={infoRowPalette}>
+                      <span className={infoRowLabelClass}>Nautical Begin</span>
                       <span className="font-medium">{data?.nautical_twilight_begin ?? "—"}</span>
                     </div>
-                    <div className="flex items-center justify-between rounded-lg bg-white/5 p-3 text-sm">
-                      <span className="text-white/70">Civil Begin</span>
+                    <div className={infoRowPalette}>
+                      <span className={infoRowLabelClass}>Civil Begin</span>
                       <span className="font-medium">{data?.civil_twilight_begin ?? "—"}</span>
                     </div>
                   </div>
                 )}
               </div>
 
-              <div className="rounded-xl border border-white/10 bg-white/5 overflow-hidden backdrop-blur-sm">
+              <div className={accordionPanelPalette}>
                 <button
-                  className="w-full flex items-center justify-between p-4 hover:bg-white/5 transition-all"
+                  className={accordionButtonPalette}
                   onClick={() => setShowEvening((s) => !s)}
                 >
                   <span className="font-semibold text-sm sm:text-base flex items-center gap-2">Evening Twilights</span>
-                  <span className="text-white/60 text-xl">{showEvening ? "▴" : "▾"}</span>
+                  <span className={accordionToggleClass}>{showEvening ? "▴" : "▾"}</span>
                 </button>
                 {showEvening && (
                   <div className="px-4 pb-4 space-y-2">
-                    <div className="flex items-center justify-between rounded-lg bg-white/5 p-3 text-sm">
-                      <span className="text-white/70">Civil End</span>
+                    <div className={infoRowPalette}>
+                      <span className={infoRowLabelClass}>Civil End</span>
                       <span className="font-medium">{data?.civil_twilight_end ?? "—"}</span>
                     </div>
-                    <div className="flex items-center justify-between rounded-lg bg-white/5 p-3 text-sm">
-                      <span className="text-white/70">Nautical End</span>
+                    <div className={infoRowPalette}>
+                      <span className={infoRowLabelClass}>Nautical End</span>
                       <span className="font-medium">{data?.nautical_twilight_end ?? "—"}</span>
                     </div>
-                    <div className="flex items-center justify-between rounded-lg bg-white/5 p-3 text-sm">
-                      <span className="text-white/70">Astronomical End</span>
+                    <div className={infoRowPalette}>
+                      <span className={infoRowLabelClass}>Astronomical End</span>
                       <span className="font-medium">{data?.astronomical_twilight_end ?? "—"}</span>
                     </div>
                   </div>
@@ -488,7 +536,7 @@ export default function AstronomyWidget() {
               </div>
             </div>
 
-            <div className="mt-5 text-[10px] sm:text-xs text-white/40 text-center">
+            <div className={`mt-5 ${footerTextClass}`}>
               Source: ipgeolocation.io Astronomy API • Data cached daily
             </div>
           </div>

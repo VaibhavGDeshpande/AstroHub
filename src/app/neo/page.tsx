@@ -89,10 +89,9 @@ export default function NEOPage() {
       isVisible={loading} 
       minDuration={1000}
     >
-      <div className="min-h-screen bg-black text-white relative overflow-hidden">
+      <div className="min-h-screen bg-black w-auto text-white relative overflow-hidden">
 
-        <div className="container mx-auto px-4 sm:px-6 lg:px-10 py-10 flex flex-col gap-10">
-          {/* NEO Explorer Component - All rendering logic moved here */}
+        <div className="container flex flex-col gap-10">
           {data && (
             <NEOExplorer/>
           )}

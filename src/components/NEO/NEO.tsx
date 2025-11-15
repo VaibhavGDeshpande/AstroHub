@@ -1,4 +1,3 @@
-// components/NEO/NEOExplorer.tsx
 'use client'
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from 'framer-motion';
@@ -142,7 +141,7 @@ const NEOExplorer = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br">
+    <div className="min-h-screen w-screen bg-gradient-to-br">
       {/* Back Button */}
       <motion.div 
         initial={{ opacity: 0, x: -20 }}

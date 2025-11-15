@@ -86,7 +86,7 @@ export const useNewsNotification = () => {
     };
 
     checkForNewNews();
-    const interval = setInterval(checkForNewNews, 60000); // Check every minute
+    const interval = setInterval(checkForNewNews, 600000); 
     return () => clearInterval(interval);
   }, [router]);
 };
