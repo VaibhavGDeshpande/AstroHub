@@ -34,27 +34,10 @@ export const metadata: Metadata = {
   },
   description: "Explore the cosmos with NASA's public APIs including Astronomy Picture of the Day (APOD), Earth Polychromatic Imaging Camera (EPIC), and more stunning space imagery and data.",
   keywords: [
-    "NASA",
-    "space",
-    "astronomy",
-    "APOD",
-    "EPIC",
-    "earth imagery",
-    "space exploration",
-    "astronomy pictures",
-    "NASA API",
-    "space data",
-    "satellite imagery",
-    "cosmos",
-    "universe",
-    "3D Models",
-    "Nasa Eyes",
-    "Space News",
-    "Space Quiz",
-    "Stellarium",
-    "earth",
-    "moon",
-    "mars",
+    "NASA", "space", "astronomy", "APOD", "EPIC", "earth imagery",
+    "space exploration", "astronomy pictures", "NASA API", "space data",
+    "satellite imagery", "cosmos", "universe", "3D Models", "Nasa Eyes",
+    "Space News", "Space Quiz", "Stellarium", "earth", "moon", "mars",
   ],
   authors: [{ name: "Vaibhav Ganesh Deshpande" }],
   creator: "Vaibhav Ganesh Deshpande",
@@ -64,20 +47,20 @@ export const metadata: Metadata = {
     address: false,
     telephone: false,
   },
-  metadataBase: new URL("https://astrohub-live.vercel.app"), // Replace with your actual domain
+  metadataBase: new URL("https://astrohub-live.vercel.app"),
   alternates: {
     canonical: "/",
   },
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://astrohub-live.vercel.app", // Replace with your actual domain
-    siteName: "AstoHub",
+    url: "https://astrohub-live.vercel.app",
+    siteName: "AstroHub", // Fixed typo: was "AstoHub"
     title: "AstroHub - Astronomy Hub for Astrophiles and Amateur Astronomers",
     description: "Explore the cosmos with NASA's public APIs including APOD, EPIC, and more stunning space imagery and data.",
     images: [
       {
-        url: "/assets/AstroHub.png", // You'll need to add this image to your public folder
+        url: "/assets/AstroHub.png",
         width: 1200,
         height: 630,
         alt: "AstroHub - Astronomy Hub for Astrophiles and young astronomers",
@@ -89,7 +72,7 @@ export const metadata: Metadata = {
     title: "AstroHub - Astronomy Hub for Astrophiles and young astronomers",
     description: "Explore the cosmos with NASA's public APIs including APOD, EPIC, and more stunning space imagery and data.",
     images: ["/assets/AstroHub.png"],
-    creator: "@yourtwitterhandle", 
+    // creator: "@yourtwitterhandle", // Commented out until you have a real handle
   },
   robots: {
     index: true,
@@ -102,13 +85,14 @@ export const metadata: Metadata = {
       "max-snippet": -1,
     },
   },
+  
+  // --- THE FIX IS HERE ---
   verification: {
-    google: " google8802ee22907a9c32.html", // Add your Google Search Console verification code
-    // yandex: "your-yandex-verification-code",
-    // yahoo: "your-yahoo-verification-code",
+    // 1. Go to Search Console -> HTML Tag
+    // 2. Copy the text inside content="HERE"
+    // 3. Paste it below:
+    google: "cHiN1rSzb5BNk_59ey39HFmSIPyhtxctzZD2mAcNYvs", 
   },
-  category: "technology",
-  classification: "Space Technology and Astronomy",
 };
 
 export default function RootLayout({
@@ -122,11 +106,10 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <ClientLayout>
-          {/* Global floating controls (stacked bottom-right) */}
           <FloatingClientWidgets />
           <Analytics/>
           <SpeedInsights/>
-        {children}
+          {children}
         </ClientLayout>
       </body>
     </html>
