@@ -1,4 +1,3 @@
-// components/Demo.tsx
 'use client';
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -77,17 +76,12 @@ const FactsSection = () => {
     };
 
 
-    const handleLoadedData = () => {
-      setVideoLoaded(true);
-    };
-
-
     video.addEventListener('canplay', handleCanPlay);
-    video.addEventListener('loadeddata', handleLoadedData);
     
+    video.load();
+
     return () => {
       video.removeEventListener('canplay', handleCanPlay);
-      video.removeEventListener('loadeddata', handleLoadedData);
     };
   }, []);
 
@@ -217,12 +211,13 @@ const FactsSection = () => {
           loop
           playsInline
           preload="auto"
+          autoPlay
           onClick={handleVideoClick}
           style={{
             objectFit: 'cover',
           }}
         >
-          <source src="/assets/mars1.mp4" type="video/mp4" />
+          <source src="/assets/mars1.webm" type="video/webm" />
         </video>
         
         <div className="absolute inset-0 bg-black/20" />

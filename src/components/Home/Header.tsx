@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { ChevronDownIcon, Bars3Icon, XMarkIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline';
+import { shouldPrefetchRoute } from '@/lib/routePrefetch';
 
 const Header = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -100,7 +101,8 @@ const Header = () => {
       icon: '',
       items: [
         { name: 'Stellarium Sky Map', path: '/stellarium', status: 'live' },
-        { name: 'Sky Charts', path: '/sky-charts', status: 'live' }
+        { name: 'Sky Charts', path: '/sky-charts', status: 'live' },
+        { name: 'Satellite Tracker', path: '/satellite-tracker', status: 'live' }
       ]
     },
     {
@@ -223,7 +225,11 @@ const Header = () => {
       <header className={`fixed top-0 left-0 right-0 z-50 bg-transparent transition-all duration-500 ease-in-out ${getHeaderClasses()}`}>
         <div className="container mx-auto px-4">
           <div className={`flex items-center justify-between transition-all duration-500 ${scrollY > 50 ? 'h-14' : 'h-16'}`}>
-            <Link href="/" className="hover:scale-105 transition-transform duration-300 relative z-10">
+            <Link
+              href="/"
+              prefetch={shouldPrefetchRoute('/')}
+              className="hover:scale-105 transition-transform duration-300 relative z-10"
+            >
               <SpaceLogo />
             </Link>
 
@@ -320,6 +326,7 @@ const Header = () => {
                                   <Link
                                     key={itemIndex}
                                     href={item.path}
+                                    prefetch={shouldPrefetchRoute(item.path)}
                                     className={`block px-3 py-2 text-xs rounded-lg transition-all duration-200 hover:translate-x-1 ${
                                       item.status === 'temporarily-closed'
                                         ? 'text-gray-400 hover:bg-red-500/10 hover:text-red-300 cursor-not-allowed opacity-75'
@@ -373,22 +380,38 @@ const Header = () => {
                 </div>
               </div>
 
-              <Link href="/about" className="relative group text-white hover:text-cyan-400 transition-colors drop-shadow-lg">
+              <Link
+                href="/about"
+                prefetch={shouldPrefetchRoute('/about')}
+                className="relative group text-white hover:text-cyan-400 transition-colors drop-shadow-lg"
+              >
                 <span className={`transition-all duration-300 font-medium whitespace-nowrap ${scrollY > 50 ? 'text-sm' : 'text-base'}`}>About</span>
                 <div className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-cyan-400 to-blue-500 group-hover:w-full transition-all duration-300" />
               </Link>
 
-              <Link href="/contact-us" className="relative group text-white hover:text-cyan-400 transition-colors drop-shadow-lg">
+              <Link
+                href="/contact-us"
+                prefetch={shouldPrefetchRoute('/contact-us')}
+                className="relative group text-white hover:text-cyan-400 transition-colors drop-shadow-lg"
+              >
                 <span className={`transition-all duration-300 font-medium whitespace-nowrap ${scrollY > 50 ? 'text-sm' : 'text-base'}`}>Contact</span>
                 <div className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-cyan-400 to-blue-500 group-hover:w-full transition-all duration-300" />
               </Link>
 
-              <Link href="/privacy-policy" className="relative group text-white hover:text-cyan-400 transition-colors drop-shadow-lg">
+              <Link
+                href="/privacy-policy"
+                prefetch={shouldPrefetchRoute('/privacy-policy')}
+                className="relative group text-white hover:text-cyan-400 transition-colors drop-shadow-lg"
+              >
                 <span className={`transition-all duration-300 font-medium whitespace-nowrap ${scrollY > 50 ? 'text-sm' : 'text-base'}`}>Privacy Policy</span>
                 <div className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-cyan-400 to-blue-500 group-hover:w-full transition-all duration-300" />
               </Link>
 
-              <Link href="/terms-and-conditions" className="relative group text-white hover:text-cyan-400 transition-colors drop-shadow-lg">
+              <Link
+                href="/terms-and-conditions"
+                prefetch={shouldPrefetchRoute('/terms-and-conditions')}
+                className="relative group text-white hover:text-cyan-400 transition-colors drop-shadow-lg"
+              >
                 <span className={`transition-all duration-300 font-medium whitespace-nowrap ${scrollY > 50 ? 'text-sm' : 'text-base'}`}>Terms & Conditions</span>
                 <div className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-cyan-400 to-blue-500 group-hover:w-full transition-all duration-300" />
               </Link>
@@ -462,6 +485,7 @@ const Header = () => {
                     <Link
                       key={itemIndex}
                       href={item.path}
+                      prefetch={shouldPrefetchRoute(item.path)}
                       className={`block pl-4 pr-2 py-2.5 text-sm rounded-lg transition-all duration-300 ${
                         item.status === 'temporarily-closed'
                           ? 'text-gray-400 cursor-not-allowed opacity-75'
@@ -505,6 +529,7 @@ const Header = () => {
           <div className="pt-4 border-t border-cyan-400/20 space-y-2">
             <Link 
               href="/about" 
+              prefetch={shouldPrefetchRoute('/about')}
               className={`block px-2 py-2.5 text-white hover:text-cyan-400 hover:bg-cyan-500/10 rounded-lg transition-all duration-300 font-medium ${isMobileMenuOpen ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4'
               }`}
               style={{ transitionDelay: '250ms' }}
@@ -514,6 +539,7 @@ const Header = () => {
             </Link>
             <Link 
               href="/contact-us" 
+              prefetch={shouldPrefetchRoute('/contact-us')}
               className={`block px-2 py-2.5 text-white hover:text-cyan-400 hover:bg-cyan-500/10 rounded-lg transition-all duration-300 font-medium ${isMobileMenuOpen ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4'
               }`}
               style={{ transitionDelay: '300ms' }}
@@ -523,6 +549,7 @@ const Header = () => {
             </Link>
             <Link 
               href="/privacy-policy" 
+              prefetch={shouldPrefetchRoute('/privacy-policy')}
               className={`block px-2 py-2.5 text-white hover:text-cyan-400 hover:bg-cyan-500/10 rounded-lg transition-all duration-300 font-medium ${isMobileMenuOpen ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4'
               }`}
               style={{ transitionDelay: '350ms' }}
@@ -532,6 +559,7 @@ const Header = () => {
             </Link>
             <Link 
               href="/terms-and-conditions" 
+              prefetch={shouldPrefetchRoute('/terms-and-conditions')}
               className={`block px-2 py-2.5 text-white hover:text-cyan-400 hover:bg-cyan-500/10 rounded-lg transition-all duration-300 font-medium ${isMobileMenuOpen ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4'
               }`}
               style={{ transitionDelay: '400ms' }}

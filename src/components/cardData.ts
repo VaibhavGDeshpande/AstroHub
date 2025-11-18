@@ -34,7 +34,8 @@ import {
   Eye,
   Sparkles,
   Newspaper,
-  Book
+  Book,
+  Satellite
 } from 'lucide-react';
 
 export const cardSections: CardSection[] = [
@@ -211,6 +212,17 @@ export const cardSections: CardSection[] = [
         features: ['Monthly updates', 'Printable charts', 'Constellation guides'],
         glow: 'yellow',
         ctaText: 'View Charts',
+        status:"Live"
+      },
+      {
+        title: 'Satellite Tracker',
+        description: 'Track live satellite positions, orbital details, and passes over your location in real time.',
+        icon: Satellite,
+        color: 'from-cyan-500 to-emerald-500',
+        path: '/satellite-tracker',
+        features: ['Live positions', 'Pass predictions', 'NORAD catalog search'],
+        glow: 'cyan',
+        ctaText: 'Track Now',
         status:"Live"
       }
     ]

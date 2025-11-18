@@ -1,11 +1,9 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import 'react-toastify/dist/ReactToastify.css';
 import ClientLayout from "@/components/provider/NotificationProvider";
 import { Analytics } from "@vercel/analytics/next"
-import NightModeToggle from "@/components/NightModeToggle";
-import AstroBot from "@/components/AstroBot";
+import FloatingClientWidgets from "@/components/FloatingClientWidgets";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -19,13 +17,19 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "AstroHub - One-Stop Space Platform with Professional Observation Tools",
+    default: "AstroHub - Space Platform with Professional Observation Tools",
     template: "%s | AstroHub"
   },
   icons: {
-    icon:[
-      {url: "/assets/AstroHub.png", sizes: "'16x16', type: 'image/png'"},
-    ]
+    icon: [
+      {
+        url: "/assets/AstroHub.png",
+        type: "image/png",
+        sizes: "16x16",
+      },
+    ],
+    shortcut: "/assets/AstroHub.png",
+    apple: "/assets/AstroHub.png",
   },
   description: "Explore the cosmos with NASA's public APIs including Astronomy Picture of the Day (APOD), Earth Polychromatic Imaging Camera (EPIC), and more stunning space imagery and data.",
   keywords: [
@@ -45,7 +49,11 @@ export const metadata: Metadata = {
     "3D Models",
     "Nasa Eyes",
     "Space News",
-    "Space Quiz"
+    "Space Quiz",
+    "Stellarium",
+    "earth",
+    "moon",
+    "mars",
   ],
   authors: [{ name: "Vaibhav Ganesh Deshpande" }],
   creator: "Vaibhav Ganesh Deshpande",
@@ -114,8 +122,7 @@ export default function RootLayout({
       >
         <ClientLayout>
           {/* Global floating controls (stacked bottom-right) */}
-          <NightModeToggle />
-          <AstroBot />
+          <FloatingClientWidgets />
           <Analytics/>
         {children}
         </ClientLayout>
