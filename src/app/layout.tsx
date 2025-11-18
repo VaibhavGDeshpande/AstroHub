@@ -103,7 +103,7 @@ export const metadata: Metadata = {
     },
   },
   verification: {
-    google: "your-google-verification-code", // Add your Google Search Console verification code
+    google: " google8802ee22907a9c32.html", // Add your Google Search Console verification code
     // yandex: "your-yandex-verification-code",
     // yahoo: "your-yahoo-verification-code",
   },
