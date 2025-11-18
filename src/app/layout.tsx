@@ -4,6 +4,7 @@ import "./globals.css";
 import ClientLayout from "@/components/provider/NotificationProvider";
 import { Analytics } from "@vercel/analytics/next"
 import FloatingClientWidgets from "@/components/FloatingClientWidgets";
+import { SpeedInsights } from "@vercel/speed-insights/next"
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -124,6 +125,7 @@ export default function RootLayout({
           {/* Global floating controls (stacked bottom-right) */}
           <FloatingClientWidgets />
           <Analytics/>
+          <SpeedInsights/>
         {children}
         </ClientLayout>
       </body>
