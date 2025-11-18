@@ -68,7 +68,7 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     const {
-      model = 'mistralai/mistral-small-3.1-24b-instruct:free',
+      model = 'openrouter/sherlock-dash-alpha',
       prompt,
       systemPrompt = DEFAULT_SYSTEM_PROMPT,
       temperature = 0.5,
