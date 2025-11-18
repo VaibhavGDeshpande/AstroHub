@@ -127,7 +127,7 @@ export default function AstroBot() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          model: 'deepseek/deepseek-chat-v3.1:free',
+          model: 'mistralai/mistral-small-3.1-24b-instruct:free',
           prompt,
           temperature: 0.4,
         }),
