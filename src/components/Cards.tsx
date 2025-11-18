@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { motion, AnimatePresence, MotionConfig, PanInfo } from 'framer-motion';
 import { ArrowRight, Sparkles, Star, ChevronLeft, ChevronRight } from 'lucide-react';
 import { cardSections, CardAPI } from './cardData';
+import { shouldPrefetchRoute } from '@/lib/routePrefetch';
 
 const hashString = (value: string) => {
   let hash = 0;
@@ -385,7 +386,11 @@ const EnhancedCards = () => {
 
     if (!api.external) {
       return (
-        <Link href={api.path} className="block h-full">
+        <Link
+          href={api.path}
+          prefetch={shouldPrefetchRoute(api.path)}
+          className="block h-full"
+        >
           {cardContent}
         </Link>
       );

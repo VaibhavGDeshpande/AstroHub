@@ -1,13 +1,13 @@
 'use client'
 
 import React, { useEffect, useRef, useState } from 'react'
-import ReactMarkdown from 'react-markdown'
 import { FaSun } from 'react-icons/fa'
 import { MessageCircleIcon } from 'lucide-react'
 import { IoClose } from 'react-icons/io5'
 import { useNightMode } from './Hooks/useNightMode'
 
 type ChatMessage = { sender: 'user' | 'bot'; text: string; ts: number }
+type MarkdownComponent = (typeof import('react-markdown'))['default']
 
 const STORAGE_KEY = 'astrobot_session_messages_v1'
 
@@ -18,6 +18,7 @@ export default function AstroBot() {
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
   const nightMode = useNightMode()
+  const [MarkdownRenderer, setMarkdownRenderer] = useState<MarkdownComponent | null>(null)
 
   const launcherPalette = nightMode
     ? 'bg-red-900/80 border border-red-500/40 shadow-[0_0_15px_rgba(255,0,0,0.45)] text-red-100'
@@ -154,6 +155,25 @@ export default function AstroBot() {
     }
   }
 
+  useEffect(() => {
+    if (!open || MarkdownRenderer) return
+    let mounted = true
+    import('react-markdown')
+      .then(mod => {
+        if (mounted) {
+          setMarkdownRenderer(() => mod.default)
+        }
+      })
+      .catch(err => {
+        if (process.env.NODE_ENV !== 'production') {
+          console.error('Failed to load Markdown renderer', err)
+        }
+      })
+    return () => {
+      mounted = false
+    }
+  }, [open, MarkdownRenderer])
+
   return (
     <>
       {/* Floating launcher (bottom-right, lowest position) */}
@@ -201,19 +221,23 @@ export default function AstroBot() {
               <div key={m.ts + '_' + i} className={`flex ${m.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
                 <div className={`max-w-[80%] rounded-2xl px-3 py-2 ${m.sender === 'user' ? userBubbleClass : botBubbleClass}`}>
                   {m.sender === 'bot' ? (
-                    <ReactMarkdown
-                      components={{
-                        p: ({ children }) => <p className="leading-relaxed mb-2 last:mb-0">{children}</p>,
-                        strong: ({ children }) => <strong className={accentStrongClass}>{children}</strong>,
-                        ul: ({ children }) => <ul className="list-disc ml-5 space-y-1">{children}</ul>,
-                        li: ({ children }) => <li>{children}</li>,
-                        h1: ({ children }) => <h1 className="text-lg font-semibold mb-1">{children}</h1>,
-                        h2: ({ children }) => <h2 className="text-base font-semibold mb-1">{children}</h2>,
-                        code: ({ children }) => <code className={codeBlockClass}>{children}</code>,
-                      }}
-                    >
-                      {m.text}
-                    </ReactMarkdown>
+                    MarkdownRenderer ? (
+                      <MarkdownRenderer
+                        components={{
+                          p: ({ children }) => <p className="leading-relaxed mb-2 last:mb-0">{children}</p>,
+                          strong: ({ children }) => <strong className={accentStrongClass}>{children}</strong>,
+                          ul: ({ children }) => <ul className="list-disc ml-5 space-y-1">{children}</ul>,
+                          li: ({ children }) => <li>{children}</li>,
+                          h1: ({ children }) => <h1 className="text-lg font-semibold mb-1">{children}</h1>,
+                          h2: ({ children }) => <h2 className="text-base font-semibold mb-1">{children}</h2>,
+                          code: ({ children }) => <code className={codeBlockClass}>{children}</code>,
+                        }}
+                      >
+                        {m.text}
+                      </MarkdownRenderer>
+                    ) : (
+                      <span className="leading-relaxed mb-2 last:mb-0 whitespace-pre-wrap">{m.text}</span>
+                    )
                   ) : (
                     <span className="whitespace-pre-wrap">{m.text}</span>
                   )}

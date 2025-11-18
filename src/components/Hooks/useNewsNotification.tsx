@@ -5,6 +5,11 @@ import { toast } from 'react-toastify';
 import { Newspaper } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
+type IdleWindow = Window &
+  typeof globalThis & {
+    requestIdleCallback?: (cb: IdleRequestCallback, options?: IdleRequestOptions) => number;
+    cancelIdleCallback?: (handle: number) => void;
+  };
 
 export const useNewsNotification = () => {
   const router = useRouter();
@@ -85,8 +90,40 @@ export const useNewsNotification = () => {
       }
     };
 
-    checkForNewNews();
-    const interval = setInterval(checkForNewNews, 600000); 
-    return () => clearInterval(interval);
+    let pollInterval: ReturnType<typeof setInterval> | null = null;
+    let idleHandle: number | null = null;
+    let timeoutHandle: ReturnType<typeof setTimeout> | null = null;
+    let started = false;
+
+    const startPolling = () => {
+      if (started) return;
+      started = true;
+      checkForNewNews();
+      pollInterval = setInterval(checkForNewNews, 600000);
+    };
+
+    if (typeof window !== 'undefined') {
+      const win = window as IdleWindow;
+      if (typeof win.requestIdleCallback === 'function') {
+        idleHandle = win.requestIdleCallback(startPolling, { timeout: 2000 });
+      } else {
+        timeoutHandle = setTimeout(startPolling, 1500);
+      }
+    }
+
+    return () => {
+      if (pollInterval) {
+        clearInterval(pollInterval);
+      }
+      if (timeoutHandle) {
+        clearTimeout(timeoutHandle);
+      }
+      if (idleHandle !== null && typeof window !== 'undefined') {
+        const win = window as IdleWindow;
+        if (typeof win.cancelIdleCallback === 'function') {
+          win.cancelIdleCallback(idleHandle);
+        }
+      }
+    };
   }, [router]);
 };

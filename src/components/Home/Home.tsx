@@ -6,7 +6,6 @@ import HeroSection from '@/components/Home/HeroSection';
 import Cards from '@/components/Cards';
 import FactsSection from '../Facts/FactsSection';
 import { toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 import { Maximize2 } from 'lucide-react';
 import Footer from './Footer';
 

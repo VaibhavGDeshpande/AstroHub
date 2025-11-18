@@ -37,7 +37,8 @@ const Footer = () => {
       title: 'Sky Tools',
       items: [
         { name: 'Stellarium Sky Map', path: '/stellarium' },
-        { name: 'Sky Charts', path: '/sky-charts' }
+        { name: 'Sky Charts', path: '/sky-charts' },
+        { name: 'Satellite Tracker', path: '/satellite-tracker' }
       ]
     },
     {
