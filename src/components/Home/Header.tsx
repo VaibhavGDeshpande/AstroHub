@@ -176,7 +176,7 @@ const Header = () => {
     return (
       <div className="flex items-center" style={{ minHeight: '48px' }}>
         <img
-          src="/assets/AstroHub.png"
+          src="/assets/AstroHub.avif"
           alt="AstroHub Logo"
           className={`mt-4 logo-transition ${isCompact
             ? 'w-[90px] sm:w-[100px] md:w-[110px] lg:w-[120px]'

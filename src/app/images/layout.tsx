@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 		siteName: 'AstroHub',
 		images: [
 			{
-				url: '/assets/Astrohub.png',
+				url: '/assets/AstroHub.avif',
 				width: 1200,
 				height: 630,
 				alt: 'NASA Images & Videos',

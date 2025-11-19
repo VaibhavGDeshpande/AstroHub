@@ -42,7 +42,7 @@ body {
   .cesium-animation-buttonGlow {
   display: block;
   fill: #fff;
-  /* keep the built-in blur and add extra glow layers */
+
   filter: url(#animation_blurred) drop-shadow(0 0 3px #aef)
     drop-shadow(0 0 3px #fff);
   animation: highlight-animation-button 1.2s ease-in-out infinite;
@@ -158,15 +158,6 @@ html.night #night-overlay {
 html.astrobot-open #astronomy-widget-trigger,
 html.astrobot-open #astronomy-widget-modal {
   display: none !important;
-}
-
-.modal-scrollable {
--webkit-overflow-scrolling: touch;
-}
-
-.custom-satellite-icon {
-  background: transparent;
-  border: none;
 }
 
 .leaflet-popup-content-wrapper {
