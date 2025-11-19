@@ -24,13 +24,13 @@ export const metadata: Metadata = {
   icons: {
     icon: [
       {
-        url: "/assets/AstroHub.png",
-        type: "image/png",
+        url: "/assets/AstroHub.avif",
+        type: "image/avif",
         sizes: "16x16",
       },
     ],
-    shortcut: "/assets/AstroHub.png",
-    apple: "/assets/AstroHub.png",
+    shortcut: "/assets/Astrohub.avif",
+    apple: "/assets/AstroHub.avif",
   },
   description: "Explore the cosmos with NASA's public APIs including Astronomy Picture of the Day (APOD), Earth Polychromatic Imaging Camera (EPIC), and more stunning space imagery and data.",
   keywords: [
@@ -60,7 +60,7 @@ export const metadata: Metadata = {
     description: "Explore the cosmos with NASA's public APIs including APOD, EPIC, and more stunning space imagery and data.",
     images: [
       {
-        url: "/assets/AstroHub.png",
+        url: "/assets/AstroHub.avif",
         width: 1200,
         height: 630,
         alt: "AstroHub - Astronomy Hub for Astrophiles and young astronomers",
@@ -71,7 +71,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "AstroHub - Astronomy Hub for Astrophiles and young astronomers",
     description: "Explore the cosmos with NASA's public APIs including APOD, EPIC, and more stunning space imagery and data.",
-    images: ["/assets/AstroHub.png"],
+    images: ["/assets/AstroHub.avif"],
     // creator: "@yourtwitterhandle", // Commented out until you have a real handle
   },
   robots: {

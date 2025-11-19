@@ -118,7 +118,7 @@ const Footer = () => {
           <div className="md:col-span-2 lg:col-span-3 space-y-4 sm:space-y-6">
             <a href="#" className="inline-block hover:scale-105 transition-transform duration-300">
               <img
-                src="/assets/AstroHub.png"
+                src="/assets/AstroHub.avif"
                 alt="AstroHub Logo"
                 width={140}
                 height={90}

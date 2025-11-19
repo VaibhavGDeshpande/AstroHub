@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     type: 'website',
     images: [
       {
-        url: '/assets/AstroHub.png',
+        url: '/assets/AstroHub.avif',
         width: 1200,
         height: 630,
         alt: 'Solar System Explorer Preview'
