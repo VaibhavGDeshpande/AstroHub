@@ -68,7 +68,7 @@ export default function TermsConditionsPage() {
               <li><strong className="text-white">Service</strong> refers to the AstroHub Website.</li>
               <li><strong className="text-white">Terms and Conditions</strong> (also referred as &quot;Terms&quot;) mean these Terms and Conditions that form the entire agreement between You and the Company regarding the use of the Service.</li>
               <li><strong className="text-white">Third-party Social Media Service</strong> means any services or content (including data, information, products or services) provided by a third-party that may be displayed, included or made available by the Service.</li>
-              <li><strong className="text-white">Website</strong> refers to AstroHub, accessible from <a href="https://astrohub-live.vercel.app/" className="text-cyan-400 hover:text-cyan-300 underline" target="_blank" rel="noopener noreferrer">https://astrohub-live.vercel.app/</a></li>
+              <li><strong className="text-white">Website</strong> refers to AstroHub, accessible from <a href="https://astrohub.live/" className="text-cyan-400 hover:text-cyan-300 underline" target="_blank" rel="noopener noreferrer">https://astrohub.live/</a></li>
               <li><strong className="text-white">You</strong> means the individual accessing or using the Service, or the company, or other legal entity on behalf of which such individual is accessing or using the Service, as applicable.</li>
             </ul>
           </section>

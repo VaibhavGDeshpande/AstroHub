@@ -10,7 +10,7 @@ export const metadata: Metadata = {
     title: 'NASA EPIC | Daily Earth Images',
     description:
       "Explore daily Earth images captured by NASA's DSCOVR EPIC camera at the L1 Lagrange point.",
-    url: 'https://astrohub-live.vercel.app/epic',
+    url: 'https://astrohub.live/epic',
     siteName: 'NASA EPIC Explorer',
     images: [
       {

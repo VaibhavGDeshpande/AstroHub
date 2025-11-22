@@ -47,14 +47,14 @@ export const metadata: Metadata = {
     address: false,
     telephone: false,
   },
-  metadataBase: new URL("https://astrohub-live.vercel.app"),
+  metadataBase: new URL("https://astrohub.live"),
   alternates: {
     canonical: "/",
   },
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://astrohub-live.vercel.app",
+    url: "https://astrohub.live",
     siteName: "AstroHub", // Fixed typo: was "AstoHub"
     title: "AstroHub - Astronomy Hub for Astrophiles and Amateur Astronomers",
     description: "Explore the cosmos with NASA's public APIs including APOD, EPIC, and more stunning space imagery and data.",
