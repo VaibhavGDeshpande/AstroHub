@@ -1,5 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  output: 'standalone',
   images: {
     remotePatterns: [
       {
@@ -7,7 +8,7 @@ const nextConfig = {
         hostname: 'apod.nasa.gov',
       },
       {
-        protocol: 'https', 
+        protocol: 'https',
         hostname: 'www.nasa.gov',
       },
       {
