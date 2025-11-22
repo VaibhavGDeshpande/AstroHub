@@ -7,6 +7,6 @@ export default function robots(): MetadataRoute.Robots {
       allow: '/',     
       disallow: [],   
     },
-    sitemap: 'https://astrohub-live.vercel.app/sitemap.xml', 
+    sitemap: 'https://astrohub.live/sitemap.xml', 
   }
 }
