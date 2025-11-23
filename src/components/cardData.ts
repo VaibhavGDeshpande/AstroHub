@@ -46,17 +46,17 @@ export const cardSections: CardSection[] = [
     titleGradient: 'from-yellow-400 via-red-500 to-yellow-500',
     subtitle: 'Real-time access to NASA\'s comprehensive space data APIs',
     cards: [
-      {
-        title: 'Astronomy Picture of the Day',
-        description: 'Discover a new astronomy picture each day with detailed explanations from professional astronomers.',
-        icon: Star,
-        color: 'from-purple-500 to-pink-500',
-        path: '/', //apod
-        features: ['Daily updates', 'HD images', 'Expert explanations'],
-        glow: 'purple',
-        ctaText: 'Explore Data',
-        status:'closed'
-      },
+      // {
+      //   title: 'Astronomy Picture of the Day',
+      //   description: 'Discover a new astronomy picture each day with detailed explanations from professional astronomers.',
+      //   icon: Star,
+      //   color: 'from-purple-500 to-pink-500',
+      //   path: '/', //apod
+      //   features: ['Daily updates', 'HD images', 'Expert explanations'],
+      //   glow: 'purple',
+      //   ctaText: 'Explore Data',
+      //   status:'closed'
+      // },
       // {
       //   title: 'Mars Rover Photos',
       //   description: 'Explore Mars through the eyes of NASA rovers including Curiosity, Opportunity, and Spirit.',
@@ -139,17 +139,17 @@ export const cardSections: CardSection[] = [
     titleGradient: 'from-green-400 to-blue-500',
     subtitle: 'Immersive 3D experiences of celestial bodies',
     cards: [
-      {
-        title: 'Solar System Explorer',
-        description: 'Navigate through our solar system with all planets, moons, and celestial bodies in real-time 3D visualization.',
-        icon: Sparkles,
-        color: 'from-orange-500 via-yellow-500 to-purple-500',
-        path: '/', //solar-system
-        features: ['All 8 planets', 'Orbital mechanics', 'Interactive navigation', 'Scale accuracy'],
-        glow: 'orange',
-        ctaText: 'Explore System',
-        status:'closed'
-      },
+      // {
+      //   title: 'Solar System Explorer',
+      //   description: 'Navigate through our solar system with all planets, moons, and celestial bodies in real-time 3D visualization.',
+      //   icon: Sparkles,
+      //   color: 'from-orange-500 via-yellow-500 to-purple-500',
+      //   path: '/', //solar-system
+      //   features: ['All 8 planets', 'Orbital mechanics', 'Interactive navigation', 'Scale accuracy'],
+      //   glow: 'orange',
+      //   ctaText: 'Explore System',
+      //   status:'closed'
+      // },
       {
         title: '3D View of Earth',
         description: 'Experience our planet in stunning 3D with interactive controls, atmospheric effects, and real-time lighting.',
@@ -296,17 +296,17 @@ export const cardSections: CardSection[] = [
     titleGradient: 'from-blue-400 to-purple-500',
     subtitle: 'Atmospheric intelligence and local observation planning',
     cards: [
-      {
-        title: 'Weather Dashboard',
-        description: 'Plan your observing sessions with live conditions, 10-day outlooks, and hourly windows.',
-        icon: Cloud,
-        color: 'from-blue-500 to-purple-500',
-        path: '/weather',
-        features: ['Live metrics', '10-day forecast', 'Hourly insights'],
-        glow: 'blue',
-        ctaText: 'Open Dashboard',
-        status: 'closed'
-      },
+      // {
+      //   title: 'Weather Dashboard',
+      //   description: 'Plan your observing sessions with live conditions, 10-day outlooks, and hourly windows.',
+      //   icon: Cloud,
+      //   color: 'from-blue-500 to-purple-500',
+      //   path: '/weather',
+      //   features: ['Live metrics', '10-day forecast', 'Hourly insights'],
+      //   glow: 'blue',
+      //   ctaText: 'Open Dashboard',
+      //   status: 'closed'
+      // },
       {
         title: 'Light Pollution Map',
         description: 'Explore global light pollution data to find the darkest skies for astrophotography.',

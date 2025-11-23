@@ -47,7 +47,7 @@ export default function ErrorMessage({ error, onRetry }: ErrorMessageProps) {
           </svg>
         </div>
         <h2 className="text-xl sm:text-2xl font-bold text-red-400 mb-2">
-          Houston, we have a problem!
+          We have a problem!
         </h2>
         <p className="text-slate-300 mb-4 sm:mb-6 text-sm sm:text-base">
           {error}

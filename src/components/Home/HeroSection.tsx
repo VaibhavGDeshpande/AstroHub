@@ -23,7 +23,7 @@ const HeroSection = () => {
 
     const video = videoRef.current;
     if (!video) return;
-    
+
     const handlePlayError = (error: unknown) => {
       console.log('Autoplay prevented:', error);
     };
@@ -54,7 +54,7 @@ const HeroSection = () => {
         >
           {/* Only loading Earth now. The browser will no longer download Mars. */}
           <source src="/assets/earth.mp4" type="video/mp4" />
-          
+
           Your browser does not support the video tag.
         </video>
         <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/60 to-black/30" />
@@ -65,14 +65,12 @@ const HeroSection = () => {
         <div className="max-w-4xl">
           <div className="space-y-4 sm:space-y-6">
             <h1
-              className={`text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-bold mb-4 sm:mb-6 transition-all duration-1000 ease-out ${
-                isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'
-              }`}
+              className={`text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-bold mb-4 sm:mb-6 transition-all duration-1000 ease-out ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'
+                }`}
             >
               <span
-                className={`block text-white ${orbitron.className} astro-hub-text transition-all duration-1000 ease-out ${
-                  isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-8'
-                }`}
+                className={`block text-white ${orbitron.className} astro-hub-text transition-all duration-1000 ease-out ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-8'
+                  }`}
                 style={{ transitionDelay: '200ms' }}
               >
                 AstroHub
@@ -80,9 +78,8 @@ const HeroSection = () => {
             </h1>
 
             <div
-              className={`space-y-2 sm:space-y-3 ml-2 sm:ml-4 transition-all duration-1000 ease-out ${
-                isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-              }`}
+              className={`space-y-2 sm:space-y-3 ml-2 sm:ml-4 transition-all duration-1000 ease-out ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+                }`}
               style={{ transitionDelay: '600ms' }}
             >
               <p
@@ -91,10 +88,7 @@ const HeroSection = () => {
                 Your gateway to the cosmos
               </p>
               <p
-                className={`text-sm sm:text-base lg:text-lg text-slate-300 leading-relaxed max-w-2xl ${inter.className} description-text transition-all duration-1000 ease-out ${
-                  isVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
-                }`}
-                style={{ transitionDelay: '800ms' }}
+                className={`text-sm sm:text-base lg:text-lg text-slate-300 leading-relaxed max-w-2xl ${inter.className} description-text`}
               >
                 Explore the universe with astronomical tools, NASA imagery,
                 and interactive sky maps. Discover cosmic phenomena from your
@@ -104,9 +98,8 @@ const HeroSection = () => {
 
             {/* Key Features Tags */}
             <div
-              className={`flex flex-wrap gap-2 mt-4 sm:mt-6 ml-2 sm:ml-4 transition-all duration-1000 ease-out ${
-                isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-              }`}
+              className={`flex flex-wrap gap-2 mt-4 sm:mt-6 ml-2 sm:ml-4 transition-all duration-1000 ease-out ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+                }`}
               style={{ transitionDelay: '1000ms' }}
             >
               <span className="px-2.5 sm:px-3 py-1 sm:py-1.5 bg-blue-500/20 text-blue-300 rounded-full text-xs font-medium backdrop-blur-sm border border-blue-400/30 hover:bg-blue-500/30 transition-colors duration-300">
