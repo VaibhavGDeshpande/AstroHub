@@ -4,7 +4,7 @@ import React, { useEffect } from 'react';
 import EarthEmbed from '@/components/Nasa-eyes/Earth/Earth';
 import LoaderWrapper from '@/components/Loader';
 import { toast } from 'react-toastify';
-import ToastProvider from '@/components/Toast';
+// import ToastProvider from '@/components/Toast';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { ArrowLeftIcon } from '@heroicons/react/24/outline';
@@ -22,7 +22,7 @@ export default function SolarSystemPage() {
   }, []);
 
   return (
-    <ToastProvider>
+    // <ToastProvider>
       <LoaderWrapper>
         {/* Header with Navigation only */}
         <div className="fixed top-4 left-4 z-50 hidden md:block">
@@ -48,6 +48,6 @@ export default function SolarSystemPage() {
           }}
         />
       </LoaderWrapper>
-    </ToastProvider>
+    // </ToastProvider>
   );
 }

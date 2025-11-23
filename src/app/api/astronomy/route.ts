@@ -7,7 +7,7 @@ export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
     const location = searchParams.get('location') || '';
-    const date = searchParams.get('date') || undefined; // optional: YYYY-MM-DD
+    const date = searchParams.get('date') || undefined; 
 
     if (!location) {
       return NextResponse.json(
