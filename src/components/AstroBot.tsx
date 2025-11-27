@@ -128,7 +128,7 @@ export default function AstroBot() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          model: 'openrouter/sherlock-dash-alpha',
+          model: 'google/gemini-2.0-flash-exp:free',
           prompt,
           temperature: 0.4,
         }),
