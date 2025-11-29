@@ -113,7 +113,8 @@ const Header = () => {
       id: 'earth-tools',
       title: 'Earth Tools',
       items: [
-        { name: 'Light Pollution Map', path: '/light-pollution' }
+        { name: 'Light Pollution Map', path: '/light-pollution' },
+        { name: 'Weather Dashboard', path: '/weather' }
       ]
     }
   ];

@@ -68,7 +68,7 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     const {
-      model = 'openrouter/sherlock-dash-alpha',
+      model = 'google/gemini-2.0-flash-exp:free',
       prompt,
       systemPrompt = DEFAULT_SYSTEM_PROMPT,
       temperature = 0.5,

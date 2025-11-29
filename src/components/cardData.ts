@@ -296,17 +296,17 @@ export const cardSections: CardSection[] = [
     titleGradient: 'from-blue-400 to-purple-500',
     subtitle: 'Atmospheric intelligence and local observation planning',
     cards: [
-      // {
-      //   title: 'Weather Dashboard',
-      //   description: 'Plan your observing sessions with live conditions, 10-day outlooks, and hourly windows.',
-      //   icon: Cloud,
-      //   color: 'from-blue-500 to-purple-500',
-      //   path: '/weather',
-      //   features: ['Live metrics', '10-day forecast', 'Hourly insights'],
-      //   glow: 'blue',
-      //   ctaText: 'Open Dashboard',
-      //   status: 'closed'
-      // },
+      {
+        title: 'Weather Dashboard',
+        description: 'Plan observing sessions with live conditions, AQI, and forecasts.',
+        icon: Cloud,
+        color: 'from-blue-500 to-purple-500',
+        path: '/weather',
+        features: ['Live metrics', 'AQI + forecast', 'Rain chance chart'],
+        glow: 'blue',
+        ctaText: 'Open Dashboard',
+        status: 'Live'
+      },
       {
         title: 'Light Pollution Map',
         description: 'Explore global light pollution data to find the darkest skies for astrophotography.',
