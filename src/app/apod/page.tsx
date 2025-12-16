@@ -215,12 +215,3 @@ export default function APODPage() {
     </LoaderWrapper>
   );
 }
-// import React from 'react'
-
-// // function page() {
-// //   return (
-// //     <div>APOD</div>
-// //   )
-// // }
-
-// // export default page
