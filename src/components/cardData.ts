@@ -46,17 +46,17 @@ export const cardSections: CardSection[] = [
     titleGradient: 'from-yellow-400 via-red-500 to-yellow-500',
     subtitle: 'Real-time access to NASA\'s comprehensive space data APIs',
     cards: [
-      // {
-      //   title: 'Astronomy Picture of the Day',
-      //   description: 'Discover a new astronomy picture each day with detailed explanations from professional astronomers.',
-      //   icon: Star,
-      //   color: 'from-purple-500 to-pink-500',
-      //   path: '/', //apod
-      //   features: ['Daily updates', 'HD images', 'Expert explanations'],
-      //   glow: 'purple',
-      //   ctaText: 'Explore Data',
-      //   status:'closed'
-      // },
+      {
+        title: 'Astronomy Picture of the Day',
+        description: 'Discover a new astronomy picture each day with detailed explanations from professional astronomers.',
+        icon: Star,
+        color: 'from-purple-500 to-pink-500',
+        path: '/', //apod
+        features: ['Daily updates', 'HD images', 'Expert explanations'],
+        glow: 'purple',
+        ctaText: 'Explore Data',
+        status:'Live'
+      },
       // {
       //   title: 'Mars Rover Photos',
       //   description: 'Explore Mars through the eyes of NASA rovers including Curiosity, Opportunity, and Spirit.',

@@ -72,7 +72,8 @@ const Header = () => {
         { name: 'Near Earth Objects', path: '/neo' },
         { name: 'EPIC Earth Images', path: '/epic' },
         { name: 'NASA Image Library', path: '/images' },
-        { name: 'NASA Eyes', path: '/nasa-eyes' }
+        { name: 'NASA Eyes', path: '/nasa-eyes' },
+        { name: 'Astronomy Picture of the Day', path: '/apod' }
       ]
     },
     {
