@@ -224,6 +224,17 @@ export const cardSections: CardSection[] = [
         glow: 'cyan',
         ctaText: 'Track Now',
         status:"Live"
+      },
+      {
+        title: 'Messier Catalog',
+        description: 'Tour the classic 110 deep-sky showpieces with images, brightness, and finder data.',
+        icon: Sparkles,
+        color: 'from-indigo-500 to-pink-500',
+        path: '/messier',
+        features: ['Filter by season/type', 'Magnitude & distance', 'Observing difficulty'],
+        glow: 'purple',
+        ctaText: 'View Catalog',
+        status: 'Live'
       }
     ]
   },
