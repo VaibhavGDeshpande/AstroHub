@@ -31,6 +31,7 @@ const routes: RouteConfig[] = [
   { path: "/telescope-calculator", priority: 0.7, changeFrequency: "monthly" },
   { path: "/exposure-calculator", priority: 0.7, changeFrequency: "monthly" },
   { path: "/light-pollution", priority: 0.7, changeFrequency: "monthly" },
+  { path: "/messier", priority: 0.7, changeFrequency: "monthly" },
   { path: "/images", priority: 0.6, changeFrequency: "weekly" },
   { path: "/space-quiz", priority: 0.6, changeFrequency: "weekly" },
 

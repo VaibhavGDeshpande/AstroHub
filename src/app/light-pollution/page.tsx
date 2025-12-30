@@ -5,6 +5,12 @@ import { motion } from "framer-motion";
 import BortleComprehensiveTable from "@/components/LightPollution/BortleComprehensiveTable";
 import BortleScaleChart from "@/components/LightPollution/BortleScaleChart";
 import LightPollutionMap from "@/components/LightPollution/LightPollutionMap";
+import LoaderWrapper from "@/components/Loader";
+import Link from "next/link";
+import {
+  ArrowLeftIcon,
+  HomeIcon,
+} from "@heroicons/react/24/outline";
 
 const quickStats = [
   { label: "Best Viewing", value: "Class 1-3", icon: "🌟" },
@@ -38,6 +44,23 @@ export default function LightPollutionRedesign() {
   const [activeTab, setActiveTab] = useState("scale");
 
   return (
+    <LoaderWrapper>
+      <div className="fixed top-4 left-4 z-50 hidden md:block">
+          {/* Back Button */}
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+          >
+            <Link
+              href="/"
+              className="flex items-center gap-2 px-3 py-2 rounded-lg bg-slate-800/50 hover:bg-slate-700/50 border border-slate-600/40 backdrop-blur-sm transition duration-300"
+            >
+              <ArrowLeftIcon className="h-4 w-4" />
+              <HomeIcon className="h-4 w-4 hidden sm:block" />
+              <span className="text-sm">Back</span>
+            </Link>
+          </motion.div> 
+        </div>
     <div className="min-h-screen bg-gradient-to-br from-slate-950 text-white overflow-x-hidden">
       <header className="relative z-10 pt-8 pb-12 px-4">
         <motion.div
@@ -145,5 +168,6 @@ export default function LightPollutionRedesign() {
         </motion.section>
       </div>
     </div>
+    </LoaderWrapper>
   );
 }
