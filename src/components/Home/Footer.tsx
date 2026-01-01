@@ -6,6 +6,7 @@ const Footer = () => {
   const quickLinks = [
     { name: 'Home', path: '/' },
     { name: 'About', path: '/about' },
+    { name: 'Resources', path: '/resources' },
     { name: 'Privacy Policy', path: '/privacy-policy' },
     { name: 'Terms of Service', path: '/terms-and-conditions' },
   ];
@@ -98,9 +99,9 @@ const Footer = () => {
     },
   ];
 
-  const resources = [
-    { name: 'NASA API', url: 'https://api.nasa.gov' },
-  ];
+  // const resources = [
+  //   { name: 'NASA API', url: 'https://api.nasa.gov' },
+  // ];
 
   const EnvelopeIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
     <svg {...props} fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -239,13 +240,12 @@ const Footer = () => {
                   ))}
                 </ul>
               </div>
-
-              {/* Resources */}
+{/* 
               <div className="min-w-0">
                 <h3 className="text-white font-semibold mb-3 sm:mb-4 text-xs sm:text-sm uppercase tracking-wider">
                   Resources
                 </h3>
-                <ul className="space-y-2 sm:space-y-2.5">
+                {/* <ul className="space-y-2 sm:space-y-2.5">
                   {resources.map((resource, index) => (
                     <li key={index}>
                       <a
@@ -261,8 +261,8 @@ const Footer = () => {
                       </a>
                     </li>
                   ))}
-                </ul>
-              </div>
+                </ul> 
+              </div> */}
             </div>
           </div>
         </div>

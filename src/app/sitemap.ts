@@ -48,6 +48,7 @@ const routes: RouteConfig[] = [
   // --- 4. STATIC INFO & LEGAL (Rare Updates) ---
   { path: "/about", priority: 0.5, changeFrequency: "yearly" },
   { path: "/contact-us", priority: 0.5, changeFrequency: "yearly" },
+  { path: "/resources", priority: 0.4, changeFrequency: "yearly" },
   { path: "/privacy-policy", priority: 0.3, changeFrequency: "yearly" },
   { path: "/terms-and-conditions", priority: 0.3, changeFrequency: "yearly" },
 ];

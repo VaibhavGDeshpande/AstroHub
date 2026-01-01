@@ -19,7 +19,7 @@ export default function PrivacyPolicyPage() {
             </span>
           </h1>
           <p className="text-gray-400 text-sm">
-            Last updated: October 17, 2025
+            Last updated: January 1, 2026
           </p>
         </div>
         
@@ -45,10 +45,12 @@ export default function PrivacyPolicyPage() {
           {/* Introduction */}
           <section>
             <p className="leading-relaxed">
-              This Privacy Policy describes Our policies and procedures on the collection, use and disclosure of Your information when You use the AstroHub Service and tells You about Your privacy rights and how the law protects You.
+              This Privacy Policy describes how AstroHub collects, uses, and shares information when you use our tools,
+              visualizations, data feeds, and contact features.
             </p>
             <p className="leading-relaxed mt-4">
-              We use Your Personal data to provide and improve the AstroHub Service. By using the Service, You agree to the collection and use of information in accordance with this Privacy Policy.
+              We use your information to provide and improve the Service. By using the Service, you agree to the
+              collection and use of information in accordance with this Privacy Policy.
             </p>
           </section>
 
@@ -64,7 +66,6 @@ export default function PrivacyPolicyPage() {
             <h3 className="text-xl font-semibold text-white mb-3">Definitions</h3>
             <p className="leading-relaxed mb-3">For the purposes of this Privacy Policy:</p>
             <ul className="list-disc list-inside space-y-2 ml-4">
-              <li><strong className="text-white">Account</strong> means a unique account created for You to access our Service or parts of our Service.</li>
               <li><strong className="text-white">Affiliate</strong> means an entity that controls, is controlled by, or is under common control with a party, where &quot;control&quot; means ownership of 50% or more of the shares, equity interest or other securities entitled to vote for election of directors or other managing authority.</li>
               <li><strong className="text-white">Company</strong> (referred to as either &quot;the Company&quot;, &quot;We&quot;, &quot;Us&quot; or &quot;Our&quot; in this Agreement) refers to AstroHub.</li>
               <li><strong className="text-white">Cookies</strong> are small files that are placed on Your computer, mobile device or any other device by a website, containing the details of Your browsing history on that website among its many uses.</li>
@@ -87,13 +88,11 @@ export default function PrivacyPolicyPage() {
             
             <div className="space-y-6">
               <div>
-                <h4 className="text-lg font-semibold text-white mb-2">Personal Data</h4>
+                <h4 className="text-lg font-semibold text-white mb-2">Information You Provide</h4>
                 <p className="leading-relaxed mb-2">
-                  While using Our Service, We may ask You to provide Us with certain personally identifiable information that can be used to contact or identify You. Personally identifiable information may include, but is not limited to:
+                  When you contact us, we collect the information you submit (such as name, email, subject, and message).
+                  We use this information to respond to your request.
                 </p>
-                <ul className="list-disc list-inside space-y-1 ml-4">
-                  <li>Usage Data</li>
-                </ul>
               </div>
 
               <div>
@@ -125,28 +124,9 @@ export default function PrivacyPolicyPage() {
                   Cookies can be &quot;Persistent&quot; or &quot;Session&quot; Cookies. Persistent Cookies remain on Your personal computer or mobile device when You go offline, while Session Cookies are deleted as soon as You close Your web browser.
                 </p>
                 <p className="leading-relaxed mb-3">
-                  We use both Session and Persistent Cookies for the purposes set out below:
+                  We use both Session and Persistent Cookies for analytics, performance monitoring, and basic functionality.
+                  This may include Google Analytics and Vercel Analytics/Speed Insights.
                 </p>
-                <ul className="list-disc list-inside space-y-3 ml-4">
-                  <li>
-                    <strong className="text-white">Necessary / Essential Cookies</strong>
-                    <p className="ml-6 mt-1 text-sm">Type: Session Cookies</p>
-                    <p className="ml-6 text-sm">Administered by: Us</p>
-                    <p className="ml-6 text-sm">Purpose: These Cookies are essential to provide You with services available through the AstroHub Website and to enable You to use some of its features. They help to authenticate users and prevent fraudulent use of user accounts. Without these Cookies, the services that You have asked for cannot be provided, and We only use these Cookies to provide You with those services.</p>
-                  </li>
-                  <li>
-                    <strong className="text-white">Cookies Policy / Notice Acceptance Cookies</strong>
-                    <p className="ml-6 mt-1 text-sm">Type: Persistent Cookies</p>
-                    <p className="ml-6 text-sm">Administered by: Us</p>
-                    <p className="ml-6 text-sm">Purpose: These Cookies identify if users have accepted the use of cookies on the AstroHub Website.</p>
-                  </li>
-                  <li>
-                    <strong className="text-white">Functionality Cookies</strong>
-                    <p className="ml-6 mt-1 text-sm">Type: Persistent Cookies</p>
-                    <p className="ml-6 text-sm">Administered by: Us</p>
-                    <p className="ml-6 text-sm">Purpose: These Cookies allow us to remember choices You make when You use the AstroHub Website, such as remembering your login details or language preference. The purpose of these Cookies is to provide You with a more personal experience and to avoid You having to re-enter your preferences every time You use the Website.</p>
-                  </li>
-                </ul>
               </div>
             </div>
           </section>
@@ -157,10 +137,9 @@ export default function PrivacyPolicyPage() {
             <p className="leading-relaxed mb-3">The Company may use Personal Data for the following purposes:</p>
             <ul className="list-disc list-inside space-y-2 ml-4">
               <li><strong className="text-white">To provide and maintain our Service</strong>, including to monitor the usage of our Service.</li>
-              <li><strong className="text-white">To manage Your Account:</strong> to manage Your registration as a user of the Service. The Personal Data You provide can give You access to different functionalities of the Service that are available to You as a registered user.</li>
-              <li><strong className="text-white">For the performance of a contract:</strong> the development, compliance and undertaking of the purchase contract for the products, items or services You have purchased or of any other contract with Us through the Service.</li>
+              <li><strong className="text-white">To deliver requested features:</strong> to provide tools, maps, charts, and personalized data outputs you ask for.</li>
               <li><strong className="text-white">To contact You:</strong> To contact You by email, telephone calls, SMS, or other equivalent forms of electronic communication, such as a mobile application&apos;s push notifications regarding updates or informative communications related to the functionalities, products or contracted services, including the security updates, when necessary or reasonable for their implementation.</li>
-              <li><strong className="text-white">To provide You</strong> with news, special offers, and general information about other goods, services and events which We offer that are similar to those that you have already purchased or inquired about unless You have opted not to receive such information.</li>
+              <li><strong className="text-white">To provide You</strong> with updates about the Service when you opt in or request them.</li>
               <li><strong className="text-white">To manage Your requests:</strong> To attend and manage Your requests to Us.</li>
               <li><strong className="text-white">For business transfers:</strong> We may use Your information to evaluate or conduct a merger, divestiture, restructuring, reorganization, dissolution, or other sale or transfer of some or all of Our assets, whether as a going concern or as part of bankruptcy, liquidation, or similar proceeding, in which Personal Data held by Us about our Service users is among the assets transferred.</li>
               <li><strong className="text-white">For other purposes</strong>: We may use Your information for other purposes, such as data analysis, identifying usage trends, determining the effectiveness of our promotional campaigns and to evaluate and improve our Service, products, services, marketing and your experience.</li>
@@ -172,9 +151,22 @@ export default function PrivacyPolicyPage() {
               <li><strong className="text-white">For business transfers:</strong> We may share or transfer Your personal information in connection with, or during negotiations of, any merger, sale of Company assets, financing, or acquisition of all or a portion of Our business to another company.</li>
               <li><strong className="text-white">With Affiliates:</strong> We may share Your information with Our affiliates, in which case we will require those affiliates to honor this Privacy Policy. Affiliates include Our parent company and any other subsidiaries, joint venture partners or other companies that We control or that are under common control with Us.</li>
               <li><strong className="text-white">With business partners:</strong> We may share Your information with Our business partners to offer You certain products, services or promotions.</li>
-              <li><strong className="text-white">With other users:</strong> when You share personal information or otherwise interact in the public areas with other users, such information may be viewed by all users and may be publicly distributed outside.</li>
               <li><strong className="text-white">With Your consent</strong>: We may disclose Your personal information for any other purpose with Your consent.</li>
             </ul>
+          </section>
+
+          {/* Third-Party Services */}
+          <section>
+            <h3 className="text-xl font-semibold text-white mb-3">Third-Party Services and APIs</h3>
+            <p className="leading-relaxed mb-4">
+              AstroHub uses third-party services to power data feeds, maps, analytics, and contact forms. When you use
+              these features, your IP address, query parameters, or location inputs may be shared with those providers.
+            </p>
+            <p className="leading-relaxed">
+              Examples include NASA APIs, weather providers, satellite tracking APIs, OpenStreetMap services, and
+              EmailJS. Please review the <Link href="/resources" className="text-cyan-400 hover:text-cyan-300 underline">Resources</Link> page
+              for details and each provider&apos;s privacy policy.
+            </p>
           </section>
 
           {/* Retention of Your Personal Data */}
@@ -192,7 +184,7 @@ export default function PrivacyPolicyPage() {
           <section>
             <h3 className="text-xl font-semibold text-white mb-3">Transfer of Your Personal Data</h3>
             <p className="leading-relaxed mb-4">
-              Your information, including Personal Data, is processed at the Company&apos;s operating offices and in any other places where the parties involved in the processing are located. It means that this information may be transferred to — and maintained on — computers located outside of Your state, province, country or other governmental jurisdiction where the data protection laws may differ from those from Your jurisdiction.
+              Your information, including Personal Data, is processed at the Company&apos;s operating offices and in any other places where the parties involved in the processing are located. It means that this information may be transferred to and maintained on computers located outside of your state, province, country or other governmental jurisdiction where the data protection laws may differ from those from your jurisdiction.
             </p>
             <p className="leading-relaxed mb-4">
               Your consent to this Privacy Policy followed by Your submission of such information represents Your agreement to that transfer.
@@ -209,10 +201,8 @@ export default function PrivacyPolicyPage() {
               You have the right to delete or request that We assist in deleting the Personal Data that We have collected about You.
             </p>
             <p className="leading-relaxed mb-4">
-              Our Service may give You the ability to delete certain information about You from within the Service.
-            </p>
-            <p className="leading-relaxed mb-4">
-              You may update, amend, or delete Your information at any time by signing in to Your Account, if you have one, and visiting the account settings section that allows you to manage Your personal information. You may also contact Us to request access to, correct, or delete any personal information that You have provided to Us.
+              If you contacted us or submitted information through the Service, you may request access to, correction of,
+              or deletion of that information by contacting us.
             </p>
             <p className="leading-relaxed">
               Please note, however, that We may need to retain certain information when we have a legal obligation or lawful basis to do so.
