@@ -19,7 +19,7 @@ export default function TermsConditionsPage() {
             </span>
           </h1>
           <p className="text-gray-400 text-sm">
-            Last updated: October 10, 2025
+            Last updated: January 1, 2026
           </p>
         </div>
         
@@ -45,7 +45,8 @@ export default function TermsConditionsPage() {
           {/* Introduction */}
           <section>
             <p className="leading-relaxed">
-              Please read these terms and conditions carefully before using Our Service.
+              These Terms and Conditions govern your access to and use of AstroHub, including all tools, visualizations,
+              data feeds, calculators, quizzes, and resource pages.
             </p>
           </section>
 
@@ -67,6 +68,7 @@ export default function TermsConditionsPage() {
               <li><strong className="text-white">Device</strong> means any device that can access the Service such as a computer, a cell phone or a digital tablet.</li>
               <li><strong className="text-white">Service</strong> refers to the AstroHub Website.</li>
               <li><strong className="text-white">Terms and Conditions</strong> (also referred as &quot;Terms&quot;) mean these Terms and Conditions that form the entire agreement between You and the Company regarding the use of the Service.</li>
+              <li><strong className="text-white">Third-Party Services</strong> means external APIs, data sources, or embedded experiences that are linked or used by the Service.</li>
               <li><strong className="text-white">Third-party Social Media Service</strong> means any services or content (including data, information, products or services) provided by a third-party that may be displayed, included or made available by the Service.</li>
               <li><strong className="text-white">Website</strong> refers to AstroHub, accessible from <a href="https://astrohub.live/" className="text-cyan-400 hover:text-cyan-300 underline" target="_blank" rel="noopener noreferrer">https://astrohub.live/</a></li>
               <li><strong className="text-white">You</strong> means the individual accessing or using the Service, or the company, or other legal entity on behalf of which such individual is accessing or using the Service, as applicable.</li>
@@ -90,6 +92,32 @@ export default function TermsConditionsPage() {
             </p>
             <p className="leading-relaxed">
               Your access to and use of the Service is also conditioned on Your acceptance of and compliance with the Privacy Policy of the Company. Our Privacy Policy describes Our policies and procedures on the collection, use and disclosure of Your personal information when You use the Application or the Website and tells You about Your privacy rights and how the law protects You. Please read Our Privacy Policy carefully before using Our Service.
+            </p>
+          </section>
+
+          {/* Acceptable Use */}
+          <section>
+            <h2 className="text-2xl font-bold text-cyan-400 mb-4">Use of the Service</h2>
+            <p className="leading-relaxed mb-4">
+              You agree to use the Service responsibly and in compliance with all applicable laws and third-party terms.
+            </p>
+            <ul className="list-disc list-inside space-y-2 ml-4">
+              <li>Do not attempt to disrupt, overload, or reverse engineer the Service.</li>
+              <li>Do not use the Service for safety-critical decisions such as navigation, emergency response, or aviation.</li>
+              <li>Respect third-party data source limits, licensing, and attribution requirements.</li>
+            </ul>
+          </section>
+
+          {/* Third-Party Data */}
+          <section>
+            <h2 className="text-2xl font-bold text-cyan-400 mb-4">Third-Party Data and Services</h2>
+            <p className="leading-relaxed mb-4">
+              AstroHub integrates data and experiences from third-party providers including NASA, weather services,
+              satellite tracking providers, and mapping platforms. These sources may change or become unavailable.
+            </p>
+            <p className="leading-relaxed">
+              Details and credits are listed on the <Link href="/resources" className="text-cyan-400 hover:text-cyan-300 underline">Resources</Link> page.
+              Third-Party Services are governed by their own terms and policies, which you should review before use.
             </p>
           </section>
 

@@ -237,6 +237,10 @@ const Header = () => {
                 <span className={`transition-all duration-300 font-medium ${scrollY > 50 ? 'text-sm' : 'text-base'}`}>About</span>
               </Link>
 
+              <Link href="/resources" className="relative group text-white hover:text-cyan-400 transition-colors">
+                <span className={`transition-all duration-300 font-medium ${scrollY > 50 ? 'text-sm' : 'text-base'}`}>Resources</span>
+              </Link>
+
               <Link href="/contact-us" className="relative group text-white hover:text-cyan-400 transition-colors">
                 <span className={`transition-all duration-300 font-medium ${scrollY > 50 ? 'text-sm' : 'text-base'}`}>Contact</span>
               </Link>
@@ -311,6 +315,9 @@ const Header = () => {
           <div className="pt-4 border-t border-cyan-400/20 space-y-2">
             <Link href="/about" prefetch={shouldPrefetchRoute('/about')} className="block px-2 py-2.5 text-white hover:text-cyan-400 hover:bg-cyan-500/10 rounded-lg transition-all font-medium" onClick={() => setIsMobileMenuOpen(false)}>
               About
+            </Link>
+            <Link href="/resources" prefetch={shouldPrefetchRoute('/resources')} className="block px-2 py-2.5 text-white hover:text-cyan-400 hover:bg-cyan-500/10 rounded-lg transition-all font-medium" onClick={() => setIsMobileMenuOpen(false)}>
+              Resources
             </Link>
             <Link href="/contact-us" prefetch={shouldPrefetchRoute('/contact-us')} className="block px-2 py-2.5 text-white hover:text-cyan-400 hover:bg-cyan-500/10 rounded-lg transition-all font-medium" onClick={() => setIsMobileMenuOpen(false)}>
               Contact Us

@@ -18,7 +18,6 @@ import {
 const About = () => {
   const [activeTab, setActiveTab] = useState('mission');
   const [hoveredFeature, setHoveredFeature] = useState<number | null>(null);
-  console.log(hoveredFeature);
   
 
   const tabs = [
@@ -28,7 +27,6 @@ const About = () => {
     { id: 'technology', label: 'Technology', icon: SparklesIcon }
   ];
 
-  // ✅ Full “Explore Now” dataset
   const features = [
     {
       icon: CameraIcon,
@@ -44,44 +42,80 @@ const About = () => {
     },
     {
       icon: GlobeAltIcon,
-      title: 'Earth Observation',
-      description: 'View our planet in near-real time with NASA’s EPIC Earth imagery and satellite visualizations.',
-      highlight: 'Live Earth data'
+      title: 'Earth Observation & Weather',
+      description: 'Explore Earth through NASA EPIC imagery, live weather, and astronomy conditions tailored to your location.',
+      highlight: 'Live sky conditions'
     },
     {
       icon: ChartBarIcon,
       title: 'Near Earth Objects (NEO)',
-      description: 'Track asteroids and comets approaching Earth using NASA’s open NEO data with orbit paths and close-approach info.',
+      description: 'Track asteroids and comets approaching Earth using NASA NEO data with orbit paths and close-approach info.',
       highlight: 'Updated daily'
     },
     {
       icon: MapIcon,
-      title: '3D Models & Visualizations',
-      description: 'Interact with realistic 3D representations of celestial bodies, spacecraft, and mission data using WebGL.',
+      title: '3D Earth, Moon, and Mars',
+      description: 'Interact with realistic 3D visualizations of celestial bodies, spacecraft, and missions using WebGL.',
       highlight: 'Immersive web experience'
     },
     {
+      icon: EyeIcon,
+      title: 'NASA Eyes Experiences',
+      description: 'Jump into NASA Eyes interactive simulations for Earth, asteroids, exoplanets, and the solar system.',
+      highlight: 'Mission-grade visualization'
+    },
+    {
       icon: StarIcon,
-      title: 'Sky Observation Tools',
-      description: 'Find out what’s visible in the night sky and identify stars, constellations, and planets in real-time.',
-      highlight: 'Dynamic stargazing'
+      title: 'Sky Charts & Stellarium',
+      description: 'Plan night-sky sessions with downloadable charts and a live interactive planetarium.',
+      highlight: 'Night-sky planning'
+    },
+    {
+      icon: MapIcon,
+      title: 'Satellite Tracker',
+      description: 'Find visible passes, live positions, and satellite details with global map views.',
+      highlight: 'ISS and beyond'
+    },
+    {
+      icon: SparklesIcon,
+      title: 'Light Pollution Explorer',
+      description: 'Scout dark-sky locations and compare Bortle scale conditions for better observing.',
+      highlight: 'Dark-sky scouting'
+    },
+    {
+      icon: ChartBarIcon,
+      title: 'Telescope Calculator',
+      description: 'Calculate field of view, magnification, and sensor coverage before you head out.',
+      highlight: 'Precision planning'
+    },
+    {
+      icon: StarIcon,
+      title: 'Astrophotography Exposure Planner',
+      description: 'Build exposure plans with target tips and light pollution guidance.',
+      highlight: 'Capture-ready workflows'
+    },
+    {
+      icon: BookOpenIcon,
+      title: 'Learning & Space Quiz',
+      description: 'Test your space knowledge with interactive quizzes and curated facts.',
+      highlight: 'Curated learning'
     },
     {
       icon: NewspaperIcon,
       title: 'Space News & Updates',
-      description: 'Stay up to date with breaking news, discoveries, and mission updates directly sourced from NASA feeds.',
-      highlight: 'Real-time headlines'
+      description: 'Stay up to date with discoveries and mission updates from trusted space sources.',
+      highlight: 'Fresh headlines'
     },
     {
       icon: BookOpenIcon,
       title: 'NASA Media Library',
-      description: 'Access millions of NASA’s official photos, videos, and audio archives for research, education, and exploration.',
+      description: 'Access millions of NASA official photos, videos, and audio archives for research, education, and exploration.',
       highlight: '1M+ assets'
     }
   ];
 
   const stats = [
-    { number: '15+', label: 'Astronomy Tools'},
+    { number: '18+', label: 'Astronomy Tools'},
     { number: '5M+', label: 'Space Images', icon: CameraIcon },
     { number: '24/7', label: 'Live Data Feeds' },
     { number: '30+', label: 'Years of Archives', icon: BookOpenIcon }
