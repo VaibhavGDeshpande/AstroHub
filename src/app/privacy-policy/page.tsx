@@ -287,7 +287,7 @@ export default function PrivacyPolicyPage() {
               If you have any questions about this Privacy Policy, You can contact us:
             </p>
             <div className="bg-cyan-400/5 border border-cyan-400/20 rounded-lg p-6">
-              <p><strong className="text-white">By email:</strong> deshpande.vaibhav1012@gmail.com</p>
+              <p><strong className="text-white">By email:</strong>live.astrohub@gmail.com</p>
             </div>
           </section>
         </div>

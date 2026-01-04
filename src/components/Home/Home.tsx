@@ -151,7 +151,6 @@ export default function Home() {
       `}</style> */}
 
       <div className="min-h-screen bg-black">
-        {/* Header moved to page.tsx for LCP optimization */}
         <HeroSection />
         <FactsSection />
         <Cards />

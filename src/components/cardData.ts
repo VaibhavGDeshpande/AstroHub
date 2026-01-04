@@ -51,7 +51,7 @@ export const cardSections: CardSection[] = [
         description: 'Discover a new astronomy picture each day with detailed explanations from professional astronomers.',
         icon: Star,
         color: 'from-purple-500 to-pink-500',
-        path: '/', //apod
+        path: '/apod', //apod
         features: ['Daily updates', 'HD images', 'Expert explanations'],
         glow: 'purple',
         ctaText: 'Explore Data',
