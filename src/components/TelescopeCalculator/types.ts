@@ -18,11 +18,14 @@ export interface CalculatedResults {
   magnification: number;
   trueFOV: number; // degrees
   exitPupil: number; // mm
-  resolvingPower: number; // arcseconds
+  resolvingPower: number; // arcseconds (Rayleigh)
+  dawesLimit: number; // arcseconds
   limitingMagnitude: number;
   maxUsefulMagnification: number;
-  focalRatio: number;
+  focalRatio: number; // native
+  effectiveFocalRatio: number; // with barlow
   effectiveFocalLength: number; // with barlow
+  lightGatheringPower: number; // vs human eye
 }
 
 export interface SkyObject {

@@ -1,11 +1,10 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
-const OPENROUTER_ENDPOINT = 'https://openrouter.ai/api/v1/chat/completions';
+const GEMINI_KEY = process.env.GEMINI_KEY;
 
-if (!OPENROUTER_API_KEY) {
-  console.warn('OPENROUTER_API_KEY is not set.');
+if (!GEMINI_KEY) {
+  console.warn('GEMINI_KEY is not set.');
 }
 
 const DEFAULT_SYSTEM_PROMPT =
@@ -18,14 +17,6 @@ type RetryableError = {
     status?: number | string;
   };
   message?: string;
-};
-
-type OpenRouterChatResponse = {
-  choices?: Array<{
-    message?: {
-      content?: string | null;
-    } | null;
-  }> | null;
 };
 
 const getStatusCode = (err: unknown): number | undefined => {
@@ -68,7 +59,6 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     const {
-      model = 'deepseek/deepseek-r1-0528:free',
       prompt,
       systemPrompt = DEFAULT_SYSTEM_PROMPT,
       temperature = 0.5,
@@ -78,54 +68,46 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Missing prompt' }, { status: 400 });
     }
 
-    if (!OPENROUTER_API_KEY) {
-      return NextResponse.json({ error: 'OpenRouter API key missing' }, { status: 500 });
+    if (!GEMINI_KEY) {
+      return NextResponse.json({ error: 'Gemini API key missing' }, { status: 500 });
     }
 
-    const extraHeaders: Record<string, string> = {};
-
     const completion = await withBackoff(async () => {
-      const res = await fetch(OPENROUTER_ENDPOINT, {
+      const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_KEY}`, {
         method: 'POST',
         headers: {
-          Authorization: `Bearer ${OPENROUTER_API_KEY}`,
           'Content-Type': 'application/json',
-          ...extraHeaders,
         },
         body: JSON.stringify({
-          model,
-          temperature,
-          messages: [
-            { role: 'system', content: systemPrompt },
-            { role: 'user', content: prompt },
-          ],
+          contents: [{
+            parts: [{ text: `${systemPrompt}\n\nUser: ${prompt}` }]
+          }],
+          generationConfig: {
+            temperature,
+          }
         }),
       });
 
-      const payload = (await res.json().catch(() => null)) as
-        | (OpenRouterChatResponse & { error?: string; message?: string })
-        | null;
+      const payload = await res.json().catch(() => null);
 
       if (!res.ok) {
+        const rawText = payload ? null : await res.text().catch(() => null);
         const message =
-          (payload && (typeof payload.error === 'string' ? payload.error : undefined)) ||
-          (payload && (typeof payload.message === 'string' ? payload.message : undefined)) ||
+          (payload && payload.error && payload.error.message) ||
+          (typeof rawText === 'string' && rawText.trim() ? rawText.slice(0, 500) : undefined) ||
           `${res.status} ${res.statusText}`;
         const err: RetryableError = { status: res.status, message };
         throw err;
       }
 
       if (!payload) {
-        throw { status: res.status, message: 'Empty response from OpenRouter' } as RetryableError;
+        throw { status: res.status, message: 'Empty response from Gemini' } as RetryableError;
       }
 
       return payload;
     });
 
-    const rawText = completion?.choices?.[0]?.message?.content ?? null;
-    const text = rawText
-      ? rawText.replace(/<｜begin▁of▁sentence｜>/g, '').trim()
-      : null;
+    const text = completion?.candidates?.[0]?.content?.parts?.[0]?.text;
 
     if (!text) {
       return NextResponse.json({ error: 'No text returned from model' }, { status: 502 });

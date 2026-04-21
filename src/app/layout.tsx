@@ -3,9 +3,11 @@ import Script from "next/script";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import ClientLayout from "@/components/provider/NotificationProvider";
+import LenisProvider from "@/components/provider/LenisProvider";
 import { Analytics } from "@vercel/analytics/next"
 import FloatingClientWidgets from "@/components/FloatingClientWidgets";
 import { SpeedInsights } from "@vercel/speed-insights/next"
+import Header from "@/components/Home/Header";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -56,7 +58,7 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_US",
     url: "https://astrohub.live",
-    siteName: "AstroHub", // Fixed typo: was "AstoHub"
+    siteName: "AstroHub", 
     title: "AstroHub - Astronomy Hub for Astrophiles and Amateur Astronomers",
     description: "Explore the cosmos with NASA's public APIs including APOD, EPIC, and more stunning space imagery and data.",
     images: [
@@ -118,12 +120,15 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <ClientLayout>
-          <FloatingClientWidgets />
-          <Analytics/>
-          <SpeedInsights/>
-          {children}
-        </ClientLayout>
+        <LenisProvider>
+          <ClientLayout>
+            <FloatingClientWidgets />
+            <Analytics/>
+            <SpeedInsights/>
+            <Header />
+            {children}
+          </ClientLayout>
+        </LenisProvider>
       </body>
     </html>
   );

@@ -34,7 +34,7 @@ export default function NightModeToggle() {
   return (
     <>
       <button
-        id="nightToggle"
+        id="night-light-filter"
         onClick={toggle}
         aria-pressed={enabled}
         aria-label={enabled ? 'Disable Night Vision' : 'Enable Night Vision'}

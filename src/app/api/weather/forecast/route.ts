@@ -1,28 +1,47 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextResponse } from "next/server";
+import { fetchOpenMeteoWeather, geocodeOpenMeteo } from "../openMeteo";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const query = searchParams.get("q") || "Pune";
   const days = searchParams.get("days") || "10";
-  const apiKey = process.env.WEATHERAPI_KEY;
-
-  if (!apiKey) {
-    return NextResponse.json({ error: "Missing WEATHERAPI_KEY" }, { status: 500 });
-  }
 
   try {
-    const response = await fetch(
-      `https://api.weatherapi.com/v1/forecast.json?key=${apiKey}&q=${encodeURIComponent(query)}&days=${days}&aqi=no&alerts=no`,
-      { next: { revalidate: 600 } }
-    );
+    const parsedDays = Number(days);
+    const safeDays = Number.isFinite(parsedDays) ? Math.min(Math.max(parsedDays, 1), 16) : 10;
 
-    if (!response.ok) {
-      const errorBody = await response.text();
-      throw new Error(`WeatherAPI error ${response.status}: ${errorBody}`);
+    const geocode = await geocodeOpenMeteo(query);
+    if (!geocode) {
+      return NextResponse.json({ error: "Location not found" }, { status: 404 });
     }
 
-    const data = await response.json();
-    return NextResponse.json(data);
+    const data = await fetchOpenMeteoWeather({ lat: String(geocode.latitude), lon: String(geocode.longitude), hours: 48 });
+    const forecastday = data.forecastDays.slice(0, safeDays).map((day: any) => ({
+      date: day?.interval?.startTime ? String(day.interval.startTime).slice(0, 10) : undefined,
+      day: {
+        maxtemp_c: day?.maxTemperature?.degrees,
+        mintemp_c: day?.minTemperature?.degrees,
+        avghumidity: day?.daytimeForecast?.relativeHumidity,
+        daily_chance_of_rain: day?.precipitation?.probability?.percent,
+        uv: day?.daytimeForecast?.uvIndex,
+        condition: {
+          text: day?.daytimeForecast?.weatherCondition?.description?.text
+        }
+      }
+    }));
+
+    return NextResponse.json(
+      {
+        location: {
+          name: geocode.name,
+          region: geocode.admin1,
+          country: geocode.country
+        },
+        forecast: { forecastday }
+      },
+      { headers: { "Cache-Control": "s-maxage=600" } }
+    );
   } catch (error) {
     console.error("Weather forecast fetch failed:", error);
     return NextResponse.json({ error: "Failed to fetch forecast" }, { status: 500 });

@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { fetchOpenMeteoWeather } from '../openMeteo';
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -11,15 +12,11 @@ export async function GET(request: Request) {
   }
 
   try {
-    const response = await fetch(
-      `https://weather.googleapis.com/v1/forecast/hours:lookup?key=${process.env.GOOGLE_WEATHER_API_KEY}&location.latitude=${lat}&location.longitude=${lon}&hours=${hours}&unitsSystem=METRIC`,
-      { next: { revalidate: 1800 } } // Cache for 30 minutes
-    );
+    const parsedHours = Number(hours);
+    const safeHours = Number.isFinite(parsedHours) ? Math.min(Math.max(parsedHours, 1), 168) : 48;
 
-    if (!response.ok) throw new Error('Weather API failed');
-    
-    const data = await response.json();
-    return NextResponse.json(data);
+    const data = await fetchOpenMeteoWeather({ lat, lon, hours: safeHours });
+    return NextResponse.json({ forecastHours: data.forecastHours }, { headers: { 'Cache-Control': 's-maxage=1800' } });
   } catch (error) {
     console.error('Failed to fetch hourly forecast', error);
     return NextResponse.json({ error: 'Failed to fetch hourly forecast' }, { status: 500 });

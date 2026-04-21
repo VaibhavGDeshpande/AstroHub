@@ -6,6 +6,7 @@ import Link from "next/link";
 import { getAPOD } from "../../api_service/APOD";
 import APODImageInfo from "../../components/APOD/APOD";
 import DateSelectionButton from "@/components/APOD/DateSearchSection";
+import SectionTitle from "@/components/SectionTitle";
 import {
   ArrowLeftIcon,
   HomeIcon,
@@ -151,16 +152,9 @@ export default function APODPage() {
         </div>
 
         <div className="container mx-auto px-4 sm:px-6 lg:px-10 pt-5 flex flex-col gap-10">
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="text-center mt-12"
-          >
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent animate-pulse">
-              NASA&apos;s Astronomy Picture of the Day
-            </h1>
-          </motion.div>
+          <SectionTitle 
+            title="NASA's Astronomy Picture of the Day" 
+          />
 
           {/* Main Content */}
           {data && (

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 'use client';
 
 // import { useEffect } from 'react';
@@ -153,8 +154,8 @@ export default function Home() {
       <div className="min-h-screen bg-black">
         {/* Header moved to page.tsx for LCP optimization */}
         <HeroSection />
-        <FactsSection />
         <Cards />
+        {/* <FactsSection /> */}
         <Footer />
       </div>
     </>

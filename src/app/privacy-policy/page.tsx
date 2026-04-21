@@ -4,7 +4,8 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowLeftIcon, HomeIcon } from "@heroicons/react/24/outline";
-import LoaderWrapper from "@/components/Loader"
+import LoaderWrapper from "@/components/Loader";
+import SectionTitle from "@/components/SectionTitle";
 
 export default function PrivacyPolicyPage() {
   return (
@@ -12,16 +13,11 @@ export default function PrivacyPolicyPage() {
     <div className="min-h-screen bg-gradient-to-b from-black via-blue-950/20 to-black pb-16">
       <div className="container mx-auto px-4 max-w-5xl">
         {/* Header */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4 pt-15">
-            <span className="bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
-              Privacy Policy
-            </span>
-          </h1>
-          <p className="text-gray-400 text-sm">
-            Last updated: January 1, 2026
-          </p>
-        </div>
+        <SectionTitle 
+          title="Privacy Policy" 
+          subtitle="Last updated: January 1, 2026"
+          className="pt-15"
+        />
         
         <div className="fixed top-4 left-4 z-50 hidden md:block">
           <motion.div

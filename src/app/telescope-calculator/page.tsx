@@ -10,6 +10,7 @@ import LoaderWrapper from '@/components/Loader';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { ArrowLeftIcon } from "@heroicons/react/24/outline";
+import SectionTitle from '@/components/SectionTitle';
 
 export default function TelescopeCalculator() {
   const [results, setResults] = useState<
@@ -51,15 +52,11 @@ export default function TelescopeCalculator() {
 
 
           {/* Header */}
-          <div className="text-center mb-8">
-
-            <h1 className="text-4xl md:text-5xl font-bold mb-3 bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
-              Telescope Calculator
-            </h1>
-            <p className="text-gray-400 text-lg">
-              Calculate your telescope&apos;s performance with different eyepieces
-            </p>
-          </div>
+          <SectionTitle 
+            title="Telescope Calculator" 
+            subtitle="Calculate your telescope's performance with different eyepieces"
+            className="pt-10"
+          />
 
           {/* Calculator Form */}
           <div className="mb-8">

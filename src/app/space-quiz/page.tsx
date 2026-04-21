@@ -2,11 +2,12 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Rocket, Star, AlertCircle } from 'lucide-react';
+import { Rocket, AlertCircle } from 'lucide-react';
 import LoaderWrapper from '@/components/Loader';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { ArrowLeftIcon, HomeIcon } from '@heroicons/react/24/outline';
+import SectionTitle from '@/components/SectionTitle';
 
 type Tag = 'space' | 'space_exploration' | 'astronomy' | 'astrophysics';
 
@@ -97,20 +98,10 @@ export default function QuizSelectionPage() {
         </div>
 
         <div className="container mx-auto px-4 sm:px-6 lg:px-10 pt-6 pb-8">
-          {/* Title */}
-          <div className="text-center mb-10">
-            <div className="flex items-center justify-center mb-4">
-              <Star className="w-7 h-7 text-yellow-400 mr-2 animate-pulse" />
-              <Rocket className="w-10 h-10 text-blue-400" />
-              <Star className="w-7 h-7 text-yellow-400 ml-2 animate-pulse" />
-            </div>
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent mb-3">
-              Space Science Trivia
-            </h1>
-            <p className="text-gray-400 text-base sm:text-lg">
-              Test your cosmic knowledge!
-            </p>
-          </div>
+          <SectionTitle 
+            title="Space Science Trivia" 
+            subtitle="Test your cosmic knowledge!"
+          />
 
           {/* Settings Card */}
           <div className="max-w-xl mx-auto bg-slate-800/50 backdrop-blur-sm border border-slate-600/40 rounded-lg p-6 sm:p-8">

@@ -3,6 +3,13 @@
 import { useEffect, useMemo, useState } from "react";
 import { getAstronomy } from "@/api_service/astronomy";
 import { useNightMode } from "./Hooks/useNightMode";
+import { 
+  Sparkles, 
+  Telescope, 
+  History, 
+  Lightbulb,
+  Loader2 
+} from 'lucide-react';
 
 type AstronomyAPI = {
   astronomy?: {
@@ -55,6 +62,13 @@ type AstronomyData = {
   date?: string;
 };
 
+interface BriefingData {
+  visible_planets: string[];
+  deep_sky_targets: string[];
+  fact: string;
+  history: string;
+}
+
 type CachedData = {
   data: AstronomyData;
   location: string;
@@ -98,17 +112,39 @@ function getTodayString(): string {
   return now.toISOString().split("T")[0];
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const BriefingSectionDisplay = ({ icon, title, items, color, bg }: any) => (
+  <div className={`rounded-xl ${bg} p-3 ring-1 ring-white/5`}>
+    <div className={`flex items-center gap-2 mb-2 ${color}`}>
+      {icon}
+      <span className="text-xs font-bold uppercase tracking-wider opacity-80">{title}</span>
+    </div>
+    <div className="flex flex-wrap gap-1.5">
+      {items.map((item: string, i: number) => (
+        <span key={i} className="text-xs bg-slate-900/40 text-slate-200 px-2 py-0.5 rounded-md border border-white/5">
+          {item}
+        </span>
+      ))}
+    </div>
+  </div>
+);
+
 export default function AstronomyWidget() {
   const [open, setOpen] = useState(false);
   const [location, setLocation] = useState("Pune");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [data, setData] = useState<AstronomyData | null>(null);
+  
+  const [briefingLoading, setBriefingLoading] = useState(false);
+  const [briefingData, setBriefingData] = useState<BriefingData | null>(null);
+  
   const [showMorning, setShowMorning] = useState(false);
   const [showEvening, setShowEvening] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [displayTime, setDisplayTime] = useState<string | undefined>(undefined); 
+  const [activeSection, setActiveSection] = useState<'local' | 'briefing'>('local');
   const nightMode = useNightMode();
-  console.log(displayTime)
 
   const triggerOrbPalette = nightMode
     ? "bg-gradient-to-br from-red-900/80 to-red-800/70 border-red-500/40 text-red-100 shadow-[0_0_18px_rgba(255,0,0,0.35)]"
@@ -126,6 +162,14 @@ export default function AstronomyWidget() {
   const titleGradientClass = nightMode
     ? "bg-gradient-to-r from-red-300 to-amber-300"
     : "bg-gradient-to-r from-blue-400 to-purple-400";
+  
+  const tabActivePalette = nightMode
+    ? "bg-red-900/60 border-red-500/50 text-red-100 shadow-inner"
+    : "bg-white/20 border-white/30 text-white shadow-inner";
+  const tabInactivePalette = nightMode
+    ? "bg-transparent border-transparent text-red-300/60 hover:bg-red-950/40 hover:text-red-200"
+    : "bg-transparent border-transparent text-white/60 hover:bg-white/10 hover:text-white";
+
   const inputPalette = nightMode
     ? "flex-1 rounded-xl border border-red-500/40 bg-red-950/40 px-4 py-2.5 text-red-50 placeholder-red-200/40 focus:outline-none focus:ring-2 focus:ring-red-500/40 focus:border-red-500/40 backdrop-blur-sm transition-all"
     : "flex-1 rounded-xl border border-white/20 bg-white/5 px-4 py-2.5 text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 backdrop-blur-sm transition-all";
@@ -227,6 +271,21 @@ export default function AstronomyWidget() {
     } catch { }
   };
 
+  const fetchBriefing = async () => {
+    if (briefingData) return; // already fetched
+    setBriefingLoading(true);
+    try {
+      const res = await fetch('/api/celestial-briefing');
+      const json = await res.json();
+      if (json.error) throw new Error(json.error);
+      setBriefingData(json);
+    } catch (err) {
+      console.error('Failed to fetch briefing:', err);
+    } finally {
+      setBriefingLoading(false);
+    }
+  };
+
   // Fetch with force option to bypass cache on changes
   const fetchData = async (loc: string, opts?: { force?: boolean }) => {
     try {
@@ -284,8 +343,6 @@ export default function AstronomyWidget() {
 
       setData(mapped);
       saveCachedData(loc, mapped);
-
-      // Reflect API local time into displayTime at fetch events
       setDisplayTime(apiLocalTime);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Failed to fetch astronomy data");
@@ -294,8 +351,10 @@ export default function AstronomyWidget() {
       setLoading(false);
     }
   };
+
   useEffect(() => {
     fetchData(location); // cached if available
+    fetchBriefing(); // fetch briefing in bg
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -311,20 +370,18 @@ export default function AstronomyWidget() {
     return `${num}%`;
   }, [data?.moon_illumination]);
 
-
   const isDay = isDaytime(data?.sunrise, data?.sunset);
 
   return (
     <>
-      {/* Floating trigger */}
       <button
         id="astronomy-widget-trigger"
         aria-label="Open astronomy widget"
         className="fixed bottom-36 right-4 z-[2147483648] flex flex-col items-center gap-1 group p-0 hover:scale-110 active:scale-95 transition-all duration-300"
         onClick={() => {
           setOpen(true);
-          fetchData(location, { force: true }); 
-          
+          fetchData(location, { force: true });
+          if (!briefingData) fetchBriefing();
         }}
       >
         <div
@@ -341,12 +398,10 @@ export default function AstronomyWidget() {
         </span>
       </button>
 
-      {/* Modal */}
       {open && (
         <div
           id="astronomy-widget-modal"
-          className={`fixed inset-0 z-[2147483648] flex items-end sm:items-center justify-center ${overlayTint} backdrop-blur-sm animate-[fadeIn_0.2s_ease-out] overflow-hidden
-          .scrollbar-hide`}
+          className={`fixed inset-0 z-[2147483648] flex items-end sm:items-center justify-center ${overlayTint} backdrop-blur-sm animate-[fadeIn_0.2s_ease-out] overflow-hidden`}
           onClick={() => {
             setOpen(false);
             fetchData(location, { force: true });
@@ -356,24 +411,16 @@ export default function AstronomyWidget() {
             className={`w-full sm:max-w-lg sm:rounded-2xl 
            backdrop-blur-md 
            p-5 sm:p-7 
-           
            max-h-[92vh] overflow-y-auto
            animate-[slideUp_0.3s_ease-out] sm:animate-[scaleIn_0.3s_ease-out]
            scrollbar-thin scrollbar-thumb-purple-600 scrollbar-track-transparent
-           touch-pan-y overscroll-contain ${modalPalette}`} // Enhanced scroll properties
-
+           touch-pan-y overscroll-contain ${modalPalette}`}
             onClick={(e) => e.stopPropagation()}
-            onWheel={(e) => {
-              // Allow wheel scrolling within the modal
-              e.stopPropagation();
-            }}
-            onTouchMove={(e) => {
-              // Allow touch scrolling within the modal
-              e.stopPropagation();
-            }}
+            onWheel={(e) => e.stopPropagation()}
+            onTouchMove={(e) => e.stopPropagation()}
           >
             {/* Header */}
-            <div className="flex items-center justify-between mb-5">
+            <div className="flex items-center justify-between xl:mb-2 mb-2">
               <div className="flex items-center gap-3">
                 <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center text-2xl ${headerIconPalette}`}>
                   {isDay ? "☀️" : getMoonPhaseIcon(data?.moon_phase)}
@@ -386,7 +433,7 @@ export default function AstronomyWidget() {
                 className={`text-2xl transition-colors ${closeButtonPalette}`}
                 onClick={() => {
                   setOpen(false);
-                  fetchData(location, { force: true }); // refresh on close
+                  fetchData(location, { force: true });
                 }}
                 aria-label="Close"
               >
@@ -394,156 +441,228 @@ export default function AstronomyWidget() {
               </button>
             </div>
 
-            {/* Location Input */}
-            <div className="flex gap-2 mb-5">
-              <input
-                type="text"
-                value={location}
-                onChange={(e) => setLocation(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" && location.trim()) {
-                    fetchData(location, { force: true }); // call API on Enter
-                  }
-                }}
-                placeholder="Enter city or place"
-                className={inputPalette}
-              />
+            {/* Navigation Tabs */}
+            <div className="flex bg-black/20 p-1 rounded-xl mb-5 ring-1 ring-white/10">
               <button
-                className={updateButtonPalette}
-                onClick={() => {
-                  fetchData(location, { force: true }); // call API on Update
-                }}
-                disabled={loading || !location.trim()}
+                className={`flex-1 py-2 text-sm font-semibold rounded-lg transition-all ${
+                  activeSection === 'local' ? tabActivePalette : tabInactivePalette
+                }`}
+                onClick={() => setActiveSection('local')}
               >
-                {loading ? (
-                  <span className="flex items-center gap-2">
-                    <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                    </svg>
-                    Loading
-                  </span>
-                ) : (
-                  "Update"
-                )}
+                Local Astronomy
+              </button>
+              <button
+                className={`flex-1 py-2 text-sm font-semibold rounded-lg flex items-center justify-center gap-2 transition-all ${
+                  activeSection === 'briefing' ? tabActivePalette : tabInactivePalette
+                }`}
+                onClick={() => setActiveSection('briefing')}
+              >
+                <Sparkles className="w-4 h-4" /> Daily Briefing
               </button>
             </div>
 
-            {error && (
-              <div className={errorPalette}>
-                {error}
+            {activeSection === 'local' && (
+              <div className="animate-[fadeIn_0.3s_ease-out]">
+                {/* Location Input */}
+                <div className="flex gap-2 mb-5">
+                  <input
+                    type="text"
+                    value={location}
+                    onChange={(e) => setLocation(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && location.trim()) {
+                        fetchData(location, { force: true });
+                      }
+                    }}
+                    placeholder="Enter city or place"
+                    className={inputPalette}
+                  />
+                  <button
+                    className={updateButtonPalette}
+                    onClick={() => {
+                      fetchData(location, { force: true });
+                    }}
+                    disabled={loading || !location.trim()}
+                  >
+                    {loading ? (
+                      <span className="flex items-center gap-2">
+                        <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                        </svg>
+                        Loading
+                      </span>
+                    ) : (
+                      "Update"
+                    )}
+                  </button>
+                </div>
+
+                {error && (
+                  <div className={errorPalette}>
+                    {error}
+                  </div>
+                )}
+
+                {/* Location Info */}
+                <div className={locationTextClass}>
+                  <span className="flex items-center gap-1">📍 {data?.location_label || location}</span>
+                  {data?.date && (
+                    <>
+                      <span>•</span>
+                      <span>📅 {data.date}</span>
+                    </>
+                  )}
+                </div>
+
+                {/* Stats Grid */}
+                <div className="grid grid-cols-2 gap-3 mb-4">
+                  <div className={statCardPalette}>
+                    <div className={statLabelClass}>Sunrise</div>
+                    <div className={statValueClass}>{data?.sunrise ?? "—"}</div>
+                  </div>
+                  <div className={statCardPalette}>
+                    <div className={statLabelClass}>Sunset</div>
+                    <div className={statValueClass}>{data?.sunset ?? "—"}</div>
+                  </div>
+                  <div className={statCardPalette}>
+                    <div className={statLabelClass}>Moonrise</div>
+                    <div className={statValueClass}>{data?.moonrise ?? "—"}</div>
+                  </div>
+                  <div className={statCardPalette}>
+                    <div className={statLabelClass}>Moonset</div>
+                    <div className={statValueClass}>{data?.moonset ?? "—"}</div>
+                  </div>
+                </div>
+
+                {/* Moon Phase */}
+                <div className={`mb-4 ${moonCardPalette}`}>
+                  <div className="text-4xl sm:text-5xl moon-emoji" aria-hidden>
+                    {getMoonPhaseIcon(data?.moon_phase)}
+                  </div>
+                  <div className="flex-1">
+                    <div className={moonLabelClass}>Moon Phase</div>
+                    <div className={moonValueClass}>{data?.moon_phase ?? "—"}</div>
+                    <div className={moonMetaClass}>
+                      Illumination: <span className="font-semibold">{illuminationPct ?? "—"}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Twilights */}
+                <div className="space-y-3">
+                  <div className={accordionPanelPalette}>
+                    <button
+                      className={accordionButtonPalette}
+                      onClick={() => setShowMorning((s) => !s)}
+                    >
+                      <span className="font-semibold text-sm sm:text-base flex items-center gap-2">Morning Twilights</span>
+                      <span className={accordionToggleClass}>{showMorning ? "▴" : "▾"}</span>
+                    </button>
+                    {showMorning && (
+                      <div className="px-4 pb-4 space-y-2">
+                        <div className={infoRowPalette}>
+                          <span className={infoRowLabelClass}>Astronomical Begin</span>
+                          <span className="font-medium">{data?.astronomical_twilight_begin ?? "—"}</span>
+                        </div>
+                        <div className={infoRowPalette}>
+                          <span className={infoRowLabelClass}>Nautical Begin</span>
+                          <span className="font-medium">{data?.nautical_twilight_begin ?? "—"}</span>
+                        </div>
+                        <div className={infoRowPalette}>
+                          <span className={infoRowLabelClass}>Civil Begin</span>
+                          <span className="font-medium">{data?.civil_twilight_begin ?? "—"}</span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className={accordionPanelPalette}>
+                    <button
+                      className={accordionButtonPalette}
+                      onClick={() => setShowEvening((s) => !s)}
+                    >
+                      <span className="font-semibold text-sm sm:text-base flex items-center gap-2">Evening Twilights</span>
+                      <span className={accordionToggleClass}>{showEvening ? "▴" : "▾"}</span>
+                    </button>
+                    {showEvening && (
+                      <div className="px-4 pb-4 space-y-2">
+                        <div className={infoRowPalette}>
+                          <span className={infoRowLabelClass}>Civil End</span>
+                          <span className="font-medium">{data?.civil_twilight_end ?? "—"}</span>
+                        </div>
+                        <div className={infoRowPalette}>
+                          <span className={infoRowLabelClass}>Nautical End</span>
+                          <span className="font-medium">{data?.nautical_twilight_end ?? "—"}</span>
+                        </div>
+                        <div className={infoRowPalette}>
+                          <span className={infoRowLabelClass}>Astronomical End</span>
+                          <span className="font-medium">{data?.astronomical_twilight_end ?? "—"}</span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
             )}
 
-            {/* Location Info */}
-            <div className={locationTextClass}>
-              <span className="flex items-center gap-1">📍 {data?.location_label || location}</span>
-              {data?.date && (
-                <>
-                  <span>•</span>
-                  <span>📅 {data.date}</span>
-                  <span></span>
-                </>
-              )}
-            </div>
+            {activeSection === 'briefing' && (
+              <div className="animate-[fadeIn_0.3s_ease-out] space-y-4">
+                {briefingLoading ? (
+                  <div className="flex flex-col items-center justify-center py-12 gap-3">
+                    <Loader2 className={`h-8 w-8 animate-spin ${nightMode ? 'text-red-400' : 'text-blue-400'}`} />
+                    <p className={`text-xs font-medium animate-pulse ${nightMode ? 'text-red-200/50' : 'text-slate-400'}`}>Scanning the stars...</p>
+                  </div>
+                ) : briefingData ? (
+                  <>
+                    <BriefingSectionDisplay 
+                      icon={<Telescope className="h-4 w-4" />} 
+                      title="Planetary Alignment"
+                      items={briefingData.visible_planets}
+                      color="text-emerald-400"
+                      bg={nightMode ? "bg-emerald-900/20" : "bg-emerald-400/10"}
+                    />
+                    <BriefingSectionDisplay 
+                      icon={<Sparkles className="h-4 w-4" />} 
+                      title="Deep Sky Gems"
+                      items={briefingData.deep_sky_targets}
+                      color="text-blue-400"
+                      bg={nightMode ? "bg-blue-900/20" : "bg-blue-400/10"}
+                    />
 
-            {/* Stats Grid */}
-            <div className="grid grid-cols-2 gap-3 mb-4">
-              {/* <div className={statCardPalette}>
-                {/* <div className={statLabelClass}>Current Time</div>
-                <div className={statValueClass}>
-                  {displayTime ?? data?.astronomy?.current_time ?? "—"}
-                </div> 
-              </div> */}
-              <div className={statCardPalette}>
-                <div className={statLabelClass}>Sunrise</div>
-                <div className={statValueClass}>{data?.sunrise ?? "—"}</div>
-              </div>
-              <div className={statCardPalette}>
-                <div className={statLabelClass}>Sunset</div>
-                <div className={statValueClass}>{data?.sunset ?? "—"}</div>
-              </div>
-              <div className={statCardPalette}>
-                <div className={statLabelClass}>Moonrise</div>
-                <div className={statValueClass}>{data?.moonrise ?? "—"}</div>
-              </div>
-              <div className={statCardPalette}>
-                <div className={statLabelClass}>Moonset</div>
-                <div className={statValueClass}>{data?.moonset ?? "—"}</div>
-              </div>
-            </div>
+                    <div className={`rounded-xl p-4 ring-1 ring-white/5 transition-colors ${nightMode ? 'bg-red-950/40 hover:bg-red-900/40 text-red-50' : 'bg-white/5 hover:bg-white/10 text-slate-200'}`}>
+                      <div className="flex items-center gap-2 mb-2">
+                        <Lightbulb className="h-4 w-4 text-yellow-500" />
+                        <span className="text-xs font-bold uppercase tracking-wider text-yellow-500/80">Daily Insight</span>
+                      </div>
+                      <p className="text-sm leading-relaxed font-medium">
+                        {briefingData.fact}
+                      </p>
+                    </div>
 
-            {/* Moon Phase */}
-            <div className={`mb-4 ${moonCardPalette}`}>
-              <div className="text-4xl sm:text-5xl moon-emoji" aria-hidden>
-                {getMoonPhaseIcon(data?.moon_phase)}
-              </div>
-              <div className="flex-1">
-                <div className={moonLabelClass}>Moon Phase</div>
-                <div className={moonValueClass}>{data?.moon_phase ?? "—"}</div>
-                <div className={moonMetaClass}>
-                  Illumination: <span className="font-semibold">{illuminationPct ?? "—"}</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Twilights */}
-            <div className="space-y-3">
-              <div className={accordionPanelPalette}>
-                <button
-                  className={accordionButtonPalette}
-                  onClick={() => setShowMorning((s) => !s)}
-                >
-                  <span className="font-semibold text-sm sm:text-base flex items-center gap-2">Morning Twilights</span>
-                  <span className={accordionToggleClass}>{showMorning ? "▴" : "▾"}</span>
-                </button>
-                {showMorning && (
-                  <div className="px-4 pb-4 space-y-2">
-                    <div className={infoRowPalette}>
-                      <span className={infoRowLabelClass}>Astronomical Begin</span>
-                      <span className="font-medium">{data?.astronomical_twilight_begin ?? "—"}</span>
+                    <div className={`rounded-xl p-4 ring-1 ring-white/5 transition-colors ${nightMode ? 'bg-red-950/40 hover:bg-red-900/40 text-red-50' : 'bg-white/5 hover:bg-white/10 text-slate-300'}`}>
+                      <div className="flex items-center gap-2 mb-2">
+                        <History className="h-4 w-4 text-purple-400" />
+                        <span className="text-xs font-bold uppercase tracking-wider text-purple-400/80">On This Day</span>
+                      </div>
+                      <p className="text-sm leading-relaxed italic">
+                        &quot;{briefingData.history}&quot;
+                      </p>
                     </div>
-                    <div className={infoRowPalette}>
-                      <span className={infoRowLabelClass}>Nautical Begin</span>
-                      <span className="font-medium">{data?.nautical_twilight_begin ?? "—"}</span>
-                    </div>
-                    <div className={infoRowPalette}>
-                      <span className={infoRowLabelClass}>Civil Begin</span>
-                      <span className="font-medium">{data?.civil_twilight_begin ?? "—"}</span>
-                    </div>
+                  </>
+                ) : (
+                  <div className="py-6 text-center">
+                    <p className={`text-xs ${nightMode ? 'text-red-200/50' : 'text-slate-500'}`}>Could not retrieve briefing. Please check your API key.</p>
                   </div>
                 )}
               </div>
-
-              <div className={accordionPanelPalette}>
-                <button
-                  className={accordionButtonPalette}
-                  onClick={() => setShowEvening((s) => !s)}
-                >
-                  <span className="font-semibold text-sm sm:text-base flex items-center gap-2">Evening Twilights</span>
-                  <span className={accordionToggleClass}>{showEvening ? "▴" : "▾"}</span>
-                </button>
-                {showEvening && (
-                  <div className="px-4 pb-4 space-y-2">
-                    <div className={infoRowPalette}>
-                      <span className={infoRowLabelClass}>Civil End</span>
-                      <span className="font-medium">{data?.civil_twilight_end ?? "—"}</span>
-                    </div>
-                    <div className={infoRowPalette}>
-                      <span className={infoRowLabelClass}>Nautical End</span>
-                      <span className="font-medium">{data?.nautical_twilight_end ?? "—"}</span>
-                    </div>
-                    <div className={infoRowPalette}>
-                      <span className={infoRowLabelClass}>Astronomical End</span>
-                      <span className="font-medium">{data?.astronomical_twilight_end ?? "—"}</span>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
+            )}
 
             <div className={`mt-5 ${footerTextClass}`}>
-              Source: ipgeolocation.io Astronomy API • Data cached daily
+              {activeSection === 'local' 
+                ? "Source: ipgeolocation.io Astronomy API • Data cached daily"
+                : "Powered by AI • Daily Celestial Briefing Insights"
+              }
             </div>
           </div>
         </div>
@@ -551,3 +670,4 @@ export default function AstronomyWidget() {
     </>
   );
 }
+

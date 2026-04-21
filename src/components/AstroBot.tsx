@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 'use client'
 
 import React, { useEffect, useRef, useState } from 'react'
@@ -53,6 +54,9 @@ export default function AstroBot() {
     ? 'bg-red-950/40 border border-red-500/30 text-red-200 rounded px-1 py-0.5'
     : 'bg-black/30 rounded px-1 py-0.5'
   const closeButtonPalette = nightMode ? 'hover:bg-red-500/10 text-red-200' : 'hover:bg-white/5 text-white'
+  const loadingShellClass = nightMode
+    ? 'border border-red-500/30 bg-red-950/40'
+    : 'border border-white/10 bg-white/5'
 
   useEffect(() => {
     try {
@@ -89,28 +93,7 @@ export default function AstroBot() {
     }
   }, [open])
 
-  useEffect(() => {
-    if (!open) return
-    const { body } = document
-    const originalOverflow = body.style.overflow
-    const originalPosition = body.style.position
-    const originalTop = body.style.top
-    const originalWidth = body.style.width
-    const scrollY = window.scrollY
-
-    body.style.overflow = 'hidden'
-    body.style.position = 'fixed'
-    body.style.top = `-${scrollY}px`
-    body.style.width = '100%'
-
-    return () => {
-      body.style.overflow = originalOverflow
-      body.style.position = originalPosition
-      body.style.top = originalTop
-      body.style.width = originalWidth
-      window.scrollTo(0, scrollY)
-    }
-  }, [open])
+  // For the popover-style modal, keep the page scrollable.
 
   const send = async () => {
     const term = input.trim()
@@ -122,13 +105,25 @@ export default function AstroBot() {
     setLoading(true)
 
     try {
-      const prompt = `Explain the astronomy topic "${term}".Give in less than or equal 20-30 sentences`
+      const prompt = [
+        `You are AstroBot inside a space/astronomy app.`,
+        `Reply in the most appropriate length for the user's question.`,
+        ``,
+        `Output rules:`,
+        `- If it's a quick fact/definition/yes-no: answer in 1 line (max ~20 words).`,
+        `- If the user says \"explain\", \"how\", \"why\", \"compare\", or \"tell me about\": answer in 12–20 short lines.`,
+        `- If the user asks for steps: use a numbered list (3–8 steps).`,
+        `- If unclear: ask exactly 1 clarifying question.`,
+        `- Keep it factual; no filler; astronomy-focused.`,
+        ``,
+        `User: ${term}`,
+      ].join('\n')
 
       const res = await fetch('/api/genai', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          model: 'deepseek/deepseek-r1-0528:free',
+          model: 'google/gemma-4-26b-a4b-it:free',
           prompt,
           temperature: 0.4,
         }),
@@ -137,7 +132,7 @@ export default function AstroBot() {
       if (!res.ok) {
         let payload = null
         try { payload = await res.json() } catch {}
-        const errMsg = payload?.error || `${res.status} ${res.statusText}`
+        const errMsg = payload?.detail || payload?.error || `${res.status} ${res.statusText}`
         throw new Error(errMsg)
       }
 
@@ -178,7 +173,7 @@ export default function AstroBot() {
     <>
       {/* Floating launcher (bottom-right, lowest position) */}
       <div
-        className="fixed bottom-4 right-4 z-[2147483648]"
+        id="astrobot-widget-trigger" className="fixed bottom-4 right-4 z-[2147483648]"
         onMouseEnter={() => setHover(true)}
         onMouseLeave={() => setHover(false)}
       >
@@ -197,11 +192,19 @@ export default function AstroBot() {
         </button>
       </div>
 
-      {/* Drawer */}
+      {/* Popover Modal (above launcher) */}
       <div className={`fixed inset-0 z-[2147483648] ${open ? 'pointer-events-auto' : 'pointer-events-none'}`} aria-hidden={!open}>
-        <div className={`absolute inset-0 ${overlayClass} transition-opacity ${open ? 'opacity-100' : 'opacity-0'}`} onClick={() => setOpen(false)} />
+        {/* click-outside catcher (no dim overlay) */}
+        <div
+          className="absolute inset-0"
+          onClick={() => setOpen(false)}
+        />
+
         <aside
-          className={`absolute right-0 top-0 h-full w-full sm:w-[420px] shadow-2xl transition-transform duration-300 ${open ? 'translate-x-0' : 'translate-x-full'} flex flex-col ${drawerPalette}`}
+          onClick={(e) => e.stopPropagation()}
+          className={`fixed bottom-20 right-4 w-[calc(100vw-2rem)] sm:w-[420px] max-h-[75vh] rounded-3xl shadow-2xl border border-white/10 overflow-hidden transition-all duration-200 origin-bottom-right ${
+            open ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-2 scale-95'
+          } flex flex-col ${drawerPalette}`}
           role="dialog"
           aria-modal="true"
           aria-label="AstroBot Chat"
@@ -216,7 +219,7 @@ export default function AstroBot() {
             </button>
           </div>
 
-          <div ref={listRef} className="flex-1 overflow-y-auto px-3 py-4 space-y-3">
+          <div ref={listRef} className="flex-1 overflow-y-auto scrollbar-hide px-3 py-4 space-y-3">
             {messages.map((m, i) => (
               <div key={m.ts + '_' + i} className={`flex ${m.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
                 <div className={`max-w-[80%] rounded-2xl px-3 py-2 ${m.sender === 'user' ? userBubbleClass : botBubbleClass}`}>
@@ -247,13 +250,28 @@ export default function AstroBot() {
 
             {loading && (
               <div className="flex justify-start">
-                <div className={`rounded-2xl px-3 py-2 max-w-[70%] ${botBubbleClass}`}>
-                  <div className="flex items-center gap-2">
-                    <span className="relative inline-flex items-center">
-                      <span className={`w-2 h-2 rounded-full mr-1 animate-typing-dot ${typingDotClass}`}></span>
-                      <span className={`w-2 h-2 rounded-full mr-1 animate-typing-dot [animation-delay:120ms] ${typingDotClass}`}></span>
-                      <span className={`w-2 h-2 rounded-full animate-typing-dot [animation-delay:240ms] ${typingDotClass}`}></span>
-                    </span>
+                <div className={`rounded-2xl px-3 py-2 max-w-[78%] ${botBubbleClass} ${loadingShellClass}`} aria-live="polite">
+                  <div className="flex items-center gap-3">
+                    <div className="relative h-8 w-8 overflow-hidden rounded-2xl bg-black/20 border border-white/10">
+                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/15 to-transparent animate-[shimmer_1.2s_linear_infinite]" />
+                      <div className={`absolute inset-0 flex items-center justify-center text-xs font-semibold ${nightMode ? 'text-red-200' : 'text-white/80'}`}>
+                        AI
+                      </div>
+                    </div>
+
+                    <div className="min-w-0">
+                      <p className={`text-xs font-semibold ${nightMode ? 'text-red-100/90' : 'text-white/80'}`}>AstroBot is thinking…</p>
+                      <div className="mt-1 flex items-center gap-2">
+                        <span className="relative inline-flex items-center" aria-hidden="true">
+                          <span className={`w-2 h-2 rounded-full mr-1 animate-typing-dot ${typingDotClass}`}></span>
+                          <span className={`w-2 h-2 rounded-full mr-1 animate-typing-dot [animation-delay:120ms] ${typingDotClass}`}></span>
+                          <span className={`w-2 h-2 rounded-full animate-typing-dot [animation-delay:240ms] ${typingDotClass}`}></span>
+                        </span>
+                        <span className="h-1.5 w-24 overflow-hidden rounded-full bg-white/10" aria-hidden="true">
+                          <span className={`block h-full w-1/3 rounded-full ${nightMode ? 'bg-red-300/70' : 'bg-emerald-300/70'} animate-[pulsebar_1.1s_ease-in-out_infinite]`} />
+                        </span>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -279,6 +297,18 @@ export default function AstroBot() {
           </div>
         </aside>
       </div>
+
+      <style jsx>{`
+        @keyframes shimmer {
+          0% { transform: translateX(-100%); }
+          100% { transform: translateX(100%); }
+        }
+        @keyframes pulsebar {
+          0% { transform: translateX(-20%); opacity: 0.5; }
+          50% { transform: translateX(140%); opacity: 1; }
+          100% { transform: translateX(-20%); opacity: 0.5; }
+        }
+      `}</style>
     </>
   )
 }

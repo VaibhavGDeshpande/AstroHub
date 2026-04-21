@@ -7,6 +7,7 @@ import type { LucideIcon } from 'lucide-react';
 import LoaderWrapper from '@/components/Loader';
 import { motion } from 'framer-motion';
 import { ArrowLeftIcon, HomeIcon } from '@heroicons/react/24/outline';
+import SectionTitle from '@/components/SectionTitle';
 
 interface CardData {
   title: string;
@@ -111,19 +112,10 @@ const NASAEyesCards = () => {
         <div className="min-h-screen flex flex-col items-center justify-center px-3 sm:px-4 md:px-6 lg:px-8 py-20 sm:py-24 md:py-16">
           <div className="container mx-auto max-w-7xl relative z-10 w-full">
             {/* Responsive Header */}
-            <motion.div 
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-              className="text-center mb-6 sm:mb-8 md:mb-10 lg:mb-12"
-            >
-              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-transparent bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text mb-2 sm:mb-3 md:mb-4 leading-tight px-2">
-                NASA&apos;s Eyes
-              </h1>
-              <p className="text-sm sm:text-base md:text-lg lg:text-xl text-slate-400 max-w-xl md:max-w-2xl lg:max-w-3xl mx-auto px-4 leading-relaxed">
-                Explore real NASA data through interactive 3D visualizations
-              </p>
-            </motion.div>
+            <SectionTitle 
+              title="NASA's Eyes" 
+              subtitle="Explore real NASA data through interactive 3D visualizations"
+            />
 
             {/* Responsive Cards Grid - Mobile First */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-5 lg:gap-6">

@@ -32,6 +32,74 @@ interface APODImageInfoProps {
   searchSection?: React.ReactNode;
 }
 
+function getVideoInfo(url: string): { kind: 'file' | 'embed'; src: string } | null {
+  const lower = url.toLowerCase();
+  if (lower.endsWith('.mp4') || lower.endsWith('.webm') || lower.endsWith('.ogg')) {
+    return { kind: 'file', src: url };
+  }
+
+  try {
+    const parsed = new URL(url);
+    const hostname = parsed.hostname.replace(/^www\./, '');
+
+    if (hostname === 'youtu.be') {
+      const id = parsed.pathname.split('/').filter(Boolean)[0];
+      if (id) return { kind: 'embed', src: `https://www.youtube.com/embed/${id}` };
+    }
+
+    if (hostname === 'youtube.com' || hostname === 'm.youtube.com' || hostname === 'music.youtube.com') {
+      if (parsed.pathname === '/watch') {
+        const id = parsed.searchParams.get('v');
+        if (id) return { kind: 'embed', src: `https://www.youtube.com/embed/${id}` };
+      }
+      if (parsed.pathname.startsWith('/embed/')) {
+        return { kind: 'embed', src: url };
+      }
+    }
+
+    if (hostname === 'vimeo.com' || hostname === 'player.vimeo.com') {
+      const parts = parsed.pathname.split('/').filter(Boolean);
+      const id = parts.find((p) => /^\d+$/.test(p));
+      if (id) return { kind: 'embed', src: `https://player.vimeo.com/video/${id}` };
+      if (hostname === 'player.vimeo.com') return { kind: 'embed', src: url };
+    }
+  } catch {
+    // ignore
+  }
+
+  return null;
+}
+
+function APODVideoPlayer({ url, title }: { url: string; title: string }) {
+  const info = getVideoInfo(url);
+
+  if (!info) return null;
+
+  if (info.kind === 'file') {
+    return (
+      <video
+        className="w-full rounded-lg bg-black"
+        controls
+        preload="metadata"
+        src={info.src}
+      />
+    );
+  }
+
+  return (
+    <div className="relative w-full rounded-lg overflow-hidden bg-black pt-[56.25%]">
+      <iframe
+        className="absolute inset-0 h-full w-full"
+        src={info.src}
+        title={title}
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+        referrerPolicy="strict-origin-when-cross-origin"
+        allowFullScreen
+      />
+    </div>
+  );
+}
+
 const APODImageInfo: React.FC<APODImageInfoProps> = ({
   data,
   currentImageIndex,
@@ -119,16 +187,23 @@ const APODImageInfo: React.FC<APODImageInfoProps> = ({
               </motion.div>
             </AnimatePresence>
           ) : (
-            <motion.div className="py-8 sm:py-12 text-center">
-              <VideoCameraIcon className="h-12 w-12 sm:h-16 sm:w-16 text-blue-400 mx-auto mb-3 sm:mb-4" />
-              <h3 className="text-lg sm:text-xl font-semibold text-white mb-3 sm:mb-4">Today&apos;s APOD is a Video</h3>
+            <motion.div className="py-6 sm:py-8 text-center space-y-4">
+              <div className="flex items-center justify-center gap-3">
+                <VideoCameraIcon className="h-10 w-10 sm:h-12 sm:w-12 text-blue-400" />
+                <h3 className="text-lg sm:text-xl font-semibold text-white">Today&apos;s APOD is a Video</h3>
+              </div>
+
+              <div className="text-left">
+                <APODVideoPlayer url={currentAPOD.url} title={currentAPOD.title} />
+              </div>
+
               <a
                 href={currentAPOD.url}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-block px-5 py-2.5 sm:px-6 sm:py-3 bg-gradient-to-r from-red-500 to-purple-600 text-white rounded-lg shadow-lg text-sm sm:text-base font-medium hover:scale-105 transition-transform"
               >
-                Watch Video
+                Open Video
               </a>
             </motion.div>
           )}
@@ -334,17 +409,22 @@ const APODImageInfo: React.FC<APODImageInfoProps> = ({
                 </motion.div>
               </AnimatePresence>
             ) : (
-              <motion.div className="p-8 text-center w-full flex flex-col justify-center">
-                <VideoCameraIcon className="h-20 w-20 text-blue-400 mx-auto mb-4" />
-                <h3 className="text-2xl font-semibold text-white mb-4">Today&apos;s APOD is a Video</h3>
-                <a
+              <motion.div className="p-6 xl:p-8 text-center w-full flex flex-col justify-center gap-5">
+                <div className="flex items-center justify-center gap-4">
+                  <VideoCameraIcon className="h-16 w-16 text-blue-400" />
+                  <h3 className="text-2xl font-semibold text-white">Today&apos;s APOD is a Video</h3>
+                </div>
+
+                <APODVideoPlayer url={currentAPOD.url} title={currentAPOD.title} />
+
+                {/* <a
                   href={currentAPOD.url}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="px-8 py-3 bg-gradient-to-r from-red-500 to-purple-600 text-white rounded-lg shadow-lg mx-auto font-semibold hover:scale-105 transition-transform"
                 >
-                  Watch Video
-                </a>
+                  Open Video
+                </a> */}
               </motion.div>
             )}
           </div>

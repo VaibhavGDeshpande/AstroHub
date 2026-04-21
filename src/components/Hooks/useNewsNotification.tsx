@@ -71,7 +71,7 @@ export const useNewsNotification = () => {
               </div>
             </div>,
             {
-              position: 'bottom-right',
+              position: 'top-right',
               autoClose: 6000,
               hideProgressBar: false,
               closeOnClick: true,

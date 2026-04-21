@@ -1,41 +1,41 @@
-// 'use client'
-// import { FC, ReactNode, useEffect, useRef } from 'react'
-// import Lenis from 'lenis'
+'use client';
 
-// interface LenisProviderProps {
-//   children: ReactNode
-// }
+import Lenis from 'lenis';
+import { type ReactNode, useEffect, useRef } from 'react';
 
-// export const LenisProvider: FC<LenisProviderProps> = ({ children }) => {
-//   const lenisRef = useRef<Lenis | null>(null)
+export default function LenisProvider({ children }: { children: ReactNode }) {
+  const lenisRef = useRef<Lenis | null>(null);
+  const rafRef = useRef<number | null>(null);
 
-//   useEffect(() => {
-//     // Initialize Lenis
-//     lenisRef.current = new Lenis({
-//       duration: 1.2,
-//       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-//     //   direction: 'vertical',
-//     //   gestureDirection: 'vertical',
-//     //   smooth: true,
-//     //   mouseMultiplier: 1,
-//     //   smoothTouch: false,
-//       touchMultiplier: 2,
-//       infinite: false,
-//     })
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
 
-//     // Animation loop
-//     function raf(time: number) {
-//       lenisRef.current?.raf(time)
-//       requestAnimationFrame(raf)
-//     }
-//     requestAnimationFrame(raf)
+    const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+    if (reduceMotion) return;
 
-//     // Cleanup
-//     return () => {
-//       lenisRef.current?.destroy()
-//     }
-//   }, [])
+    lenisRef.current = new Lenis({
+      lerp: 0.08,
+      smoothWheel: true,
+      // smoothTouch: false,
+      wheelMultiplier: 1.0,
+      touchMultiplier: 1.5,
+      easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      infinite: false,
+    });
 
-//   return <>{children}</>
-// }
-console.log("Hello")
+    const raf = (time: number) => {
+      lenisRef.current?.raf(time);
+      rafRef.current = requestAnimationFrame(raf);
+    };
+
+    rafRef.current = requestAnimationFrame(raf);
+
+    return () => {
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      lenisRef.current?.destroy();
+      lenisRef.current = null;
+    };
+  }, []);
+
+  return <>{children}</>;
+}

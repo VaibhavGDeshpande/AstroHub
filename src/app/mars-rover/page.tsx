@@ -16,6 +16,7 @@ import MarsPhotoCard from '@/components/MarsOrbiter/MarsPhotoCard';
 import MarsPhotoControls from '@/components/MarsOrbiter/MarsPhotoControl';
 import ErrorMessage from "@/components/Error";
 import LoaderWrapper from "@/components/Loader";
+import SectionTitle from "@/components/SectionTitle";
 
 export default function MarsPhotosPage() {
   const [photos, setPhotos] = useState<MarsOrbiter[]>([]);
@@ -126,19 +127,10 @@ export default function MarsPhotosPage() {
 
         <div className="container mx-auto px-4 sm:px-6 lg:px-10 py-5 flex flex-col gap-10">
           {/* Header with gradient title - matching APOD style */}
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="text-center mt-12"
-          >
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent animate-pulse">
-              Mars Rover Photos
-            </h1>
-            <p className="text-slate-300 mt-2">
-              Explore images captured by NASA&apos;s rovers on the Martian surface
-            </p>
-          </motion.div>
+          <SectionTitle 
+            title="Mars Rover Photos" 
+            subtitle="Explore images captured by NASA's rovers on the Martian surface"
+          />
 
           {/* Rover Info with animation delay */}
           {currentRover && (

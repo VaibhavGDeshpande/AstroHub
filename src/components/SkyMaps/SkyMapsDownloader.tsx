@@ -108,9 +108,6 @@ export default function SkyMapsDownloader() {
       <div className="container mx-auto px-4 sm:px-6 lg:px-10 py-12">
         {/* Header Section */}
         <div className="text-center mb-12 space-y-6">
-          <div className="inline-block">
-            <div className="text-6xl md:text-7xl mb-4">✨</div>
-          </div>
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent">
             Sky Maps Collection
           </h1>

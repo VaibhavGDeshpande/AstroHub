@@ -128,7 +128,9 @@ export default function SatelliteTrackerPage({ params }: SatelliteTrackerPagePro
                   </svg>
                 </div>
                 <div>
-                  <h1 className="text-2xl font-bold text-white">Satellite Tracker</h1>
+                  <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent animate-pulse">
+                    Satellite Tracker
+                  </h1>
                   <p className="text-sm text-slate-400">Real-time orbital tracking</p>
                 </div>
               </div>

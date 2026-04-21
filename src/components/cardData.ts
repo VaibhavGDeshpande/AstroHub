@@ -51,7 +51,7 @@ export const cardSections: CardSection[] = [
         description: 'Discover a new astronomy picture each day with detailed explanations from professional astronomers.',
         icon: Star,
         color: 'from-purple-500 to-pink-500',
-        path: '/', //apod
+        path: '/apod', //apod
         features: ['Daily updates', 'HD images', 'Expert explanations'],
         glow: 'purple',
         ctaText: 'Explore Data',
@@ -135,7 +135,7 @@ export const cardSections: CardSection[] = [
   {
     id: '3d-models',
     badgeColor: 'green',
-    badgeText: 'Interactive',
+    badgeText: '3D Models',
     titleGradient: 'from-green-400 to-blue-500',
     subtitle: 'Immersive 3D experiences of celestial bodies',
     cards: [
@@ -188,7 +188,7 @@ export const cardSections: CardSection[] = [
   {
     id: 'sky-tools',
     badgeColor: 'indigo',
-    badgeText: 'Observation',
+    badgeText: 'Sky Tools',
     titleGradient: 'from-green-400 to-blue-500',
     subtitle: 'Professional tools for mapping and observing the night sky',
     cards: [
@@ -241,7 +241,7 @@ export const cardSections: CardSection[] = [
   {
     id: 'news',
     badgeColor: 'emerald',
-    badgeText: 'Live Updates',
+    badgeText: 'News and Media',
     titleGradient: 'from-emerald-400 to-teal-500',
     subtitle: 'Latest updates from space exploration and test your knowledge of Universe',
     cards: [

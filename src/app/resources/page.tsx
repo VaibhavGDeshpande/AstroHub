@@ -4,6 +4,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import LoaderWrapper from "@/components/Loader";
 import { ArrowLeftIcon, HomeIcon, LinkIcon } from "@heroicons/react/24/outline";
+import SectionTitle from "@/components/SectionTitle";
 
 const apiResources = [
   {
@@ -156,16 +157,11 @@ export default function ResourcesPage() {
     <LoaderWrapper>
       <div className="min-h-screen bg-gradient-to-b from-black via-blue-950/20 to-black pb-16">
         <div className="container mx-auto px-4 max-w-6xl">
-          <div className="text-center mb-12">
-            <h1 className="text-4xl md:text-5xl font-bold mb-4 pt-15">
-              <span className="bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
-                Resources & Credits
-              </span>
-            </h1>
-            <p className="text-gray-400 text-sm">
-              Data sources, APIs, and reference websites used across AstroHub.
-            </p>
-          </div>
+          <SectionTitle 
+            title="Resources & Credits" 
+            subtitle="Data sources, APIs, and reference websites used across AstroHub."
+            className="pt-15"
+          />
 
           <div className="fixed top-4 left-4 z-50 hidden md:block">
             <motion.div

@@ -8,24 +8,38 @@ export const calculateTelescopePerformance = (
 ): CalculatedResults => {
   const barlowFactor = eyepiece.barlowFactor || 1;
   const effectiveFocalLength = telescope.focalLength * barlowFactor;
-  const focalRatio = telescope.focalLength / telescope.aperture;
+  const nativeFocalRatio = telescope.focalLength / telescope.aperture;
+  const effectiveFocalRatio = effectiveFocalLength / telescope.aperture;
 
   const magnification = effectiveFocalLength / eyepiece.focalLength;
   const trueFOV = eyepiece.apparentFOV / magnification;
   const exitPupil = telescope.aperture / magnification;
+  
+  // Rayleigh Criterion: 138 / D_mm
   const resolvingPower = 138 / telescope.aperture;
-  const limitingMagnitude = 2 + 5 * Math.log10(telescope.aperture);
+  // Dawes Limit: 116 / D_mm
+  const dawesLimit = 116 / telescope.aperture;
+  
+  // Theoretical Limiting Magnitude: 2.7 + 5 * log10(D_mm)
+  const limitingMagnitude = 2.7 + 5 * Math.log10(telescope.aperture);
+  
   const maxUsefulMagnification = 2 * telescope.aperture;
+  
+  // Light Gathering Power relative to 7mm human pupil
+  const lightGatheringPower = Math.pow(telescope.aperture / 7, 2);
 
   return {
     magnification: Math.round(magnification * 10) / 10,
     trueFOV: Math.round(trueFOV * 100) / 100,
     exitPupil: Math.round(exitPupil * 10) / 10,
     resolvingPower: Math.round(resolvingPower * 100) / 100,
+    dawesLimit: Math.round(dawesLimit * 100) / 100,
     limitingMagnitude: Math.round(limitingMagnitude * 10) / 10,
     maxUsefulMagnification: Math.round(maxUsefulMagnification),
-    focalRatio: Math.round(focalRatio * 10) / 10,
+    focalRatio: Math.round(nativeFocalRatio * 10) / 10,
+    effectiveFocalRatio: Math.round(effectiveFocalRatio * 10) / 10,
     effectiveFocalLength: Math.round(effectiveFocalLength),
+    lightGatheringPower: Math.round(lightGatheringPower),
   };
 };
 

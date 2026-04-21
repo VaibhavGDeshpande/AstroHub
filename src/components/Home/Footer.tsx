@@ -4,7 +4,7 @@ const Footer = () => {
   const currentYear = new Date().getFullYear();
 
   const quickLinks = [
-    { name: 'Home', path: '/' },
+    { name: 'Home', path: '#' },
     { name: 'About', path: '/about' },
     { name: 'Resources', path: '/resources' },
     { name: 'Privacy Policy', path: '/privacy-policy' },
@@ -20,8 +20,8 @@ const Footer = () => {
         { name: 'Near Earth Objects', path: '/neo' },
         { name: 'EPIC Earth Images', path: '/epic' },
         { name: 'NASA Image Library', path: '/images' },
-        { name: 'NASA Eyes', path: '/nasa-eyes' },
-        { name: 'Messier Catalog', path: '/messier' }
+        { name: 'NASA Eyes', path: '/nasa-eyes' }
+        
       ]
     },
     {
@@ -40,7 +40,8 @@ const Footer = () => {
       items: [
         { name: 'Stellarium Sky Map', path: '/stellarium' },
         { name: 'Sky Charts', path: '/sky-charts' },
-        { name: 'Satellite Tracker', path: '/satellite-tracker' }
+        { name: 'Satellite Tracker', path: '/satellite-tracker' },
+        { name: 'Messier Catalog', path: '/messier' }
       ]
     },
     {

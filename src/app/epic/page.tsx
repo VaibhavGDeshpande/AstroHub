@@ -9,6 +9,7 @@ import Link from 'next/link';
 import { ArrowLeftIcon, HomeIcon } from '@heroicons/react/24/outline';
 import ErrorMessage from '@/components/Error';
 import LoaderWrapper from '@/components/Loader';
+import SectionTitle from '@/components/SectionTitle';
 
 interface EPICData {
   images: EPICImage[];
@@ -174,24 +175,12 @@ const EPICPage = () => {
         {/* Main container - fixed height, no scroll */}
         <div className="h-full w-full flex flex-col overflow-hidden">
           {/* Compact header - fixed size */}
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="flex-shrink-0 text-center pt-14 sm:pt-16 pb-3 sm:pb-4 px-3 sm:px-4"
-          >
-            <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-blue-400 via-cyan-500 to-green-500 bg-clip-text text-transparent leading-tight">
-              DSCOVR EPIC
-            </h1>
-            <motion.p 
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5 }}
-              className="text-slate-300 text-xs sm:text-sm md:text-base max-w-xl lg:max-w-2xl mx-auto mt-1 sm:mt-2 leading-snug"
-            >
-              Earth from L1 Lagrange Point • 1 Million Miles Away
-            </motion.p>
-          </motion.div>
+          <div className="flex-shrink-0 pt-16 px-4">
+            <SectionTitle 
+              title="DSCOVR EPIC" 
+              subtitle="Earth from L1 Lagrange Point • 1 Million Miles Away"
+            />
+          </div>
 
           {/* Main content - fills remaining space */}
           {epicData && (

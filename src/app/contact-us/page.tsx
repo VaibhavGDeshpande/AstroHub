@@ -7,6 +7,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowLeftIcon, HomeIcon } from "@heroicons/react/24/outline";
 import emailjs from '@emailjs/browser';
+import SectionTitle from "@/components/SectionTitle";
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({
@@ -105,16 +106,10 @@ export default function ContactPage() {
         </div>
 
         {/* Header */}
-        <div className="text-center mb-6">
-          <h1 className="text-3xl md:text-4xl font-bold mb-3">
-            <span className="bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
-              Get In Touch
-            </span>
-          </h1>
-          <p className="text-gray-300 text-sm md:text-base max-w-2xl mx-auto">
-            Have questions about our astronomy tools? Want to report an issue or provide feedback? We&apos;d love to hear from you.
-          </p>
-        </div>
+        <SectionTitle 
+          title="Get In Touch" 
+          subtitle="Have questions about our astronomy tools? Want to report an issue or provide feedback? We'd love to hear from you."
+        />
 
         {/* Contact Form */}
         <div className="flex-1 flex items-center justify-center">

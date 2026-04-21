@@ -1,603 +1,286 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 'use client'
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { motion, AnimatePresence, MotionConfig, PanInfo } from 'framer-motion';
-import { ArrowRight, Sparkles, Star, ChevronLeft, ChevronRight } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ArrowRight, Sparkles } from 'lucide-react';
 import { cardSections, CardAPI } from './cardData';
 import { shouldPrefetchRoute } from '@/lib/routePrefetch';
 
-const hashString = (value: string) => {
-  let hash = 0;
-  for (let i = 0; i < value.length; i++) {
-    hash = (hash << 5) - hash + value.charCodeAt(i);
-    hash |= 0;
-  }
-  return Math.abs(hash);
-};
-
-const createParticleStyles = (sectionId: string, cardId: string) => {
-  const baseSeed = hashString(`${sectionId}-${cardId}`);
-  const seededRandom = (offset: number) => {
-    const x = Math.sin(baseSeed + offset) * 10000;
-    return x - Math.floor(x);
-  };
-
-  return Array.from({ length: 8 }, (_, index) => {
-    const horizontal = 15 + seededRandom(index * 4) * 70;
-    const vertical = 15 + seededRandom(index * 4 + 1) * 70;
-    const duration = 3 + seededRandom(index * 4 + 2) * 3;
-    const delay = seededRandom(index * 4 + 3) * 2;
-
-    return {
-      left: `${horizontal}%`,
-      top: `${vertical}%`,
-      animation: `float ${duration}s ease-in-out infinite`,
-      animationDelay: `${delay}s`,
-    };
-  });
-};
-
 const EnhancedCards = () => {
   const [isVisible, setIsVisible] = useState(false);
-  const [activeIndices, setActiveIndices] = useState<{ [key: string]: number }>({});
-  const [isMobile, setIsMobile] = useState(false);
-  const [direction, setDirection] = useState<{ [key: string]: number }>({});
-  const [isPaused, setIsPaused] = useState<{ [key: string]: boolean }>({});
-
+  const [activeTab, setActiveTab] = useState(cardSections[0].id);
 
   useEffect(() => {
     setIsVisible(true);
-
-    // Initialize active indices for each section
-    const initialIndices: { [key: string]: number } = {};
-    const initialDirections: { [key: string]: number } = {};
-    const initialPaused: { [key: string]: boolean } = {};
-    cardSections.forEach(section => {
-      initialIndices[section.id] = 0;
-      initialDirections[section.id] = 1;
-      initialPaused[section.id] = false;
-    });
-    setActiveIndices(initialIndices);
-    setDirection(initialDirections);
-    setIsPaused(initialPaused);
   }, []);
-
-
-  useEffect(() => {
-    const handleResize = () => {
-      setIsMobile(window.innerWidth < 1024);
-    };
-    handleResize();
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
-
-  // Auto-rotate cards every 4 seconds - ONLY FOR DESKTOP and when NOT paused
-  useEffect(() => {
-    if (isMobile) return;
-
-    const intervals: NodeJS.Timeout[] = [];
-
-    cardSections.forEach(section => {
-      if (section.cards.length >= 3) {
-        const interval = setInterval(() => {
-          // Only rotate if not paused
-          if (!isPaused[section.id]) {
-            setDirection(prev => ({ ...prev, [section.id]: 1 }));
-            setActiveIndices(prev => ({
-              ...prev,
-              [section.id]: (prev[section.id] + 1) % section.cards.length
-            }));
-          }
-        }, 4000);
-        intervals.push(interval);
-      }
-    });
-
-    return () => intervals.forEach(interval => clearInterval(interval));
-  }, [isMobile, isPaused]);
-
-
-  // Navigation handlers
-  const handlePrevious = (sectionId: string, cardsLength: number) => {
-    setDirection(prev => ({ ...prev, [sectionId]: -1 }));
-    setActiveIndices(prev => ({
-      ...prev,
-      [sectionId]: (prev[sectionId] - 1 + cardsLength) % cardsLength
-    }));
-  };
-
-
-  const handleNext = (sectionId: string, cardsLength: number) => {
-    setDirection(prev => ({ ...prev, [sectionId]: 1 }));
-    setActiveIndices(prev => ({
-      ...prev,
-      [sectionId]: (prev[sectionId] + 1) % cardsLength
-    }));
-  };
-
-
-  // Swipe handlers
-  const swipeConfidenceThreshold = 10000;
-  const swipePower = (offset: number, velocity: number) => {
-    return Math.abs(offset) * velocity;
-  };
-
-
-  const handleDragEnd = (
-    sectionId: string,
-    cardsLength: number,
-    e: MouseEvent | TouchEvent | PointerEvent,
-    { offset, velocity }: PanInfo
-  ) => {
-    const swipe = swipePower(offset.x, velocity.x);
-
-    if (swipe < -swipeConfidenceThreshold) {
-      handleNext(sectionId, cardsLength);
-    } else if (swipe > swipeConfidenceThreshold) {
-      handlePrevious(sectionId, cardsLength);
-    }
-  };
-
 
   const getBadgeColor = (color: string) => {
     const colors: { [key: string]: string } = {
-      blue: 'bg-blue-500/10 border-blue-500/20 text-blue-400',
-      green: 'bg-green-500/10 border-green-500/20 text-green-400',
-      indigo: 'bg-indigo-500/10 border-indigo-500/20 text-indigo-400',
-      emerald: 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400',
-      cyan: 'bg-cyan-500/10 border-cyan-500/20 text-cyan-400',
+      blue: 'bg-blue-500/10 border-blue-500/20 text-blue-400 focus-visible:ring-blue-500/50',
+      green: 'bg-green-500/10 border-green-500/20 text-green-400 focus-visible:ring-green-500/50',
+      indigo: 'bg-indigo-500/10 border-indigo-500/20 text-indigo-400 focus-visible:ring-indigo-500/50',
+      emerald: 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400 focus-visible:ring-emerald-500/50',
+      cyan: 'bg-cyan-500/10 border-cyan-500/20 text-cyan-400 focus-visible:ring-cyan-500/50',
+      purple: 'bg-purple-500/10 border-purple-500/20 text-purple-400 focus-visible:ring-purple-500/50',
+      yellow: 'bg-yellow-500/10 border-yellow-500/20 text-yellow-400 focus-visible:ring-yellow-500/50',
+      red: 'bg-red-500/10 border-red-500/20 text-red-400 focus-visible:ring-red-500/50',
+      gray: 'bg-gray-500/10 border-gray-500/20 text-gray-400 focus-visible:ring-gray-500/50',
     };
     return colors[color] || colors.blue;
   };
 
-
-  const getVisibleCards = (sectionId: string, cards: CardAPI[]) => {
-    if (isMobile || cards.length < 3) {
-      return [{ card: cards[activeIndices[sectionId] || 0], position: 'center', originalIndex: activeIndices[sectionId] || 0 }];
-    }
-
-    const activeIndex = activeIndices[sectionId] || 0;
-    const leftIndex = (activeIndex - 1 + cards.length) % cards.length;
-    const rightIndex = (activeIndex + 1) % cards.length;
-
-    return [
-      { card: cards[leftIndex], position: 'left', originalIndex: leftIndex },
-      { card: cards[activeIndex], position: 'center', originalIndex: activeIndex },
-      { card: cards[rightIndex], position: 'right', originalIndex: rightIndex }
-    ];
+  const getGradientFromColor = (color: string) => {
+    const gradients: { [key: string]: string } = {
+      blue: 'from-blue-600/20 to-blue-900/10 border-blue-500/30',
+      green: 'from-green-600/20 to-green-900/10 border-green-500/30',
+      indigo: 'from-indigo-600/20 to-indigo-900/10 border-indigo-500/30',
+      emerald: 'from-emerald-600/20 to-emerald-900/10 border-emerald-500/30',
+      cyan: 'from-cyan-600/20 to-cyan-900/10 border-cyan-500/30',
+      purple: 'from-purple-600/20 to-purple-900/10 border-purple-500/30',
+      yellow: 'from-yellow-600/20 to-yellow-900/10 border-yellow-500/30',
+      red: 'from-red-600/20 to-red-900/10 border-red-500/30',
+      gray: 'from-slate-600/20 to-slate-900/10 border-slate-500/30',
+    };
+    return gradients[color] || gradients.blue;
   };
 
-
-  // Circular transition variants for desktop
-  const cardVariants = {
-    center: {
-      scale: 1,
-      opacity: 1,
-      zIndex: 3,
-      filter: 'blur(0px)',
-      x: 0,
-      rotateY: 0,
-      transition: {
-        duration: 0.6
-      }
-    },
-    side: {
-      scale: 0.88,
-      opacity: 0.4,
-      zIndex: 1,
-      filter: 'blur(2px)',
-      rotateY: 0,
-      transition: {
-        duration: 0.6
-      }
-    }
-  };
-
-
-  // Enhanced mobile card variants with swipe support
-  const mobileCardVariants = {
-    enter: (direction: number) => ({
-      x: direction > 0 ? 300 : -300,
-      opacity: 0,
-      scale: 0.9,
-    }),
-    center: {
-      x: 0,
-      opacity: 1,
-      scale: 1,
-      zIndex: 1,
-      transition: {
-        duration: 0.4,
-        type: "spring" as const,
-        stiffness: 300,
-        damping: 30
-      }
-    },
-    exit: (direction: number) => ({
-      x: direction > 0 ? -300 : 300,
-      opacity: 0,
-      scale: 0.9,
-      zIndex: 0,
-      transition: {
-        duration: 0.4,
-      }
-    })
-  };
-
-
-  const contentVariants = {
-    hidden: {
-      opacity: 0,
-      y: 15,
-    },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        duration: 0.4,
-        staggerChildren: 0.05,
-        delayChildren: 0.1,
-      }
-    }
-  };
-
-
-  const itemVariants = {
-    hidden: {
-      opacity: 0,
-      x: -10,
-    },
-    visible: {
-      opacity: 1,
-      x: 0,
-      transition: {
-        duration: 0.3,
-      }
-    }
-  };
-
-
-  const renderCard = (api: CardAPI, position: string, sectionId: string, originalIndex: number) => {
+  const renderCard = (api: CardAPI, originalIndex: number) => {
     const Icon = api.icon;
-    const isCenter = position === 'center';
-    const particleStyles = createParticleStyles(sectionId, `${api.title}-${originalIndex}`);
-
+    
     const cardContent = (
-      <motion.div
-        layoutId={isMobile ? undefined : `card-${sectionId}-${api.title}`}
-        variants={isMobile ? undefined : cardVariants}
-        animate={isCenter ? "center" : "side"}
-        onMouseEnter={() => !isMobile && setIsPaused(prev => ({ ...prev, [sectionId]: true }))}
-        onMouseLeave={() => !isMobile && setIsPaused(prev => ({ ...prev, [sectionId]: false }))}
-        className="h-full"
-      >
-        <div className="relative h-full bg-gradient-to-br from-slate-900/90 to-slate-800/90 backdrop-blur-xl border border-slate-700/50 rounded-2xl sm:rounded-3xl p-5 sm:p-7 overflow-hidden transition-all duration-300 hover:border-slate-500/70 hover:shadow-2xl hover:shadow-purple-500/20 hover:-translate-y-2 flex flex-col min-h-[380px] sm:min-h-[400px] cursor-pointer group">
+      <div className={`relative h-full w-full bg-gradient-to-br from-slate-900/80 to-slate-800/80 backdrop-blur-xl border border-slate-700/50 rounded-2xl p-6 overflow-hidden transition-all duration-300 hover:border-slate-500/70 hover:shadow-[0_15px_40px_rgba(8,_112,_184,_0.08)] hover:-translate-y-1.5 flex flex-col group`}>
+        {/* Animated gradient background */}
+        <div className={`absolute inset-0 bg-gradient-to-br ${api.color} opacity-0 group-hover:opacity-[0.08] transition-all duration-500 blur-xl`} />
 
-          {/* Animated gradient background */}
-          <div className={`absolute inset-0 bg-gradient-to-br ${api.color} opacity-0 group-hover:opacity-[0.15] transition-all duration-500 blur-2xl`} />
+        {/* Mesh gradient overlay */}
+        <div className="absolute inset-0 opacity-10 group-hover:opacity-20 transition-opacity duration-300 pointer-events-none">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.05),transparent_50%)]" />
+        </div>
 
-          {/* Mesh gradient overlay */}
-          <div className="absolute inset-0 opacity-30">
-            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 via-purple-500/10 to-pink-500/10" />
+        <div className="relative z-10 flex flex-col h-full">
+          <div className="flex flex-col mb-4">
+            <div className={`relative w-12 h-12 rounded-xl bg-gradient-to-br ${api.color} flex items-center justify-center shadow-lg group-hover:scale-105 group-hover:rotate-3 transition-all duration-300 mb-4`}>
+              <Icon className={`w-6 h-6 text-white`} />
+              <div className={`absolute inset-0 rounded-xl bg-gradient-to-br ${api.color} blur-md opacity-0 group-hover:opacity-60 transition-all duration-300`} />
+            </div>
+
+            <h3 className={`font-bold text-white mb-2 text-xl group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-blue-400 group-hover:via-purple-400 group-hover:to-pink-400 group-hover:bg-clip-text transition-all duration-300`}>
+              {api.title}
+            </h3>
+            <p className={`text-slate-400 leading-relaxed font-light text-sm line-clamp-3`}>
+              {api.description}
+            </p>
           </div>
 
-          {/* Floating particles */}
-          <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700">
-            {particleStyles.map((style, i) => (
-              <div
-                key={i}
-                className="absolute w-1 h-1 bg-white/60 rounded-full"
-                style={style}
-              />
+          <div className="flex-grow" />
+
+          <div className={`space-y-2 mb-6`}>
+            {api.features.map((feature: string, idx: number) => (
+              <div key={idx} className="flex items-center group/feature">
+                <div className={`w-1.5 h-1.5 rounded-full bg-gradient-to-r ${api.color} mr-3 group-hover/feature:scale-125 transition-all duration-200`} />
+                <span className="text-sm text-slate-500 group-hover/feature:text-slate-300 transition-colors duration-200">
+                  {feature}
+                </span>
+              </div>
             ))}
           </div>
 
-          {/* Corner accent */}
-          <div className="absolute top-0 right-0 w-24 sm:w-32 h-24 sm:h-32 bg-gradient-to-br from-white/5 to-transparent rounded-bl-full opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-
-          {/* Icon container */}
-          <div className="relative mb-4 sm:mb-6 flex-shrink-0">
-            <div className={`relative w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl bg-gradient-to-br ${api.color} flex items-center justify-center shadow-2xl group-hover:scale-110 group-hover:rotate-6 transition-all duration-300`}>
-              <Icon className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
-              <div className={`absolute inset-0 rounded-xl sm:rounded-2xl bg-gradient-to-br ${api.color} blur-2xl opacity-0 group-hover:opacity-70 transition-all duration-300`} />
-            </div>
-            <Sparkles className="absolute -top-1 -right-1 w-4 h-4 sm:w-5 sm:h-5 text-yellow-400 opacity-0 group-hover:opacity-100 group-hover:animate-pulse transition-opacity duration-300" />
-          </div>
-
-          {/* Content - Only animate on center card */}
-          <motion.div
-            className="relative flex-grow flex flex-col z-10"
-            variants={isCenter ? contentVariants : undefined}
-            initial={isCenter ? "hidden" : false}
-            animate={isCenter ? "visible" : false}
-            key={isCenter ? `content-${sectionId}-${originalIndex}-${activeIndices[sectionId]}` : undefined}
-          >
-            <motion.h3
-              variants={isCenter ? itemVariants : undefined}
-              className="text-xl sm:text-2xl font-bold text-white mb-2 sm:mb-3 group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-blue-400 group-hover:via-purple-400 group-hover:to-pink-400 group-hover:bg-clip-text transition-all duration-300"
-            >
-              {api.title}
-            </motion.h3>
-
-            <motion.p
-              variants={isCenter ? itemVariants : undefined}
-              className="text-slate-400 mb-4 sm:mb-6 text-xs sm:text-sm leading-relaxed group-hover:text-slate-300 transition-colors duration-200 flex-grow"
-            >
-              {api.description}
-            </motion.p>
-
-            {/* Features */}
-            <motion.div
-              variants={isCenter ? contentVariants : undefined}
-              className="space-y-2 sm:space-y-3 mb-4 sm:mb-6"
-            >
-              {api.features.map((feature: string, idx: number) => (
-                <motion.div
-                  key={idx}
-                  variants={isCenter ? itemVariants : {}}
-                  className="flex items-center group/feature"
-                >
-                  <div className={`w-1.5 h-1.5 rounded-full bg-gradient-to-r ${api.color} mr-2 sm:mr-3 group-hover:scale-150 group-hover:shadow-lg transition-all duration-200`} />
-                  <span className="text-xs text-slate-500 group-hover/feature:text-white transition-colors duration-200 font-medium">
-                    {feature}
-                  </span>
-                </motion.div>
-              ))}
-            </motion.div>
-          </motion.div>
-
-          {/* CTA */}
-          <div className="relative flex items-center justify-between pt-4 sm:pt-5 border-t border-slate-700/30 group-hover:border-slate-600/50 transition-all duration-200 mt-auto z-10">
-            <div className="flex items-center gap-1.5 sm:gap-2">
-              <span className={`text-xs sm:text-sm font-semibold bg-gradient-to-r ${api.color} bg-clip-text text-transparent group-hover:text-white transition-all duration-200`}>
+          <div className={`relative flex items-center justify-between pt-4 border-t border-slate-700/30 group-hover:border-slate-600/50 transition-all duration-200`}>
+            <div className="flex items-center gap-2 group/cta">
+              <span className={`text-sm font-semibold bg-gradient-to-r ${api.color} bg-clip-text text-transparent transition-all duration-200`}>
                 {api.ctaText}
               </span>
-              <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4 text-slate-400 group-hover:text-white group-hover:translate-x-2 transition-all duration-200" />
+              <ArrowRight className={`w-4 h-4 text-slate-400 group-hover/cta:text-white group-hover/cta:translate-x-1.5 transition-all duration-200`} />
             </div>
 
             {api.status && (
-              <div className="flex items-center gap-1.5 sm:gap-2">
+              <div className="flex items-center gap-2">
                 <div className="relative">
-                  <div className={`w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full ${api.status === 'Live'
-                      ? 'bg-emerald-400 animate-pulse'
-                      : 'bg-red-400 animate-pulse'
-                    }`} />
-                  <div className={`absolute inset-0 w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full ${api.status === 'Live'
-                      ? 'bg-emerald-400 animate-ping'
-                      : 'bg-red-400 animate-ping'
-                    }`} />
+                  <div className={`w-1.5 h-1.5 rounded-full ${api.status === 'Live' ? 'bg-emerald-400' : 'bg-amber-400'}`} />
+                  <div className={`absolute inset-0 w-1.5 h-1.5 rounded-full animate-ping border border-transparent ${api.status === 'Live' ? 'bg-emerald-400' : 'bg-amber-400'}`} />
                 </div>
-                <span className={`text-xs font-semibold ${api.status === 'Live'
-                    ? 'text-emerald-400'
-                    : 'text-red-400'
-                  }`}>
+                <span className={`text-[10px] uppercase tracking-wider font-semibold ${api.status === 'Live' ? 'text-emerald-400' : 'text-amber-400'}`}>
                   {api.status}
                 </span>
               </div>
             )}
           </div>
-          {/* Hover overlay */}
-          <div className="absolute inset-0 rounded-2xl sm:rounded-3xl bg-gradient-to-t from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
         </div>
-      </motion.div>
+      </div>
     );
 
-    if (!api.external) {
-      return (
-        <Link
-          href={api.path}
-          prefetch={shouldPrefetchRoute(api.path)}
-          className="block h-full"
-        >
-          {cardContent}
-        </Link>
-      );
-    } else {
-      return (
-        <a href={api.path} target="_blank" rel="noopener noreferrer" className="block h-full">
-          {cardContent}
-        </a>
-      );
-    }
+    const wrapWithLink = (content: React.ReactNode) => {
+      if (!api.external) {
+        return (
+          <Link href={api.path} prefetch={shouldPrefetchRoute(api.path)} className="block h-full cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500/50 rounded-2xl">
+            {content}
+          </Link>
+        );
+      } else {
+        return (
+          <a href={api.path} target="_blank" rel="noopener noreferrer" className="block h-full cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500/50 rounded-2xl">
+            {content}
+          </a>
+        );
+      }
+    };
+
+    return (
+      <motion.div
+        key={`${activeTab}-${api.title}`}
+        initial={{ opacity: 0, y: 15, scale: 0.98 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        exit={{ opacity: 0, y: -15, scale: 0.98 }}
+        transition={{ duration: 0.4, delay: originalIndex * 0.05 }}
+        className="h-full"
+      >
+        {wrapWithLink(cardContent)}
+      </motion.div>
+    );
   };
 
+  const activeSection = cardSections.find(s => s.id === activeTab);
 
   return (
-    <MotionConfig transition={{ duration: 0.4 }}>
-      <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-black py-12 sm:py-16 md:py-20 px-4 relative overflow-hidden">
-        {/* Enhanced background effects */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-0 left-1/4 w-64 sm:w-96 h-64 sm:h-96 bg-purple-500/20 rounded-full blur-[120px] animate-pulse" style={{ animationDuration: '8s' }} />
-          <div className="absolute top-1/3 right-1/4 w-64 sm:w-96 h-64 sm:h-96 bg-blue-500/20 rounded-full blur-[120px] animate-pulse" style={{ animationDuration: '10s', animationDelay: '2s' }} />
-          <div className="absolute bottom-1/4 left-1/3 w-64 sm:w-96 h-64 sm:h-96 bg-emerald-500/20 rounded-full blur-[120px] animate-pulse" style={{ animationDuration: '9s', animationDelay: '1s' }} />
-          <div className="absolute bottom-0 left-1/2 w-64 sm:w-96 h-64 sm:h-96 bg-cyan-500/20 rounded-full blur-[120px] animate-pulse" style={{ animationDuration: '12s', animationDelay: '4s' }} />
+    <div className="min-h-screen bg-[#020617] py-16 sm:py-24 relative overflow-hidden">
+      {/* Background Ambience */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-0 right-1/4 w-[600px] h-[600px] bg-purple-500/10 rounded-full blur-[140px] animate-pulse" style={{ animationDuration: '8s' }} />
+        <div className="absolute top-1/2 left-1/4 w-[500px] h-[500px] bg-blue-500/10 rounded-full blur-[140px] animate-pulse" style={{ animationDuration: '10s', animationDelay: '2s' }} />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,rgba(2,6,23,0.8)_100%)]" />
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.01)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.01)_1px,transparent_1px)] bg-[size:64px_64px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]" />
+      </div>
 
-          {/* Grid overlay */}
-          <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:100px_100px]" />
-
-          {/* Radial gradient overlay */}
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,rgba(0,0,0,0.4)_100%)]" />
-        </div>
-
-        <div className="container mx-auto max-w-7xl relative z-10">
-          {/* Main header */}
-          <div className={`text-center mb-16 sm:mb-20 md:mb-24 transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-8xl font-black text-transparent bg-gradient-to-r from-yellow-400 via-red-500 to-yellow-500 bg-clip-text mb-6 sm:mb-8 leading-tight tracking-tight px-4">
-              Explore the Universe
-            </h1>
-            <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-slate-400 max-w-3xl mx-auto leading-relaxed font-light px-4">
-              Access real-time space data, immersive 3D models, and professional sky observation tools
-            </p>
-
-            {/* Decorative line */}
-            <div className="flex items-center justify-center gap-2 sm:gap-3 mt-6 sm:mt-8">
-              <div className="w-12 sm:w-20 h-px bg-gradient-to-r from-transparent via-blue-500 to-transparent"></div>
-              <Star className="w-3 h-3 sm:w-4 sm:h-4 text-blue-400 animate-pulse" />
-              <div className="w-12 sm:w-20 h-px bg-gradient-to-r from-transparent via-purple-500 to-transparent"></div>
+      <div className="container mx-auto max-w-[1400px] relative z-10 px-4 sm:px-6 lg:px-8">
+        
+        {/* Header */}
+        <motion.div 
+          id="tour-features-directory"
+          className="mb-12 lg:mb-20 text-center md:text-left md:flex items-end justify-between border-b border-slate-800/60 pb-8"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: isVisible ? 1 : 0, y: isVisible ? 0 : 20 }}
+          transition={{ duration: 0.6 }}
+        >
+          <div className="max-w-2xl">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-slate-800/30 border border-slate-700/50 mb-6 backdrop-blur-sm">
+              <Sparkles className="w-3.5 h-3.5 text-blue-400" />
+              <span className="text-xs font-semibold text-slate-300 uppercase tracking-widest">Platform Directory</span>
             </div>
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-black text-white mb-4 tracking-tight">
+              Command Center
+            </h1>
+            <p className="text-lg text-slate-400 font-light">
+              Explore our suite of astronomical tools, telemetry access points, and interactive simulations. 
+            </p>
+          </div>
+        </motion.div>
+
+        {/* Command Center Layout */}
+        <div className="flex flex-col lg:flex-row gap-8 lg:gap-12">
+          
+          {/* Left Sidebar Navigation */}
+          <motion.div 
+            className="w-full lg:w-72 flex-shrink-0"
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: isVisible ? 1 : 0, x: isVisible ? 0 : -20 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+          >
+            <div className="sticky top-24 bg-slate-900/50 backdrop-blur-md border border-slate-800/80 rounded-2xl p-4 sm:p-5">
+              <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-4 px-2">Navigation</h3>
+              
+              {/* Mobile Horizontal Scroll / Desktop Vertical List */}
+              <div className="flex lg:flex-col gap-2 overflow-x-auto pb-4 lg:pb-0 scrollbar-hide snap-x">
+                {cardSections.map((section) => {
+                  const isActive = activeTab === section.id;
+                  const baseBadge = getBadgeColor(section.badgeColor);
+                  const activeGradient = getGradientFromColor(section.badgeColor);
+                  
+                  return (
+                    <button
+                      key={section.id}
+                      onClick={() => setActiveTab(section.id)}
+                      className={`relative flex items-center justify-between w-full p-3 sm:p-4 rounded-xl text-left transition-all duration-300 flex-shrink-0 lg:flex-shrink snap-start group outline-none focus-visible:ring-2 focus-visible:ring-slate-400 min-w-[200px] lg:min-w-0
+                        ${isActive 
+                          ? `bg-gradient-to-br ${activeGradient} shadow-lg` 
+                          : 'hover:bg-slate-800/40 border border-transparent hover:border-slate-700/50'
+                        }
+                      `}
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors
+                          ${isActive ? 'bg-slate-900/50' : 'bg-slate-800/80 group-hover:bg-slate-700/80'}
+                        `}>
+                          <div className={`w-2 h-2 rounded-full ${isActive ? `bg-${section.badgeColor}-400 animate-pulse shadow-[0_0_10px_currentColor]` : 'bg-slate-600'}`} />
+                        </div>
+                        <div className="flex flex-col">
+                          <span className={`text-sm font-semibold transition-colors ${isActive ? 'text-white' : 'text-slate-300 group-hover:text-white'}`}>
+                            {section.badgeText}
+                          </span>
+                          {isActive && (
+                            <span className="text-[10px] text-slate-400 capitalize hidden sm:block">
+                              {section.cards.length} Modules
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      
+                      {isActive && (
+                        <motion.div 
+                          layoutId="activeTabIndicator"
+                          className="absolute inset-0 border-2 rounded-xl pointer-events-none"
+                          style={{ borderColor: `var(--${section.badgeColor}-500, #3b82f6)`, opacity: 0.3 }}
+                          transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                        />
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Right Content Area */}
+          <div className="flex-1 min-w-0 relative">
+            <AnimatePresence mode="wait">
+              {activeSection && (
+                <motion.div
+                  key={activeSection.id}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <div className="mb-6 lg:mb-8 pb-4 border-b border-slate-800/60 hidden lg:block">
+                    <h2 className="text-2xl font-bold text-white mb-2">{activeSection.subtitle}</h2>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-slate-400 uppercase tracking-widest">{activeSection.badgeText} Directory</span>
+                      <span className="w-1.5 h-1.5 rounded-full bg-slate-700" />
+                      <span className="text-xs text-slate-500">{activeSection.cards.length} Services Available</span>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6 auto-rows-fr">
+                    {activeSection.cards.map((api, index) => renderCard(api, index))}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
 
-          {/* Dynamic Sections with Carousel */}
-          {cardSections.map((section) => {
-            const visibleCards = getVisibleCards(section.id, section.cards);
-            const shouldShowCarousel = section.cards.length >= 3;
-            const activeIndex = activeIndices[section.id] || 0;
-            const sectionDirection = direction[section.id] || 1;
-
-            return (
-              <section key={section.id} className="mb-20 sm:mb-24 md:mb-28">
-                <div className="text-center mb-12 sm:mb-14 md:mb-16 px-4">
-                  <div className="inline-block mb-3 sm:mb-4">
-                    <div className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 ${getBadgeColor(section.badgeColor)} border rounded-full`}>
-                      <div className={`w-1.5 h-1.5 sm:w-2 sm:h-2 bg-${section.badgeColor}-400 rounded-full animate-pulse`}></div>
-                      <span className="text-xs font-semibold uppercase tracking-wider">{section.badgeText}</span>
-                    </div>
-                  </div>
-                  <h2 className={`text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-transparent bg-gradient-to-r ${section.titleGradient} bg-clip-text mb-4 sm:mb-5 tracking-tight`}>
-                    {section.badgeText}
-                  </h2>
-                  <p className="text-sm sm:text-base md:text-lg text-slate-400 max-w-2xl mx-auto font-light">
-                    {section.subtitle}
-                  </p>
-                </div>
-
-                {shouldShowCarousel ? (
-                  <>
-                    {/* Desktop View - Three cards carousel with arrows */}
-                    <div className="hidden lg:block relative px-12 xl:px-16">
-                      {/* Navigation Arrows - Desktop */}
-                      <button
-                        onClick={() => handlePrevious(section.id, section.cards.length)}
-                        className="absolute left-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 xl:w-12 xl:h-12 rounded-full bg-gradient-to-br from-slate-800/90 to-slate-700/90 border border-slate-600/50 flex items-center justify-center hover:border-purple-500/50 hover:shadow-lg hover:shadow-purple-500/20 transition-all duration-300 group"
-                        aria-label="Previous slide"
-                      >
-                        <ChevronLeft className="w-5 h-5 xl:w-6 xl:h-6 text-slate-400 group-hover:text-white transition-colors" />
-                      </button>
-
-                      <div className="flex justify-center gap-4 xl:gap-6 relative w-full mb-8">
-                        {visibleCards.map(({ card, position, originalIndex }) => (
-                          <div key={`${section.id}-${card.title}`} className="w-1/3">
-                            {renderCard(card, position, section.id, originalIndex)}
-                          </div>
-                        ))}
-                      </div>
-
-                      <button
-                        onClick={() => handleNext(section.id, section.cards.length)}
-                        className="absolute right-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 xl:w-12 xl:h-12 rounded-full bg-gradient-to-br from-slate-800/90 to-slate-700/90 border border-slate-600/50 flex items-center justify-center hover:border-purple-500/50 hover:shadow-lg hover:shadow-purple-500/20 transition-all duration-300 group"
-                        aria-label="Next slide"
-                      >
-                        <ChevronRight className="w-5 h-5 xl:w-6 xl:h-6 text-slate-400 group-hover:text-white transition-colors" />
-                      </button>
-                    </div>
-
-                    {/* Mobile/Tablet View - Single card with navigation arrows */}
-                    <div className="lg:hidden relative px-4">
-                      {/* Counter */}
-                      <div className="flex justify-center items-center mb-4">
-                        <span className="text-xs sm:text-sm text-slate-500 font-medium px-4 py-1.5 rounded-full bg-slate-800/50 border border-slate-700/50">
-                          {activeIndex + 1} / {section.cards.length}
-                        </span>
-                      </div>
-
-                      {/* Navigation Arrows - Mobile */}
-                      <div className="flex items-center justify-center gap-3 mb-4">
-                        <button
-                          onClick={() => handlePrevious(section.id, section.cards.length)}
-                          className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br from-slate-800/90 to-slate-700/90 border border-slate-600/50 flex items-center justify-center hover:border-purple-500/50 hover:shadow-lg hover:shadow-purple-500/20 transition-all duration-300 group active:scale-95"
-                          aria-label="Previous card"
-                        >
-                          <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6 text-slate-400 group-hover:text-white transition-colors" />
-                        </button>
-                        
-                        <span className="text-xs sm:text-sm text-slate-500 font-medium">
-                          Tap or Swipe
-                        </span>
-
-                        <button
-                          onClick={() => handleNext(section.id, section.cards.length)}
-                          className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br from-slate-800/90 to-slate-700/90 border border-slate-600/50 flex items-center justify-center hover:border-purple-500/50 hover:shadow-lg hover:shadow-purple-500/20 transition-all duration-300 group active:scale-95"
-                          aria-label="Next card"
-                        >
-                          <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6 text-slate-400 group-hover:text-white transition-colors" />
-                        </button>
-                      </div>
-
-                      <div className="min-h-[380px] sm:min-h-[400px] relative mb-6 sm:mb-8 overflow-hidden">
-                        <AnimatePresence initial={false} mode="wait" custom={sectionDirection}>
-                          <motion.div
-                            key={`mobile-${section.id}-${activeIndex}`}
-                            custom={sectionDirection}
-                            variants={mobileCardVariants}
-                            initial="enter"
-                            animate="center"
-                            exit="exit"
-                            drag="x"
-                            dragConstraints={{ left: 0, right: 0 }}
-                            dragElastic={1}
-                            onDragEnd={(e, info) => handleDragEnd(section.id, section.cards.length, e, info)}
-                            className="absolute inset-0 cursor-grab active:cursor-grabbing"
-                          >
-                            {renderCard(visibleCards[0].card, 'center', section.id, visibleCards[0].originalIndex)}
-                          </motion.div>
-                        </AnimatePresence>
-                      </div>
-                    </div>
-
-                    {/* Indicator Dots */}
-                    <div className="flex justify-center mt-6 sm:mt-8 space-x-1.5 sm:space-x-2">
-                      {section.cards.map((_, idx) => (
-                        <motion.button
-                          key={idx}
-                          onClick={() => {
-                            setDirection(prev => ({
-                              ...prev,
-                              [section.id]: idx > activeIndex ? 1 : -1
-                            }));
-                            setActiveIndices(prev => ({ ...prev, [section.id]: idx }));
-                          }}
-                          className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full transition-all duration-300 ${activeIndex === idx ? 'bg-purple-500' : 'bg-slate-600'
-                            }`}
-                          whileHover={{ scale: 1.2 }}
-                          whileTap={{ scale: 0.9 }}
-                          animate={{
-                            scale: activeIndex === idx ? 1.15 : 1,
-                          }}
-                          aria-label={`Go to slide ${idx + 1}`}
-                        />
-                      ))}
-                    </div>
-                  </>
-                ) : (
-                  // Regular grid for sections with fewer than 3 cards
-                  <div className={`grid ${section.cards.length === 2 ? 'grid-cols-1 md:grid-cols-2' : 'grid-cols-1'} gap-4 sm:gap-6 max-w-4xl mx-auto px-4`}>
-                    {section.cards.map((api, index) => (
-                      <div
-                        key={index}
-                        className={`transition-all duration-700 ease-out ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'
-                          }`}
-                        style={{ transitionDelay: `${index * 80}ms` }}
-                      >
-                        {renderCard(api, 'center', section.id, index)}
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </section>
-            );
-          })}
         </div>
-
-        <style jsx>{`
-          @keyframes float {
-            0%, 100% { transform: translateY(0) rotate(0deg); }
-            50% { transform: translateY(-20px) rotate(5deg); }
-          }
-        `}</style>
       </div>
-    </MotionConfig>
+      
+      <style jsx>{`
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+        .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+      `}</style>
+    </div>
   );
 };
 

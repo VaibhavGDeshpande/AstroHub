@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { type Dispatch, type ReactNode, type SetStateAction, useCallback, useEffect, useMemo, useState } from 'react';
 import dynamic from 'next/dynamic';
@@ -236,7 +236,7 @@ export default function AstroWeatherDashboard({ lat = 18.516726, lon = 73.856255
 
   const activeLocationLabel = locationLabel || `Lat ${coordinates.lat.toFixed(2)}, Lon ${coordinates.lon.toFixed(2)}`;
   const { current } = weather;
-  const dailyForecast = weather.daily.slice(0, 10);
+  const dailyForecast = weather.daily.slice(0, 16);
   const dailyToday = dailyForecast?.[0];
   const selectedDay = dailyForecast[selectedDayIndex] ?? dailyForecast[0];
   const totalDailyPages = Math.max(1, Math.ceil((dailyForecast.length || 0) / DAY_CARDS_PER_PAGE));
@@ -350,7 +350,7 @@ export default function AstroWeatherDashboard({ lat = 18.516726, lon = 73.856255
               disabled={isSearching}
               className="rounded-2xl border border-white/10 bg-red-500/10 px-4 py-2 text-sm font-semibold text-red-200 backdrop-blur transition hover:bg-red-500/20 disabled:cursor-not-allowed disabled:opacity-60"
             >
-              {isSearching ? 'Searching…' : 'Search'}
+              {isSearching ? 'Searchingâ€¦' : 'Search'}
             </button>
             <button
               onClick={handleUseMyLocation}
@@ -386,7 +386,7 @@ export default function AstroWeatherDashboard({ lat = 18.516726, lon = 73.856255
       )}
 
       {weather.loading && (
-        <div className="text-center text-sm text-slate-400">Fetching the latest data…</div>
+        <div className="text-center text-sm text-slate-400">Fetching the latest data</div>
       )}
 
       {!weather.loading && current && (
@@ -426,7 +426,7 @@ export default function AstroWeatherDashboard({ lat = 18.516726, lon = 73.856255
                       <p>High: {Math.round(dailyToday?.maxTemperature?.degrees ?? dailyToday?.temperature?.high?.value ?? 0)}°</p>
                       <p>Low: {Math.round(dailyToday?.minTemperature?.degrees ?? dailyToday?.temperature?.low?.value ?? 0)}°</p>
                       <p>QPF: {formatNumber(current?.precipitation?.qpf?.quantity ?? dailyToday?.precipitation?.qpf?.quantity)} mm</p>
-                      <p>Temp change 24h: {formatNumber(current?.currentConditionsHistory?.temperatureChange?.degrees)}°</p>
+                      <p>Pressure: {formatNumber(current?.airPressure?.meanSeaLevelMillibars ?? current?.seaLevelPressure?.value)} hPa</p>
                     </div>
                   </div>
                   <div className="mt-6 grid gap-4 sm:grid-cols-2">
@@ -437,8 +437,8 @@ export default function AstroWeatherDashboard({ lat = 18.516726, lon = 73.856255
                     />
                     <SummaryStat
                       icon={<Sun className="h-4 w-4 text-amber-300" />}
-                      label="Thunderstorm Probability"
-                      value={`${current?.thunderstormProbability ?? 0}%`}
+                      label="UV Index"
+                      value={`${current?.uvIndex ?? dailyToday?.daytimeForecast?.uvIndex ?? 0}`}
                     />
                   </div>
                 </div>
@@ -475,8 +475,11 @@ export default function AstroWeatherDashboard({ lat = 18.516726, lon = 73.856255
           {activeTab === 'daily' && (
             <div className={`${cardShell} p-6`}>
               <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                <p className="text-xs uppercase tracking-[0.4em] text-slate-400">Daily Forecast (10 Days)</p>
+                <p className="text-xs uppercase tracking-[0.4em] text-slate-400">Daily Forecast (16 Days)</p>
                 <span className="text-xs text-slate-500">Tap a day to view daytime vs nighttime details.</span>
+              </div>
+              <div className="mt-5">
+                <DailyForecastGraph days={dailyForecast} />
               </div>
               <div className="mt-4 flex items-center justify-between">
                 <button
@@ -740,6 +743,10 @@ function HourlyForecastPanel({
         </div>
       </div>
 
+      <div className="mt-5">
+        <HourlyForecastGraph hours={trimmedHours} />
+      </div>
+
       <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
         {visibleHours.map((hour, idx) => (
           <HourSummaryCard key={hour?.interval?.startTime || idx} hour={hour} />
@@ -796,3 +803,195 @@ function formatHourLabel(hour?: ForecastHour) {
   if (Number.isNaN(date.getTime())) return '--';
   return date.toLocaleTimeString([], { hour: '2-digit' });
 }
+
+function clamp(value: number, min: number, max: number) {
+  return Math.max(min, Math.min(max, value));
+}
+
+function buildLinePath(values: number[], width = 360, height = 96, padding = 10) {
+  const filtered = values.filter((v) => Number.isFinite(v));
+  const minValue = filtered.length ? Math.min(...filtered) : 0;
+  const maxValue = filtered.length ? Math.max(...filtered) : 1;
+  const span = Math.max(1e-6, maxValue - minValue);
+
+  const n = Math.max(1, values.length);
+  const innerW = width - padding * 2;
+  const innerH = height - padding * 2;
+
+  const points = values.map((v, i) => {
+    const t = n === 1 ? 0 : i / (n - 1);
+    const x = padding + innerW * t;
+    const normalized = Number.isFinite(v) ? (v - minValue) / span : NaN;
+    const y = Number.isFinite(normalized) ? padding + innerH * (1 - clamp(normalized, 0, 1)) : NaN;
+    return { x, y, valid: Number.isFinite(v) && Number.isFinite(y) };
+  });
+
+  const segments: string[] = [];
+  for (let i = 0; i < points.length; i++) {
+    const p = points[i];
+    if (!p.valid) continue;
+    const cmd = i === 0 || !points[i - 1]?.valid ? 'M' : 'L';
+    segments.push(`${cmd} ${p.x.toFixed(2)} ${p.y.toFixed(2)}`);
+  }
+
+  const d = segments.join(' ');
+  const latest = values.findLast?.((v) => Number.isFinite(v)) ?? filtered[filtered.length - 1] ?? null;
+
+  return { d, minValue, maxValue, latest, points, padding, width, height };
+}
+
+function GraphCard({
+  title,
+  subtitle,
+  children
+}: {
+  title: string;
+  subtitle?: string;
+  children: ReactNode;
+}) {
+  return (
+    <div className="rounded-2xl border border-white/10 bg-gradient-to-b from-white/5 to-white/[0.03] p-4">
+      <div className="flex items-baseline justify-between gap-4">
+        <p className="text-xs uppercase tracking-[0.3em] text-slate-400">{title}</p>
+        {subtitle ? <p className="text-xs text-slate-500">{subtitle}</p> : null}
+      </div>
+      <div className="mt-3">{children}</div>
+    </div>
+  );
+}
+
+function DailyForecastGraph({ days }: { days: ForecastDay[] }) {
+  const series = days.slice(0, 16);
+  const labels = series.map((d) => getDayDisplay(d).weekday);
+  const maxTemps = series.map((d) => Number(d?.maxTemperature?.degrees ?? d?.temperature?.high?.value ?? NaN));
+  const minTemps = series.map((d) => Number(d?.minTemperature?.degrees ?? d?.temperature?.low?.value ?? NaN));
+
+  const maxPath = buildLinePath(maxTemps, 360, 96, 10);
+  const minPath = buildLinePath(minTemps, 360, 96, 10);
+
+  return (
+    <GraphCard
+      title="Temperature Trend"
+      subtitle={
+        maxPath.latest !== null && minPath.latest !== null
+          ? `Latest: ${Math.round(maxPath.latest as number)}° / ${Math.round(minPath.latest as number)}°`
+          : undefined
+      }
+    >
+      <div className="w-full overflow-hidden">
+        <svg viewBox="0 0 360 120" className="h-36 w-full">
+          <defs>
+            <linearGradient id="tempMax" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%" stopColor="#ec4899" stopOpacity="0.9" />
+              <stop offset="100%" stopColor="#f472b6" stopOpacity="0.9" />
+            </linearGradient>
+            <linearGradient id="tempMin" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%" stopColor="#22d3ee" stopOpacity="0.9" />
+              <stop offset="100%" stopColor="#60a5fa" stopOpacity="0.9" />
+            </linearGradient>
+          </defs>
+
+          {/* grid */}
+          {Array.from({ length: 4 }).map((_, i) => {
+            const y = 10 + ((96 - 20) * i) / 3;
+            return <line key={i} x1="10" x2="350" y1={y} y2={y} stroke="rgba(148,163,184,0.18)" strokeWidth="1" />;
+          })}
+          {/* y-axis labels */}
+          <text x="12" y="14" fontSize="9" fill="rgba(148,163,184,0.8)">
+            {Math.round(maxPath.maxValue)}°
+          </text>
+          <text x="12" y="92" fontSize="9" fill="rgba(148,163,184,0.8)">
+            {Math.round(minPath.minValue)}°
+          </text>
+
+          <path d={maxPath.d} fill="none" stroke="url(#tempMax)" strokeWidth="2.5" strokeLinecap="round" />
+          <path d={minPath.d} fill="none" stroke="url(#tempMin)" strokeWidth="2.5" strokeLinecap="round" />
+
+          {/* x-axis */}
+          <line x1="10" x2="350" y1="96" y2="96" stroke="rgba(148,163,184,0.25)" strokeWidth="1" />
+          {labels.map((l, i) => {
+            if (i % 2 !== 0) return null;
+            const x = maxPath.points[i]?.x ?? 10;
+            return (
+              <text key={l + i} x={x} y="114" textAnchor="middle" fontSize="9" fill="rgba(148,163,184,0.75)">
+                {l}
+              </text>
+            );
+          })}
+        </svg>
+        <div className="mt-2 flex flex-wrap items-center gap-3 text-xs text-slate-400">
+          <span className="inline-flex items-center gap-2">
+            <span className="h-2 w-6 rounded-full bg-pink-500/80" />
+            Max
+          </span>
+          <span className="inline-flex items-center gap-2">
+            <span className="h-2 w-6 rounded-full bg-cyan-400/80" />
+            Min
+          </span>
+        </div>
+      </div>
+    </GraphCard>
+  );
+}
+
+function HourlyForecastGraph({ hours }: { hours: ForecastHour[] }) {
+  const series = hours.slice(0, 48);
+  const temps = series.map((h) => Number(h?.temperature?.degrees ?? h?.temperature?.value ?? NaN));
+  const labels = series.map((h) => formatHourLabel(h));
+  const path = buildLinePath(temps, 360, 96, 10);
+
+  return (
+    <GraphCard
+      title="Temperature (48h)"
+      subtitle={path.latest !== null ? `Now: ${Math.round(path.latest as number)}°C` : undefined}
+    >
+      <div className="w-full overflow-hidden">
+        <svg viewBox="0 0 360 120" className="h-36 w-full">
+          <defs>
+            <linearGradient id="tempHourly" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%" stopColor="#a78bfa" stopOpacity="0.9" />
+              <stop offset="100%" stopColor="#22d3ee" stopOpacity="0.9" />
+            </linearGradient>
+          </defs>
+          {Array.from({ length: 4 }).map((_, i) => {
+            const y = 10 + ((96 - 20) * i) / 3;
+            return <line key={i} x1="10" x2="350" y1={y} y2={y} stroke="rgba(148,163,184,0.18)" strokeWidth="1" />;
+          })}
+          <text x="12" y="14" fontSize="9" fill="rgba(148,163,184,0.8)">
+            {Math.round(path.maxValue)}°
+          </text>
+          <text x="12" y="92" fontSize="9" fill="rgba(148,163,184,0.8)">
+            {Math.round(path.minValue)}°
+          </text>
+          <path d={path.d} fill="none" stroke="url(#tempHourly)" strokeWidth="2.5" strokeLinecap="round" />
+          <line x1="10" x2="350" y1="96" y2="96" stroke="rgba(148,163,184,0.25)" strokeWidth="1" />
+
+          {/* 1-hour x-axis ticks (labels every 3 hours to keep it readable) */}
+          {labels.map((l, i) => {
+            if (!l) return null;
+            const x = path.points[i]?.x ?? 10;
+            const isMajor = i % 3 === 0;
+            return (
+              <g key={l + i}>
+                <line
+                  x1={x}
+                  x2={x}
+                  y1={96}
+                  y2={isMajor ? 102 : 100}
+                  stroke="rgba(148,163,184,0.32)"
+                  strokeWidth="1"
+                />
+                {isMajor ? (
+                  <text x={x} y="114" textAnchor="middle" fontSize="9" fill="rgba(148,163,184,0.75)">
+                    {l}
+                  </text>
+                ) : null}
+              </g>
+            );
+          })}
+        </svg>
+      </div>
+    </GraphCard>
+  );
+}
+

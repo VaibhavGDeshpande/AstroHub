@@ -74,25 +74,27 @@ type BortleScaleChartProps = {
 
 export default function BortleScaleChart({ className = "" }: BortleScaleChartProps) {
   return (
-    <div className={`grid gap-3 ${className}`}>
+    <div className={`grid gap-4 ${className}`}>
       {bortleScale.map((b, i) => (
         <motion.div
           key={b.number}
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: i * 0.05 }}
-          className="group flex items-center gap-4 p-4 rounded-xl bg-gradient-to-r from-slate-700/20 to-slate-800/20 border border-slate-600/30 hover:border-purple-500/50 transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/20"
+          className="group flex items-center gap-4 p-4 md:p-6 rounded-2xl bg-white/5 border border-white/5 hover:border-purple-500/50 transition-all duration-500 hover:shadow-2xl hover:shadow-purple-500/20"
         >
-          <div className="flex items-center gap-3">
-            <div className="text-3xl font-bold text-purple-400 w-8">{b.number}</div>
-            <div className={`w-12 h-12 rounded-lg ${b.color} border-2 border-white/30 shadow-lg`} />
+          <div className="flex items-center gap-4">
+            <div className="text-2xl md:text-3xl font-black text-purple-400 w-8 md:w-10 tabular-nums">{b.number}</div>
+            <div className={`w-12 h-12 md:w-16 md:h-16 rounded-xl ${b.color} border border-white/20 shadow-xl group-hover:scale-110 transition-transform duration-500`} />
           </div>
-          <div className="flex-1">
-            <div className="font-bold text-lg text-white mb-1 flex items-center gap-2">
-              {b.className}
-              <span className="text-sm">{b.stars}</span>
+          <div className="flex-1 min-w-0">
+            <div className="font-bold text-base md:text-xl text-white mb-1 flex flex-wrap items-center gap-2">
+              <span className="truncate">{b.className}</span>
+              <span className="text-xs md:text-sm bg-black/40 px-2 py-0.5 rounded-full border border-white/10 group-hover:bg-purple-500/20 transition-all duration-500">{b.stars}</span>
             </div>
-            <div className="text-sm text-slate-400">{b.location}</div>
+            <div className="text-xs md:text-sm text-slate-500 font-medium group-hover:text-slate-300 transition-colors line-clamp-2 md:line-clamp-none">
+              {b.location}
+            </div>
           </div>
         </motion.div>
       ))}

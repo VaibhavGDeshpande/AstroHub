@@ -11,6 +11,7 @@ import {
   ArrowLeftIcon,
   HomeIcon,
 } from "@heroicons/react/24/outline";
+import SectionTitle from "@/components/SectionTitle";
 
 const quickStats = [
   { label: "Best Viewing", value: "Class 1-3", icon: "🌟" },
@@ -62,47 +63,40 @@ export default function LightPollutionRedesign() {
           </motion.div> 
         </div>
     <div className="min-h-screen bg-gradient-to-br from-slate-950 text-white overflow-x-hidden">
-      <header className="relative z-10 pt-8 pb-12 px-4">
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="max-w-7xl mx-auto text-center"
-        >
-          <h1 className="text-5xl md:text-6xl font-bold bg-gradient-to-r bg-clip-text mb-4">
-            Light Pollution Map
-          </h1>
-          <p className="text-lg md:text-xl text-slate-300 max-w-2xl mx-auto">
-            Discover the darkness of the night sky and find the perfect stargazing locations worldwide
-          </p>
-        </motion.div>
+      <header className="relative z-10 pt-16 px-4">
+        <SectionTitle 
+          title="Light Pollution Map" 
+          subtitle="Discover the darkness of the night sky and find the perfect stargazing locations worldwide"
+        />
       </header>
 
-      <div className="relative z-10 max-w-7xl mx-auto px-4 pb-16">
+      <div className="relative z-10 max-w-7xl mx-auto px-4 pb-16 space-y-8 md:space-y-12">
         <motion.section
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="mb-12"
         >
-          <div className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-xl rounded-3xl p-6 md:p-8 border border-slate-700/50 shadow-2xl">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl md:text-3xl font-bold text-cyan-300">🗺️ Global Light Pollution Overlay</h2>
+          <div className="bg-gradient-to-br from-slate-800/40 to-slate-900/40 backdrop-blur-xl rounded-[2rem] p-5 md:p-8 border border-white/10 shadow-2xl">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+              <h2 className="text-xl md:text-3xl font-black text-cyan-300 tracking-tight flex items-center gap-2">
+                <span className="text-2xl">🗺️</span> Global Overlay
+              </h2>
             </div>
 
-            <LightPollutionMap className="border-2 border-slate-700/50" />
+            <LightPollutionMap className="border border-white/10 shadow-inner" />
 
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mt-6">
               {quickStats.map((stat, i) => (
                 <motion.div
                   key={stat.label}
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: 0.4 + i * 0.1 }}
-                  className="bg-gradient-to-br from-slate-700/30 to-slate-800/30 rounded-xl p-4 border border-slate-600/30"
+                  className="bg-white/5 rounded-2xl p-4 border border-white/5 hover:border-white/10 transition-colors group"
                 >
-                  <div className="text-2xl mb-2">{stat.icon}</div>
-                  <div className="text-slate-400 text-sm">{stat.label}</div>
-                  <div className="text-xl font-bold text-white">{stat.value}</div>
+                  <div className="text-2xl mb-2 transition-transform group-hover:scale-110 duration-300">{stat.icon}</div>
+                  <div className="text-slate-500 text-[10px] uppercase font-bold tracking-widest mb-1">{stat.label}</div>
+                  <div className="text-base md:text-xl font-black text-white">{stat.value}</div>
                 </motion.div>
               ))}
             </div>
@@ -113,36 +107,39 @@ export default function LightPollutionRedesign() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
-          className="mb-12"
         >
-          <div className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-xl rounded-3xl p-6 md:p-8 border border-slate-700/50 shadow-2xl">
-            <h2 className="text-2xl md:text-3xl font-bold text-purple-300 mb-6">📊 Bortle Dark Sky Scale</h2>
+          <div className="bg-gradient-to-br from-slate-800/40 to-slate-900/40 backdrop-blur-xl rounded-[2rem] p-5 md:p-8 border border-white/10 shadow-2xl">
+            <h2 className="text-xl md:text-3xl font-black text-purple-300 tracking-tight mb-6 flex items-center gap-2">
+              <span className="text-2xl">📊</span> Bortle scale
+            </h2>
 
-            <div className="flex gap-2 mb-6 bg-slate-800/50 p-1 rounded-xl">
+            <div className="flex bg-black/40 p-1.5 rounded-2xl border border-white/5 mb-6">
               <button
                 onClick={() => setActiveTab("scale")}
-                className={`flex-1 px-4 py-2 rounded-lg font-semibold transition-all duration-300 ${
+                className={`flex-1 px-4 py-2.5 rounded-xl font-bold text-xs md:text-sm uppercase tracking-widest transition-all duration-500 ${
                   activeTab === "scale"
-                    ? "bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg"
-                    : "text-slate-400 hover:text-white"
+                    ? "bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-[0_0_20px_rgba(147,51,234,0.3)]"
+                    : "text-slate-500 hover:text-slate-300"
                 }`}
               >
-                Visual Scale
+                Visual Guide
               </button>
               <button
                 onClick={() => setActiveTab("table")}
-                className={`flex-1 px-4 py-2 rounded-lg font-semibold transition-all duration-300 ${
+                className={`flex-1 px-4 py-2.5 rounded-xl font-bold text-xs md:text-sm uppercase tracking-widest transition-all duration-500 ${
                   activeTab === "table"
-                    ? "bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg"
-                    : "text-slate-400 hover:text-white"
+                    ? "bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-[0_0_20px_rgba(147,51,234,0.3)]"
+                    : "text-slate-500 hover:text-slate-300"
                 }`}
               >
-                Detailed Data
+                Telemetry
               </button>
             </div>
 
-            {activeTab === "scale" && <BortleScaleChart />}
-            {activeTab === "table" && <BortleComprehensiveTable />}
+            <div className="min-h-[400px]">
+              {activeTab === "scale" && <BortleScaleChart />}
+              {activeTab === "table" && <BortleComprehensiveTable />}
+            </div>
           </div>
         </motion.section>
 

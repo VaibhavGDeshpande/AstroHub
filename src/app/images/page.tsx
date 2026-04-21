@@ -19,6 +19,7 @@ import {
   HomeIcon 
 } from '@heroicons/react/24/outline';
 import LoaderWrapper from '@/components/Loader';
+import SectionTitle from '@/components/SectionTitle';
 
 export default function NasaMediaBrowser() {
   const [searchResults, setSearchResults] = useState<NivlItem[]>([]);
@@ -160,31 +161,11 @@ export default function NasaMediaBrowser() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 py-8">
         {/* Animated Header */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          className="text-center mb-12 mt-12"
-        >
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.2, duration: 0.6 }}
-            className="flex items-center justify-center space-x-3 mb-4"
-          >
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent animate-pulse">
-              NASA Media Browser
-            </h1>
-          </motion.div>
-          <motion.p 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.4, duration: 0.6 }}
-            className="text-lg text-slate-300"
-          >
-            Explore NASA&apos;s vast collection of images and videos from across the cosmos
-          </motion.p>
-        </motion.div>
+        <SectionTitle 
+          title="NASA Media Browser" 
+          subtitle="Explore NASA's vast collection of images and videos from across the cosmos"
+          className="mt-12"
+        />
 
         {/* Search Filters with Backdrop Blur */}
         <motion.div

@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 // import Image from 'next/image';
 import { ChevronDownIcon, Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
+import { usePathname } from 'next/navigation';
 import { shouldPrefetchRoute } from '@/lib/routePrefetch';
 import SpaceLogo from './SpaceLogo';
 
@@ -53,6 +54,26 @@ const Header = () => {
     };
   }, [isMobileMenuOpen]);
 
+  useEffect(() => {
+    const handleOpen = () => setIsDropdownOpen(true);
+    const handleClose = () => setIsDropdownOpen(false);
+    
+    const handleMobileOpen = () => setIsMobileMenuOpen(true);
+    const handleMobileClose = () => setIsMobileMenuOpen(false);
+    
+    window.addEventListener('openExploreMenu', handleOpen);
+    window.addEventListener('closeExploreMenu', handleClose);
+    window.addEventListener('openMobileMenu', handleMobileOpen);
+    window.addEventListener('closeMobileMenu', handleMobileClose);
+    
+    return () => {
+      window.removeEventListener('openExploreMenu', handleOpen);
+      window.removeEventListener('closeExploreMenu', handleClose);
+      window.removeEventListener('openMobileMenu', handleMobileOpen);
+      window.removeEventListener('closeMobileMenu', handleMobileClose);
+    };
+  }, []);
+
   type ExploreItem = {
     name: string;
     path: string;
@@ -73,7 +94,6 @@ const Header = () => {
         { name: 'EPIC Earth Images', path: '/epic' },
         { name: 'NASA Image Library', path: '/images' },
         { name: 'NASA Eyes', path: '/nasa-eyes' },
-        { name: 'Messier Catalog', path: '/messier' },
         { name: 'Astronomy Picture of the Day', path: '/apod' }
       ]
     },
@@ -92,7 +112,8 @@ const Header = () => {
       items: [
         { name: 'Stellarium Sky Map', path: '/stellarium' },
         { name: 'Sky Charts', path: '/sky-charts' },
-        { name: 'Satellite Tracker', path: '/satellite-tracker' }
+        { name: 'Satellite Tracker', path: '/satellite-tracker' },
+        { name: 'Messier Catalog', path: '/messier' }
       ]
     },
     {
@@ -105,10 +126,11 @@ const Header = () => {
     },
     {
       id: 'news',
-      title: 'News & Learning',
+      title: 'News & Media',
       items: [
         { name: 'Space News & Updates', path: '/space-news' },
-        { name: 'Space Quiz', path: '/space-quiz' }
+        { name: 'Space Quiz', path: '/space-quiz' },
+        { name: 'Space Wallpapers', path: '/wallpapers' }
       ]
     },
     {
@@ -144,6 +166,13 @@ const Header = () => {
     return `${transformClass} ${heightClass}`;
   };
 
+  const pathname = usePathname();
+  const HIDE_HEADER_ROUTES = ['/3d-earth', '/3d-moon', '/3d-mars', '/stellarium', '/nasa-eyes'];
+
+  if (HIDE_HEADER_ROUTES.includes(pathname)) {
+    return null;
+  }
+
   return (
     <>
       <header className={`fixed top-0 left-0 right-0 z-50 bg-transparent transition-all duration-500 ${getHeaderClasses()}`}>
@@ -175,7 +204,7 @@ const Header = () => {
                 </button>
 
                 {/* Dropdown Menu */}
-                <div className={`absolute right-0 pt-2 w-[95vw] max-w-[900px] z-50 transition-all duration-300 ${isDropdownOpen ? 'opacity-100 visible' : 'opacity-0 invisible pointer-events-none'
+                <div id="explore-header" className={`absolute right-0 pt-2 w-[95vw] max-w-[900px] z-50 transition-all duration-300 ${isDropdownOpen ? 'opacity-100 visible' : 'opacity-0 invisible pointer-events-none'
                   }`}>
                   <div className="bg-black/95 backdrop-blur-xl rounded-xl shadow-2xl border border-cyan-400/20 overflow-hidden">
 
@@ -241,17 +270,7 @@ const Header = () => {
                 <span className={`transition-all duration-300 font-medium ${scrollY > 50 ? 'text-sm' : 'text-base'}`}>Resources</span>
               </Link>
 
-              <Link href="/contact-us" className="relative group text-white hover:text-cyan-400 transition-colors">
-                <span className={`transition-all duration-300 font-medium ${scrollY > 50 ? 'text-sm' : 'text-base'}`}>Contact</span>
-              </Link>
 
-              <Link href="/privacy-policy" className="relative group text-white hover:text-cyan-400 transition-colors">
-                <span className={`transition-all duration-300 font-medium ${scrollY > 50 ? 'text-sm' : 'text-base'}`}>Privacy Policy</span>
-              </Link>
-
-              <Link href="/terms-and-conditions" className="relative group text-white hover:text-cyan-400 transition-colors">
-                <span className={`transition-all duration-300 font-medium ${scrollY > 50 ? 'text-sm' : 'text-base'}`}>Terms & Conditions</span>
-              </Link>
             </nav>
 
             {/* Mobile menu button */}
@@ -271,7 +290,7 @@ const Header = () => {
       </header>
 
       {/* Mobile Menu */}
-      <div className={`lg:hidden fixed top-[64px] left-0 right-0 bottom-0 bg-black/95 backdrop-blur-xl transition-all duration-300 z-40 ${isMobileMenuOpen ? 'opacity-100 visible' : 'opacity-0 invisible'
+      <div id="tour-explore-mobile-menu" className={`lg:hidden fixed top-[64px] left-0 right-0 bottom-0 bg-black/95 backdrop-blur-xl transition-all duration-300 z-40 ${isMobileMenuOpen ? 'opacity-100 visible' : 'opacity-0 invisible'
         }`}>
         <nav className="h-full overflow-y-auto px-4 py-6 space-y-4 relative z-10">
 
@@ -319,15 +338,7 @@ const Header = () => {
             <Link href="/resources" prefetch={shouldPrefetchRoute('/resources')} className="block px-2 py-2.5 text-white hover:text-cyan-400 hover:bg-cyan-500/10 rounded-lg transition-all font-medium" onClick={() => setIsMobileMenuOpen(false)}>
               Resources
             </Link>
-            <Link href="/contact-us" prefetch={shouldPrefetchRoute('/contact-us')} className="block px-2 py-2.5 text-white hover:text-cyan-400 hover:bg-cyan-500/10 rounded-lg transition-all font-medium" onClick={() => setIsMobileMenuOpen(false)}>
-              Contact Us
-            </Link>
-            <Link href="/privacy-policy" prefetch={shouldPrefetchRoute('/privacy-policy')} className="block px-2 py-2.5 text-white hover:text-cyan-400 hover:bg-cyan-500/10 rounded-lg transition-all font-medium" onClick={() => setIsMobileMenuOpen(false)}>
-              Privacy Policy
-            </Link>
-            <Link href="/terms-and-conditions" prefetch={shouldPrefetchRoute('/terms-and-conditions')} className="block px-2 py-2.5 text-white hover:text-cyan-400 hover:bg-cyan-500/10 rounded-lg transition-all font-medium" onClick={() => setIsMobileMenuOpen(false)}>
-              Terms & Conditions
-            </Link>
+
           </div>
         </nav>
       </div>
