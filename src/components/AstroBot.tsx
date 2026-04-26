@@ -172,8 +172,8 @@ export default function AstroBot() {
   return (
     <>
       {/* Floating launcher (bottom-right, lowest position) */}
-      <div
-        id="astrobot-widget-trigger" className="fixed bottom-4 right-4 z-[2147483648]"
+      <div 
+         className="fixed bottom-4 right-4 z-[100]"
         onMouseEnter={() => setHover(true)}
         onMouseLeave={() => setHover(false)}
       >
@@ -182,7 +182,7 @@ export default function AstroBot() {
             Ask astronomy related questions
           </div>
         )}
-        <button
+        <button id="astro-bot"
           aria-label="Open AstroBot"
           className={`relative h-12 w-12 rounded-full flex items-center justify-center hover:scale-105 transition-transform shadow-lg ${launcherPalette}`}
           onClick={() => setOpen(true)}
@@ -193,7 +193,7 @@ export default function AstroBot() {
       </div>
 
       {/* Popover Modal (above launcher) */}
-      <div className={`fixed inset-0 z-[2147483648] ${open ? 'pointer-events-auto' : 'pointer-events-none'}`} aria-hidden={!open}>
+      <div className={`fixed inset-0 z-[110] ${open ? 'pointer-events-auto' : 'pointer-events-none'}`} aria-hidden={!open}>
         {/* click-outside catcher (no dim overlay) */}
         <div
           className="absolute inset-0"

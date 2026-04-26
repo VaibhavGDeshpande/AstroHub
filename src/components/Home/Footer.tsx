@@ -49,7 +49,8 @@ const Footer = () => {
       title: 'Advanced Tools',
       items: [
         { name: 'Telescope Calculator', path: '/telescope-calculator' },
-        { name: 'Astrophotography Exposure Calculator', path: '/exposure-calculator' }
+        { name: 'Astrophotography Exposure Calculator', path: '/exposure-calculator' },
+        { name: 'Cosmic Age Calculator', path: '/cosmic-age' }
       ]
     },
     {
@@ -58,6 +59,7 @@ const Footer = () => {
       items: [
         { name: 'Space News & Updates', path: '/space-news' },
         { name: 'Space Quiz', path: '/space-quiz' },
+        { name: 'Wallpapers', path: '/wallpapers' },
       ]
     },
     {

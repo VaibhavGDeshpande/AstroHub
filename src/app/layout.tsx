@@ -2,12 +2,12 @@ import type { Metadata } from "next";
 import Script from "next/script";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import ClientLayout from "@/components/provider/NotificationProvider";
-import LenisProvider from "@/components/provider/LenisProvider";
-import { Analytics } from "@vercel/analytics/next"
+import { Analytics } from "@vercel/analytics/next";
 import FloatingClientWidgets from "@/components/FloatingClientWidgets";
-import { SpeedInsights } from "@vercel/speed-insights/next"
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import Header from "@/components/Home/Header";
+import ClientLayout from "@/components/provider/NotificationProvider";
+import SmoothScrollProvider from "@/components/provider/SmoothScrollProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -120,15 +120,15 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <LenisProvider>
-          <ClientLayout>
+        <ClientLayout>
+          <SmoothScrollProvider>
             <FloatingClientWidgets />
             <Analytics/>
             <SpeedInsights/>
             <Header />
             {children}
-          </ClientLayout>
-        </LenisProvider>
+          </SmoothScrollProvider>
+        </ClientLayout>
       </body>
     </html>
   );

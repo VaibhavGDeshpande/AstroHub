@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useState, useRef } from 'react';
 import { Orbitron, Inter } from 'next/font/google';
+import { ChevronDown } from 'lucide-react';
 
 const orbitron = Orbitron({
   subsets: ['latin'],
@@ -125,6 +126,16 @@ const HeroSection = () => {
             </div> */}
           </div>
         </div>
+      </div>
+
+      {/* Scroll Down Indicator */}
+      <div 
+        className={`absolute bottom-8 sm:bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 transition-all duration-1000 ease-out cursor-pointer ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}
+        style={{ transitionDelay: '1200ms' }}
+        onClick={() => window.scrollTo({ top: window.innerHeight, behavior: 'smooth' })}
+      >
+        <span className="text-[10px] sm:text-xs text-cyan-200/70 uppercase tracking-[0.2em] font-medium drop-shadow-md">Scroll to reveal</span>
+        <ChevronDown className="w-5 h-5 sm:w-6 sm:h-6 text-cyan-400 animate-bounce drop-shadow-[0_0_8px_rgba(34,211,238,0.6)]" />
       </div>
 
       <style jsx>{`

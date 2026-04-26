@@ -297,6 +297,17 @@ export const cardSections: CardSection[] = [
         glow: 'pink',
         ctaText: 'Plan Exposure',
         status: 'Live'
+      },
+      {
+        title: 'Cosmic Age Calculator',
+        description: 'Map your exact age on Earth to the vast distances of space to find your cosmic twin star.',
+        icon: Star,
+        color: 'from-blue-500 to-indigo-500',
+        path: '/cosmic-age',
+        features: ['Precise age mapping', 'Stellar distance matching', 'Cinematic result card'],
+        glow: 'indigo',
+        ctaText: 'Find Your Star',
+        status: 'Live'
       }
     ]
   },

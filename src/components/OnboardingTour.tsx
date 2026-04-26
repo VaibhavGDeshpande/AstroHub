@@ -23,11 +23,11 @@ export default function OnboardingTour() {
         popoverClass: 'driverjs-theme',
         steps: [
           {
-            element: '#astronomy-widget-trigger',
+            element: '#astronomy-widget',
             popover: {
               title: 'Astronomy Dashboard',
               description: 'Click here to access daily celestial briefings, sunrise/sunset times, and moon phases based on your location.',
-              side: "left", align: 'start'
+              side: "left", align: 'end'
             }
           },
           {
@@ -35,15 +35,15 @@ export default function OnboardingTour() {
             popover: {
               title: 'Night Light Filter (Red)',
               description: 'When pressed the screen will adapt to the night light filter',
-              side: "left", align: 'start'
+              side: "left", align: 'end'
             }
           },
           {
-            element: '#astrobot-widget-trigger',
+            element: '#astro-bot',
             popover: {
               title: 'Meet AstroBot',
               description: 'Got questions about space? Chat directly with our AI astronomy assistant!',
-              side: "left", align: 'start'
+              side: "left", align: 'end'
             }
           },
           {

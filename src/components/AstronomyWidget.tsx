@@ -375,9 +375,9 @@ export default function AstronomyWidget() {
   return (
     <>
       <button
-        id="astronomy-widget-trigger"
+        id="astronomy-widget"
         aria-label="Open astronomy widget"
-        className="fixed bottom-36 right-4 z-[2147483648] flex flex-col items-center gap-1 group p-0 hover:scale-110 active:scale-95 transition-all duration-300"
+        className="fixed bottom-36 right-4 z-[100] flex flex-col items-center gap-1 group p-0 hover:scale-110 active:scale-95 transition-all duration-300"
         onClick={() => {
           setOpen(true);
           fetchData(location, { force: true });
@@ -401,7 +401,7 @@ export default function AstronomyWidget() {
       {open && (
         <div
           id="astronomy-widget-modal"
-          className={`fixed inset-0 z-[2147483648] flex items-end sm:items-center justify-center ${overlayTint} backdrop-blur-sm animate-[fadeIn_0.2s_ease-out] overflow-hidden`}
+          className={`fixed inset-0 z-[110] flex items-end sm:items-center justify-center ${overlayTint} backdrop-blur-sm animate-[fadeIn_0.2s_ease-out] overflow-hidden`}
           onClick={() => {
             setOpen(false);
             fetchData(location, { force: true });

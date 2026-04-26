@@ -151,7 +151,7 @@ export default function APODPage() {
           </motion.div> 
         </div>
 
-        <div className="container mx-auto px-4 sm:px-6 lg:px-10 pt-5 flex flex-col gap-10">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-10 pt-24 flex flex-col gap-10">
           <SectionTitle 
             title="NASA's Astronomy Picture of the Day" 
           />

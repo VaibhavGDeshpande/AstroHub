@@ -38,7 +38,7 @@ export default function NightModeToggle() {
         onClick={toggle}
         aria-pressed={enabled}
         aria-label={enabled ? 'Disable Night Vision' : 'Enable Night Vision'}
-        className={`fixed bottom-20 right-4 z-[2147483648]
+        className={`fixed bottom-20 right-4 z-[100]
                     w-12 h-12 rounded-full
                     shadow-lg backdrop-blur
                     flex items-center justify-center
