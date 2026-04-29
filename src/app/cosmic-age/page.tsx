@@ -9,8 +9,9 @@ import CosmicAgeResultCard from "@/components/CosmicAgeResultCard";
 export default function CosmicAgePage() {
   const [dob, setDob] = useState("");
   const [result, setResult] = useState<{ age: number; star: Star } | null>(null);
+  const [isFetching, setIsFetching] = useState(false);
 
-  const calculateCosmicAge = (e: React.FormEvent) => {
+  const calculateCosmicAge = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!dob) return;
 
@@ -26,9 +27,38 @@ export default function CosmicAgePage() {
       return;
     }
 
-    const closestStar = findClosestStar(ageInYears);
-    
-    setResult({ age: ageInYears, star: closestStar });
+    setIsFetching(true);
+
+    try {
+      // 1. Try to fetch from API Ninjas via our backend route
+      const res = await fetch(`/api/stars?age=${ageInYears}`);
+      const data = await res.json();
+
+      if (res.ok && data.stars && data.stars.length > 0) {
+        // Map API response to our Star interface
+        const topMatch = data.stars[0];
+        const apiStar: Star = {
+          name: topMatch.name,
+          distanceLy: parseFloat(topMatch.distance_light_year),
+          constellation: topMatch.constellation,
+          type: topMatch.spectral_class ? `Spectral Class ${topMatch.spectral_class}` : "Unknown Type",
+          funFact: `This star is located exactly ${topMatch.distance_light_year} light-years away, matching your cosmic age. Data sourced live from astronomical catalogs.`
+        };
+        setResult({ age: ageInYears, star: apiStar });
+      } else {
+        // 2. Fallback to local dataset if API returns no results or fails
+        console.log("Falling back to local star dataset...");
+        const closestStar = findClosestStar(ageInYears);
+        setResult({ age: ageInYears, star: closestStar });
+      }
+    } catch (err) {
+      console.error("Error fetching star data:", err);
+      // Fallback on network error
+      const closestStar = findClosestStar(ageInYears);
+      setResult({ age: ageInYears, star: closestStar });
+    } finally {
+      setIsFetching(false);
+    }
   };
 
   const resetCalculator = () => {
@@ -94,10 +124,11 @@ export default function CosmicAgePage() {
               
               <button
                 type="submit"
-                className="w-full flex items-center justify-center gap-2 py-4 px-6 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white rounded-xl font-medium transition-all shadow-lg shadow-blue-900/30 group"
+                disabled={isFetching}
+                className="w-full flex items-center justify-center gap-2 py-4 px-6 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white rounded-xl font-medium transition-all shadow-lg shadow-blue-900/30 group disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <span>Find My Star</span>
-                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                <span>{isFetching ? "Calculating Distance..." : "Find My Star"}</span>
+                {!isFetching && <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />}
               </button>
             </motion.form>
           ) : (

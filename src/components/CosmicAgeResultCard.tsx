@@ -76,8 +76,8 @@ export default function CosmicAgeResultCard({ star, age }: CosmicAgeResultCardPr
 
         <div className="w-full flex items-center justify-between text-slate-400 text-sm px-4">
           <div className="flex items-center gap-2">
-            <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></div>
-            <span>Earth</span>
+            <div className="w-3 h-3 rounded-full bg-yellow-100 shadow-[0_0_15px_#fef08a]"></div>
+            <span>{star.name}</span>
           </div>
           <div className="flex-1 h-px bg-gradient-to-r from-blue-500/20 via-blue-500/50 to-purple-500/20 mx-4 relative">
             <motion.div 
@@ -88,8 +88,8 @@ export default function CosmicAgeResultCard({ star, age }: CosmicAgeResultCardPr
             ></motion.div>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full bg-yellow-100 shadow-[0_0_15px_#fef08a]"></div>
-            <span>{star.name}</span>
+            <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></div>
+            <span>Earth</span>
           </div>
         </div>
 
