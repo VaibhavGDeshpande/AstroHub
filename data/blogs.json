@@ -1,0 +1,13 @@
+[
+  {
+    "id": "f2581cfb-636b-4f13-b75b-1124dd7bdf29",
+    "slug": "youtube",
+    "title": "youtube",
+    "excerpt": "you tube ",
+    "content": "<div data-youtube-video=\"\"><iframe class=\"w-full aspect-video rounded-xl shadow-lg my-6\" width=\"640\" height=\"480\" allowfullscreen=\"true\" autoplay=\"false\" disablekbcontrols=\"false\" enableiframeapi=\"false\" endtime=\"0\" ivloadpolicy=\"0\" loop=\"false\" modestbranding=\"false\" origin=\"\" playlist=\"\" rel=\"1\" src=\"https://www.youtube.com/embed/6Ae_mFJqwIY?rel=1\" start=\"0\"></iframe></div><p></p>",
+    "coverImage": "",
+    "published": true,
+    "createdAt": "2026-04-26T17:27:46.092Z",
+    "updatedAt": "2026-04-26T17:28:40.100Z"
+  }
+]

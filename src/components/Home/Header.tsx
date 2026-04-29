@@ -11,29 +11,30 @@ import SpaceLogo from './SpaceLogo';
 const Header = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [scrollDirection, setScrollDirection] = useState<'up' | 'down' | null>(null);
-  const [lastScrollY, setLastScrollY] = useState(0);
+  const [isHidden, setIsHidden] = useState(false);
   const [scrollY, setScrollY] = useState(0);
   const [searchQuery, setSearchQuery] = useState('');
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const lastScrollYRef = useRef(0);
 
   useEffect(() => {
     const updateScrollDirection = () => {
       const currentScrollY = window.pageYOffset;
       setScrollY(currentScrollY);
 
-      if (Math.abs(currentScrollY - lastScrollY) > 10) {
-        const direction = currentScrollY > lastScrollY ? "down" : "up";
-        if (direction !== scrollDirection) {
-          setScrollDirection(direction);
+      if (Math.abs(currentScrollY - lastScrollYRef.current) > 10) {
+        if (currentScrollY > lastScrollYRef.current && currentScrollY > 100) {
+          setIsHidden(true);
+        } else {
+          setIsHidden(false);
         }
-        setLastScrollY(currentScrollY > 0 ? currentScrollY : 0);
+        lastScrollYRef.current = currentScrollY > 0 ? currentScrollY : 0;
       }
     };
 
-    window.addEventListener("scroll", updateScrollDirection);
+    window.addEventListener("scroll", updateScrollDirection, { passive: true });
     return () => window.removeEventListener("scroll", updateScrollDirection);
-  }, [scrollDirection, lastScrollY]);
+  }, []);
 
   useEffect(() => {
     const handleResize = () => {
@@ -130,6 +131,7 @@ const Header = () => {
       title: 'News & Media',
       items: [
         { name: 'Space News & Updates', path: '/space-news' },
+        { name: 'AstroHub Transmission', path: '/blogs' },
         { name: 'Space Quiz', path: '/space-quiz' },
         { name: 'Space Wallpapers', path: '/wallpapers' }
       ]
@@ -153,17 +155,8 @@ const Header = () => {
   })).filter(category => category.items.length > 0);
 
   const getHeaderClasses = () => {
-    let transformClass = 'translate-y-0';
-    let heightClass = 'h-16';
-
-    if (scrollDirection === 'down' && scrollY > 100) {
-      transformClass = '-translate-y-full';
-    }
-
-    if (scrollY > 50) {
-      heightClass = 'h-14';
-    }
-
+    const transformClass = isHidden ? '-translate-y-full' : 'translate-y-0';
+    const heightClass = scrollY > 50 ? 'h-14' : 'h-16';
     return `${transformClass} ${heightClass}`;
   };
 
@@ -267,6 +260,10 @@ const Header = () => {
                 <span className={`transition-all duration-300 font-medium ${scrollY > 50 ? 'text-sm' : 'text-base'}`}>About</span>
               </Link>
 
+              <Link href="/blogs" className="relative group text-white hover:text-cyan-400 transition-colors">
+                <span className={`transition-all duration-300 font-medium ${scrollY > 50 ? 'text-sm' : 'text-base'}`}>Blogs</span>
+              </Link>
+
               <Link href="/resources" className="relative group text-white hover:text-cyan-400 transition-colors">
                 <span className={`transition-all duration-300 font-medium ${scrollY > 50 ? 'text-sm' : 'text-base'}`}>Resources</span>
               </Link>
@@ -335,6 +332,9 @@ const Header = () => {
           <div className="pt-4 border-t border-cyan-400/20 space-y-2">
             <Link href="/about" prefetch={shouldPrefetchRoute('/about')} className="block px-2 py-2.5 text-white hover:text-cyan-400 hover:bg-cyan-500/10 rounded-lg transition-all font-medium" onClick={() => setIsMobileMenuOpen(false)}>
               About
+            </Link>
+            <Link href="/blogs" prefetch={shouldPrefetchRoute('/blogs')} className="block px-2 py-2.5 text-white hover:text-cyan-400 hover:bg-cyan-500/10 rounded-lg transition-all font-medium" onClick={() => setIsMobileMenuOpen(false)}>
+              Blogs
             </Link>
             <Link href="/resources" prefetch={shouldPrefetchRoute('/resources')} className="block px-2 py-2.5 text-white hover:text-cyan-400 hover:bg-cyan-500/10 rounded-lg transition-all font-medium" onClick={() => setIsMobileMenuOpen(false)}>
               Resources

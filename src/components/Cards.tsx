@@ -190,7 +190,7 @@ const EnhancedCards = () => {
               <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-4 px-2">Navigation</h3>
               
               {/* Mobile Horizontal Scroll / Desktop Vertical List */}
-              <div className="flex lg:flex-col gap-2 overflow-x-auto pb-4 lg:pb-0 scrollbar-hide snap-x">
+              <div className="grid grid-cols-2 lg:grid-cols-1 gap-2">
                 {cardSections.map((section) => {
                   const isActive = activeTab === section.id;
                   const baseBadge = getBadgeColor(section.badgeColor);
@@ -200,7 +200,7 @@ const EnhancedCards = () => {
                     <button
                       key={section.id}
                       onClick={() => setActiveTab(section.id)}
-                      className={`relative flex items-center justify-between w-full p-3 sm:p-4 rounded-xl text-left transition-all duration-300 flex-shrink-0 lg:flex-shrink snap-start group outline-none focus-visible:ring-2 focus-visible:ring-slate-400 min-w-[200px] lg:min-w-0
+                      className={`relative flex items-center justify-between w-full p-3 sm:p-4 rounded-xl text-left transition-all duration-300 group outline-none focus-visible:ring-2 focus-visible:ring-slate-400
                         ${isActive 
                           ? `bg-gradient-to-br ${activeGradient} shadow-lg` 
                           : 'hover:bg-slate-800/40 border border-transparent hover:border-slate-700/50'

@@ -58,6 +58,7 @@ const Footer = () => {
       title: 'News & Learning',
       items: [
         { name: 'Space News & Updates', path: '/space-news' },
+        { name: 'AstroHub Transmission', path: '/blogs' },
         { name: 'Space Quiz', path: '/space-quiz' },
         { name: 'Wallpapers', path: '/wallpapers' },
       ]

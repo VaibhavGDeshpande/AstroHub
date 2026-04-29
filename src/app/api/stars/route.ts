@@ -45,7 +45,7 @@ export async function GET(request: Request) {
     }
 
     // Sort by closest distance
-    data.sort((a: any, b: any) => {
+    data.sort((a: { distance_light_year: string }, b: { distance_light_year: string }) => {
       const distA = parseFloat(a.distance_light_year);
       const distB = parseFloat(b.distance_light_year);
       return Math.abs(distA - age) - Math.abs(distB - age);
