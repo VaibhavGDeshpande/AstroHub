@@ -53,7 +53,14 @@ export default function RichTextEditor({ content, onChange }: RichTextEditorProp
     ],
     content,
     onUpdate: ({ editor }) => {
-      onChange(editor.getHTML());
+      // Preserve intentional blank lines (e.g. multiple Enter presses) by turning empty
+      // paragraphs into a visible non-breaking space. Without this, empty <p> blocks can
+      // collapse in rendered prose styles.
+      const html = editor
+        .getHTML()
+        .replaceAll('<p></p>', '<p>&nbsp;</p>')
+        .replaceAll('<p><br></p>', '<p>&nbsp;</p>');
+      onChange(html);
     },
     editorProps: {
       attributes: {
@@ -234,10 +241,10 @@ export default function RichTextEditor({ content, onChange }: RichTextEditorProp
         {divider}
         
         {/* Headings */}
-        <button type="button" onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()} className={btnClass(editor.isActive('heading', { level: 2 }))} title="Heading 1">
+        <button type="button" onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()} className={btnClass(editor.isActive('heading', { level: 1 }))} title="Heading 1">
           <Heading1 className="w-4 h-4" />
         </button>
-        <button type="button" onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()} className={btnClass(editor.isActive('heading', { level: 3 }))} title="Heading 2">
+        <button type="button" onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()} className={btnClass(editor.isActive('heading', { level: 2 }))} title="Heading 2">
           <Heading2 className="w-4 h-4" />
         </button>
         

@@ -86,10 +86,7 @@ export default function HeroSlider({ slides }: HeroSliderProps) {
       onMouseLeave={() => setIsPaused(false)}
     >
       <div className="pt-24 md:pt-28 pb-8 px-4 max-w-7xl mx-auto relative z-10 text-center">
-        {/* <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-blue-500/10 border border-blue-500/20 mb-4 backdrop-blur-sm">
-          <Star className="w-3.5 h-3.5 text-blue-400" />
-          <span className="text-xs font-semibold text-blue-400 uppercase tracking-widest">Astrohub Feed</span>
-        </div> */}
+
         <h1 className="text-4xl md:text-7xl font-black text-white mb-4 tracking-tight">
           Astrohub <span className="text-blue-500">Transmission</span>
         </h1>

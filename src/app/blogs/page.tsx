@@ -6,7 +6,8 @@ import HeroSlider from "@/components/blog/HeroSlider";
 
 export const revalidate = 0;
 
-function getReadingTime(text: string) {
+function getReadingTime(text: string | null | undefined) {
+  if (!text || typeof text !== "string") return 1;
   return Math.ceil(text.trim().split(/\s+/).length / 200);
 }
 
@@ -79,37 +80,43 @@ function SectionHeader({ icon: Icon, title, href, color }: { icon: React.Element
 }
 
 export default async function BlogsPage() {
-  const supabase = await createClient();
+  try {
+    const supabase = await createClient();
 
-  const [whatsUpRes, tutorialsRes, explainersRes] = await Promise.all([
-    supabase.from("whats_up").select("*").eq("published", true).order("createdAt", { ascending: false }).limit(3),
-    supabase.from("tutorials").select("*").eq("published", true).order("createdAt", { ascending: false }).limit(3),
-    supabase.from("explainers").select("*").eq("published", true).order("createdAt", { ascending: false }).limit(3),
-  ]);
+    const [whatsUpRes, tutorialsRes, explainersRes] = await Promise.all([
+      supabase.from("whats_up").select("*").eq("published", true).order("createdAt", { ascending: false }).limit(3),
+      supabase.from("tutorials").select("*").eq("published", true).order("createdAt", { ascending: false }).limit(3),
+      supabase.from("explainers").select("*").eq("published", true).order("createdAt", { ascending: false }).limit(3),
+    ]);
 
-  const whatsUp = (whatsUpRes.data || []).map((r) => ({ ...r, contentType: "whats-up" as const })) as Blog[];
-  const tutorials = (tutorialsRes.data || []).map((r) => ({ ...r, contentType: "tutorial" as const })) as Blog[];
-  const explainers = (explainersRes.data || []).map((r) => ({ ...r, contentType: "explainer" as const })) as Blog[];
+    if (whatsUpRes.error || tutorialsRes.error || explainersRes.error) {
+      console.error("Supabase Error:", whatsUpRes.error || tutorialsRes.error || explainersRes.error);
+      throw new Error("Failed to fetch blogs from database");
+    }
 
-  // Build hero slides: latest from each type that exists
-  const heroSlides: Blog[] = [
-    ...(whatsUp.length > 0 ? [whatsUp[0]] : []),
-    ...(tutorials.length > 0 ? [tutorials[0]] : []),
-    ...(explainers.length > 0 ? [explainers[0]] : []),
-  ];
+    const whatsUp = (whatsUpRes.data || []).map((r) => ({ ...r, contentType: "whats-up" as const })) as Blog[];
+    const tutorials = (tutorialsRes.data || []).map((r) => ({ ...r, contentType: "tutorial" as const })) as Blog[];
+    const explainers = (explainersRes.data || []).map((r) => ({ ...r, contentType: "explainer" as const })) as Blog[];
 
-  return (
-    <div className="min-h-screen bg-slate-950 text-slate-200 pb-24 relative overflow-hidden">
-      {/* Background glows */}
-      <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-blue-900/15 rounded-full blur-[140px] pointer-events-none" />
-      <div className="absolute top-[50%] right-0 w-[500px] h-[500px] bg-purple-900/10 rounded-full blur-[120px] pointer-events-none" />
+    // Build hero slides: latest from each type that exists
+    const heroSlides: Blog[] = [
+      ...(whatsUp.length > 0 ? [whatsUp[0]] : []),
+      ...(tutorials.length > 0 ? [tutorials[0]] : []),
+      ...(explainers.length > 0 ? [explainers[0]] : []),
+    ];
 
-      {/* Hero Auto-Slider */}
-      {heroSlides.length > 0 && (
-        <div className="mb-12">
-          <HeroSlider slides={heroSlides} />
-        </div>
-      )}
+    return (
+      <div className="min-h-screen bg-slate-950 text-slate-200 pb-24 relative overflow-hidden">
+        {/* Background glows */}
+        <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-blue-900/15 rounded-full blur-[140px] pointer-events-none" />
+        <div className="absolute top-[50%] right-0 w-[500px] h-[500px] bg-purple-900/10 rounded-full blur-[120px] pointer-events-none" />
+
+        {/* Hero Auto-Slider */}
+        {heroSlides.length > 0 && (
+          <div className="mb-12">
+            <HeroSlider slides={heroSlides} />
+          </div>
+        )}
 
       <div className="max-w-7xl mx-auto px-4 relative z-10 space-y-20">
         {/* Eyes on the Sky Section */}
@@ -149,6 +156,25 @@ export default async function BlogsPage() {
           </div>
         )}
       </div>
-    </div>
-  );
+      </div>
+    );
+  } catch (error) {
+    console.error("Critical Blog Page Error:", error);
+    return (
+      <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4">
+        <div className="bg-slate-900/50 border border-red-500/20 p-8 rounded-3xl max-w-md w-full text-center backdrop-blur-md">
+          <div className="w-16 h-16 bg-red-500/10 rounded-2xl flex items-center justify-center mx-auto mb-6">
+            <Telescope className="w-8 h-8 text-red-400" />
+          </div>
+          <h1 className="text-2xl font-bold text-white mb-4">Transmission Interrupted</h1>
+          <p className="text-slate-400 mb-8 leading-relaxed">
+            We&apos;re having trouble reaching the stellar database. Please check your connection or try again later.
+          </p>
+          <Link href="/" className="inline-flex items-center justify-center bg-white text-slate-950 font-bold px-6 py-3 rounded-xl transition-transform hover:scale-105 active:scale-95">
+            Return to AstroHub
+          </Link>
+        </div>
+      </div>
+    );
+  }
 }
