@@ -168,3 +168,47 @@ html.astrobot-open #astronomy-widget-modal {
   margin: 10px;
   line-height: 1.6;
 }
+
+/* TipTap Editor — Text alignment */
+.ProseMirror [style*="text-align: center"] {
+  text-align: center;
+}
+.ProseMirror [style*="text-align: right"] {
+  text-align: right;
+}
+.ProseMirror [style*="text-align: justify"] {
+  text-align: justify;
+}
+
+/* TipTap Editor — Image styling */
+.ProseMirror img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 0.75rem;
+  cursor: pointer;
+  transition: box-shadow 0.2s;
+}
+.ProseMirror img:hover {
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+}
+.ProseMirror img.ProseMirror-selectednode {
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.6);
+}
+
+/* Centered images in rendered content */
+.prose img {
+  margin-left: auto;
+  margin-right: auto;
+}
+.prose [style*="text-align: center"] img {
+  margin-left: auto;
+  margin-right: auto;
+}
+.prose [style*="text-align: right"] img {
+  margin-left: auto;
+  margin-right: 0;
+}
+.prose [style*="text-align: left"] img {
+  margin-left: 0;
+  margin-right: auto;
+}

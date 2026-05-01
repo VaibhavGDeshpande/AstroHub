@@ -1,6 +1,30 @@
-import fs from 'fs';
-import path from 'path';
+// Blog type definitions for the multi-content-type blog system
+// Each content type maps to its own Supabase table: whats_up, tutorials, explainers
 
+export type ContentType = 'whats-up' | 'tutorial' | 'explainer';
+export type DifficultyLevel = 'beginner' | 'intermediate' | 'advanced';
+
+// Maps content type to its Supabase table name
+export const TABLE_MAP: Record<ContentType, string> = {
+  'whats-up': 'whats_up',
+  'tutorial': 'tutorials',
+  'explainer': 'explainers',
+};
+
+export interface SkyEvent {
+  title: string;
+  date: string;
+  description: string;
+  visibility?: string;
+}
+
+export interface VisualAid {
+  url: string;
+  caption: string;
+}
+
+// Unified Blog type — all type-specific fields are optional
+// since pages access them conditionally after checking contentType
 export interface Blog {
   id: string;
   slug: string;
@@ -9,35 +33,42 @@ export interface Blog {
   content: string;
   coverImage: string;
   published: boolean;
+  author: string;
+  publishDate: string | null;
   createdAt: string;
   updatedAt: string;
+  contentType: ContentType;
+  // Eyes on the Sky fields
+  skyMonth?: number;
+  skyYear?: number;
+  skyEvents?: SkyEvent[];
+  previousMonthSlug?: string;
+  // Tutorial fields
+  difficultyLevel?: DifficultyLevel;
+  estimatedReadTime?: number;
+  toolsNeeded?: string[];
+  // Explainer fields
+  topicCategory?: string;
+  keyConcepts?: string[];
+  visualAids?: VisualAid[];
 }
 
-const dataFilePath = path.join(process.cwd(), 'data', 'blogs.json');
+export const TOPIC_CATEGORIES = [
+  'Planets',
+  'Stars',
+  'Galaxies',
+  'Nebulae',
+  'Black Holes',
+  'Comets & Asteroids',
+  'Telescopes & Instruments',
+  'Space Missions',
+  'Cosmology',
+  'Astrophotography',
+  'Solar System',
+  'Exoplanets',
+] as const;
 
-// Ensure the data directory and file exist
-export function initDb() {
-  const dir = path.dirname(dataFilePath);
-  if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir, { recursive: true });
-  }
-  if (!fs.existsSync(dataFilePath)) {
-    fs.writeFileSync(dataFilePath, JSON.stringify([]), 'utf-8');
-  }
-}
-
-export function getBlogs(): Blog[] {
-  initDb();
-  const fileContent = fs.readFileSync(dataFilePath, 'utf-8');
-  try {
-    return JSON.parse(fileContent) as Blog[];
-  } catch (error) {
-    console.error('Failed to parse blogs.json:', error);
-    return [];
-  }
-}
-
-export function saveBlogs(blogs: Blog[]) {
-  initDb();
-  fs.writeFileSync(dataFilePath, JSON.stringify(blogs, null, 2), 'utf-8');
-}
+export const MONTHS = [
+  'January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December',
+] as const;

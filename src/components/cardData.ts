@@ -266,6 +266,17 @@ export const cardSections: CardSection[] = [
         glow: 'emerald',
         ctaText: 'Start Quiz',
         status:"Live"
+      },
+      {
+        title: 'Astrohub Transmission',
+        description: 'The source of truth for the cosmos. Dive into expert articles, deep-space guides, and astronomical blogs.',
+        icon: Sparkles,
+        color: 'from-blue-500 to-indigo-500',
+        path: '/blogs',
+        features: ['Expert articles', 'Sky guides', 'Community blogs'],
+        glow: 'blue',
+        ctaText: 'Start Reading',
+        status: 'Live'
       }
     ]
   },

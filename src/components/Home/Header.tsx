@@ -189,7 +189,7 @@ const Header = () => {
   return (
     <>
       <header className={`fixed top-0 left-0 right-0 z-50 bg-transparent transition-all duration-500 ${getHeaderClasses()}`}>
-        <div className="container mx-auto px-4">
+        <div className="container mx-auto px-4 xl:px-8">
           <div className={`flex items-center justify-between transition-all duration-500 ${scrollY > 50 ? 'h-14' : 'h-16'}`}>
             <Link
               href="/"
@@ -280,7 +280,7 @@ const Header = () => {
               </Link>
 
               <Link href="/blogs" className="relative group text-white hover:text-cyan-400 transition-colors">
-                <span className={`transition-all duration-300 font-medium ${scrollY > 50 ? 'text-sm' : 'text-base'}`}>Blogs</span>
+                <span className={`transition-all duration-300 font-medium ${scrollY > 50 ? 'text-sm' : 'text-base'}`}>Transmission</span>
               </Link>
 
               <Link href="/resources" className="relative group text-white hover:text-cyan-400 transition-colors">
@@ -305,30 +305,29 @@ const Header = () => {
           </div>
         </div>
       </header>
-
       {/* Mobile Menu */}
-      <div id="tour-explore-mobile-menu" className={`lg:hidden fixed top-[64px] left-0 right-0 bottom-0 bg-black/95 backdrop-blur-xl transition-all duration-300 z-40 ${isMobileMenuOpen ? 'opacity-100 visible' : 'opacity-0 invisible'
+      <div id="tour-explore-mobile-menu" className={`lg:hidden fixed inset-0 bg-black/98 backdrop-blur-2xl transition-all duration-300 z-40 ${isMobileMenuOpen ? 'opacity-100 visible' : 'opacity-0 invisible pointer-events-none'
         }`}>
-        <nav className="h-full overflow-y-auto overscroll-contain px-4 py-6 space-y-4 relative z-10">
+        <nav className="h-full overflow-y-auto pt-24 pb-12 px-4 space-y-8">
+          <div className="text-cyan-400/60 text-[10px] font-bold uppercase tracking-[0.2em] px-2">
+            Navigation Menu
+          </div>
 
           {/* Mobile Items */}
-          <div className="space-y-4 max-h-[calc(100vh-240px)] overflow-y-auto">
+          <div className="space-y-4">
             {filteredCategories.map((category) => (
-              <div key={category.id} className="bg-gradient-to-br from-cyan-500/5 to-blue-500/5 rounded-lg p-3 border border-cyan-400/10">
-                <div className="text-cyan-300 text-sm font-semibold uppercase px-2 mb-2">
-                  {category.title} ({category.items.length})
+              <div key={category.id} className="bg-slate-900/50 rounded-2xl p-5 border border-cyan-400/10 backdrop-blur-sm">
+                <div className="text-cyan-300 text-xs font-bold uppercase mb-4 flex items-center justify-between">
+                  <span>{category.title}</span>
+                  <span className="text-[10px] text-cyan-400/40 bg-cyan-400/10 px-2 py-0.5 rounded-full">{category.items.length}</span>
                 </div>
-                <div className="space-y-1">
+                <div className="grid grid-cols-1 gap-1">
                   {category.items.map((item, itemIndex) => (
                     <Link
                       key={itemIndex}
                       href={item.path}
-                      prefetch={shouldPrefetchRoute(item.path)}
-                      className="block pl-4 pr-2 py-2.5 text-sm text-white rounded-lg hover:text-cyan-400 hover:bg-cyan-500/10 transition-all"
-                      onClick={() => {
-                        setIsMobileMenuOpen(false);
-                        setSearchQuery('');
-                      }}
+                      className="block py-3 px-3 text-sm text-white/70 rounded-xl hover:text-cyan-400 hover:bg-cyan-400/10 active:bg-cyan-400/20 transition-all border border-transparent hover:border-cyan-400/20"
+                      onClick={() => setIsMobileMenuOpen(false)}
                     >
                       {item.name}
                     </Link>
@@ -338,27 +337,24 @@ const Header = () => {
             ))}
 
             {filteredCategories.length === 0 && (
-              <div className="text-center py-8">
-                <div className="text-cyan-400/30 text-4xl mb-3">🔍</div>
-                <p className="text-gray-400 text-sm">
-                  No tools found matching <span className="text-cyan-400">&quot;{searchQuery}&quot;</span>
-                </p>
+              <div className="text-center py-20">
+                <div className="text-cyan-400/20 text-5xl mb-4">🔍</div>
+                <p className="text-slate-400 text-sm">No results found</p>
               </div>
             )}
           </div>
 
           {/* Mobile Additional Links */}
-          <div className="pt-4 border-t border-cyan-400/20 space-y-2">
-            <Link href="/about" prefetch={shouldPrefetchRoute('/about')} className="block px-2 py-2.5 text-white hover:text-cyan-400 hover:bg-cyan-500/10 rounded-lg transition-all font-medium" onClick={() => setIsMobileMenuOpen(false)}>
-              About
+          <div className="pt-6 border-t border-white/5 space-y-3">
+            <Link href="/about" className="flex items-center px-5 py-4 text-white font-semibold bg-white/5 rounded-2xl border border-white/10 hover:border-cyan-400/30 transition-all" onClick={() => setIsMobileMenuOpen(false)}>
+              About AstroHub
             </Link>
-            <Link href="/blogs" prefetch={shouldPrefetchRoute('/blogs')} className="block px-2 py-2.5 text-white hover:text-cyan-400 hover:bg-cyan-500/10 rounded-lg transition-all font-medium" onClick={() => setIsMobileMenuOpen(false)}>
-              Blogs
+            <Link href="/blogs" className="flex items-center px-5 py-4 text-white font-semibold bg-white/5 rounded-2xl border border-white/10 hover:border-cyan-400/30 transition-all" onClick={() => setIsMobileMenuOpen(false)}>
+              AstroHub Transmission
             </Link>
-            <Link href="/resources" prefetch={shouldPrefetchRoute('/resources')} className="block px-2 py-2.5 text-white hover:text-cyan-400 hover:bg-cyan-500/10 rounded-lg transition-all font-medium" onClick={() => setIsMobileMenuOpen(false)}>
-              Resources
+            <Link href="/resources" className="flex items-center px-5 py-4 text-white font-semibold bg-white/5 rounded-2xl border border-white/10 hover:border-cyan-400/30 transition-all" onClick={() => setIsMobileMenuOpen(false)}>
+              Space Resources
             </Link>
-
           </div>
         </nav>
       </div>
