@@ -7,7 +7,7 @@ import FloatingClientWidgets from "@/components/FloatingClientWidgets";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import Header from "@/components/Home/Header";
 import ClientLayout from "@/components/provider/NotificationProvider";
-import SmoothScrollProvider from "@/components/provider/SmoothScrollProvider";
+// import SmoothScrollProvider from "@/components/provider/SmoothScrollProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -121,13 +121,13 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <ClientLayout>
-          <SmoothScrollProvider>
+          {/* <SmoothScrollProvider> */}
             <FloatingClientWidgets />
             <Analytics/>
             <SpeedInsights/>
             <Header />
             {children}
-          </SmoothScrollProvider>
+          {/* </SmoothScrollProvider> */}
         </ClientLayout>
       </body>
     </html>
