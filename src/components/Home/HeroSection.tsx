@@ -2,6 +2,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { Orbitron, Inter } from 'next/font/google';
 import { ChevronDown } from 'lucide-react';
+import Link from 'next/link';
 
 const orbitron = Orbitron({
   subsets: ['latin'],
@@ -98,32 +99,27 @@ const HeroSection = () => {
             </div>
 
             {/* Key Features Tags */}
-            {/* <div
+            <div
               className={`flex flex-wrap gap-2 mt-4 sm:mt-6 ml-2 sm:ml-4 transition-all duration-1000 ease-out ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
                 }`}
               style={{ transitionDelay: '1000ms' }}
             >
               <span className="px-2.5 sm:px-3 py-1 sm:py-1.5 bg-blue-500/20 text-blue-300 rounded-full text-xs font-medium backdrop-blur-sm border border-blue-400/30 hover:bg-blue-500/30 transition-colors duration-300">
-              <Link href="/nasa-data">
-                NASA APIs
+              <Link href="/weather">
+                Weather Forecast
                 </Link>
               </span>
               <span className="px-2.5 sm:px-3 py-1 sm:py-1.5 bg-purple-500/20 text-purple-300 rounded-full text-xs font-medium backdrop-blur-sm border border-purple-400/30 hover:bg-purple-500/30 transition-colors duration-300">
-              <Link href="/3d-models">
-                3D Models
+              <Link href="/space-news">
+                Latest Space News
                 </Link>
               </span>
               <span className="px-2.5 sm:px-3 py-1 sm:py-1.5 bg-green-500/20 text-green-300 rounded-full text-xs font-medium backdrop-blur-sm border border-green-400/30 hover:bg-green-500/30 transition-colors duration-300">
-              <Link href="/space-observations">
-                Space Observations
+              <Link href="/blogs">
+                AstroHub Transmission
                 </Link>
               </span>
-              <span className="px-2.5 sm:px-3 py-1 sm:py-1.5 bg-orange-500/20 text-orange-300 rounded-full text-xs font-medium backdrop-blur-sm border border-orange-400/30 hover:bg-orange-500/30 transition-colors duration-300">
-              <Link href="/space-updates">
-                Space Updates
-                </Link>
-              </span>
-            </div> */}
+            </div>
           </div>
         </div>
       </div>

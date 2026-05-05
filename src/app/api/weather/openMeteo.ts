@@ -6,6 +6,9 @@ export type OpenMeteoWeather = {
   currentConditions: Record<string, unknown>;
   forecastDays: Array<Record<string, unknown>>;
   forecastHours: Array<Record<string, unknown>>;
+  timezone?: string;
+  timezoneAbbreviation?: string;
+  utcOffsetSeconds?: number;
 };
 
 const FORECAST_URL = 'https://api.open-meteo.com/v1/forecast';
@@ -71,7 +74,7 @@ function buildTimes(series: any, utcOffsetSeconds: number) {
   const interval = Number(series.interval());
   const len = Math.max(0, Math.floor((end - start) / interval));
 
-  return Array.from({ length: len }, (_, i) => new Date((start + i * interval + utcOffsetSeconds) * 1000));
+  return Array.from({ length: len }, (_, i) => new Date((start + i * interval) * 1000));
 }
 
 function roundOrUndefined(value: number | undefined | null) {
@@ -252,8 +255,8 @@ export async function fetchOpenMeteoWeather({
   const dailySunset = daily ? safeValuesArray(daily.variables(8)) : [];
 
   const forecastDays = dailyTimes.slice(0, 16).map((date, i) => {
-    const sunrise = dailySunrise[i] ? new Date((dailySunrise[i] + utcOffsetSeconds) * 1000).toISOString() : undefined;
-    const sunset = dailySunset[i] ? new Date((dailySunset[i] + utcOffsetSeconds) * 1000).toISOString() : undefined;
+    const sunrise = dailySunrise[i] ? new Date(dailySunrise[i] * 1000).toISOString() : undefined;
+    const sunset = dailySunset[i] ? new Date(dailySunset[i] * 1000).toISOString() : undefined;
     const precipMax = roundOrUndefined(dailyPrecipProbMax[i]) ?? 0;
 
     const dayForecast: Record<string, unknown> = {
@@ -286,7 +289,10 @@ export async function fetchOpenMeteoWeather({
   return {
     currentConditions,
     forecastDays,
-    forecastHours
+    forecastHours,
+    timezone: response.timezone() || undefined,
+    timezoneAbbreviation: response.timezoneAbbreviation() || undefined,
+    utcOffsetSeconds
   };
 }
 

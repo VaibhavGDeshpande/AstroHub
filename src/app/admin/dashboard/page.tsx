@@ -7,6 +7,7 @@ import {
   Telescope, BookOpen, Lightbulb, BarChart3, FileText, Eye
 } from "lucide-react";
 import PostEditor from "@/components/admin/PostEditor";
+import LoaderWrapper from "@/components/Loader";
 
 const TYPE_CONFIG = {
   "whats-up": { label: "Eyes on the Sky", icon: Telescope, color: "blue" },
@@ -70,6 +71,7 @@ export default function AdminDashboard() {
   const whatsUpPosts = blogs.filter((b) => b.contentType === "whats-up");
 
   return (
+    <LoaderWrapper>
     <div className="min-h-screen bg-slate-950 text-slate-200 p-4 md:p-8 pt-24 md:pt-32">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
@@ -194,5 +196,6 @@ export default function AdminDashboard() {
         )}
       </div>
     </div>
+    </LoaderWrapper>
   );
 }

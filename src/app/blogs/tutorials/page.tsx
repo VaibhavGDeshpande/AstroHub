@@ -4,6 +4,8 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import type { Blog, DifficultyLevel } from "@/lib/blogsDb";
 import { Calendar, Clock, ArrowRight, ArrowLeft, BookOpen, Star } from "lucide-react";
+import LoaderWrapper from "@/components/Loader";
+
 
 const LEVELS: { value: DifficultyLevel | "all"; label: string }[] = [
   { value: "all", label: "All Levels" },
@@ -38,6 +40,7 @@ export default function TutorialsPage() {
   const filtered = filter === "all" ? posts : posts.filter((p) => p.difficultyLevel === filter);
 
   return (
+    <LoaderWrapper>
     <div className="min-h-screen bg-slate-950 text-slate-200 pt-32 pb-24 md:pt-40 px-4 relative overflow-hidden">
       <div className="absolute top-0 right-0 w-[600px] h-[500px] bg-emerald-900/10 rounded-full blur-[140px] pointer-events-none" />
 
@@ -114,5 +117,6 @@ export default function TutorialsPage() {
         )}
       </div>
     </div>
+    </LoaderWrapper>
   );
 }

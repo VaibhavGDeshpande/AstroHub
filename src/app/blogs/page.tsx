@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import type { Blog } from "@/lib/blogsDb";
 import { Calendar, Clock, ArrowRight, Telescope, BookOpen, Lightbulb, Star } from "lucide-react";
 import HeroSlider from "@/components/blog/HeroSlider";
+import LoaderWrapper from "@/components/Loader";
 
 export const revalidate = 0;
 
@@ -106,6 +107,7 @@ export default async function BlogsPage() {
     ];
 
     return (
+      <LoaderWrapper>
       <div className="min-h-screen bg-slate-950 text-slate-200 pb-24 relative overflow-hidden">
         {/* Background glows */}
         <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-blue-900/15 rounded-full blur-[140px] pointer-events-none" />
@@ -157,10 +159,12 @@ export default async function BlogsPage() {
         )}
       </div>
       </div>
+      </LoaderWrapper>
     );
   } catch (error) {
     console.error("Critical Blog Page Error:", error);
     return (
+      <LoaderWrapper>
       <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4">
         <div className="bg-slate-900/50 border border-red-500/20 p-8 rounded-3xl max-w-md w-full text-center backdrop-blur-md">
           <div className="w-16 h-16 bg-red-500/10 rounded-2xl flex items-center justify-center mx-auto mb-6">
@@ -175,6 +179,7 @@ export default async function BlogsPage() {
           </Link>
         </div>
       </div>
+      </LoaderWrapper>
     );
   }
 }

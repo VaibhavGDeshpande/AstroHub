@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import type { Blog } from "@/lib/blogsDb";
 import { MONTHS } from "@/lib/blogsDb";
 import { Calendar, ArrowRight, ArrowLeft, Telescope, Star } from "lucide-react";
+import LoaderWrapper from "@/components/Loader";
 
 export const revalidate = 0;
 
@@ -23,6 +24,7 @@ export default async function WhatsUpPage() {
   const posts = (data || []).map((r) => ({ ...r, contentType: "whats-up" as const })) as Blog[];
 
   return (
+    <LoaderWrapper>
     <div className="min-h-screen bg-slate-950 text-slate-200 pt-32 pb-24 md:pt-40 px-4 relative overflow-hidden">
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[500px] bg-blue-900/15 rounded-full blur-[140px] pointer-events-none" />
 
@@ -83,5 +85,6 @@ export default async function WhatsUpPage() {
         )}
       </div>
     </div>
+    </LoaderWrapper>
   );
 }

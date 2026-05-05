@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import SatelliteMap from '@/components/Satellite/SatelliteMap';
+import LoaderWrapper from '@/components/Loader';
 
 interface PresetSatellite {
   label: string;
@@ -57,6 +58,7 @@ export default function ExamplePage() {
   }, [customNorad, selectedPreset]);
 
   return (
+    <LoaderWrapper>
     <div className="min-h-screen bg-slate-950 text-white">
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-8 lg:flex-row">
         <section className="space-y-6 rounded-2xl bg-slate-900/70 p-6 shadow-xl ring-1 ring-white/10 lg:w-80">
@@ -107,5 +109,6 @@ export default function ExamplePage() {
         </section>
       </div>
     </div>
+    </LoaderWrapper>
   );
 }

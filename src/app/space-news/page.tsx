@@ -4,9 +4,11 @@ import ArticleList from "@/components/space_news/ArticleList";
 import Link from "next/link";
 import { ArrowLeftIcon, HomeIcon } from "@heroicons/react/24/outline";
 import { motion } from "framer-motion";
+import LoaderWrapper from "@/components/Loader";
 
 export default function SpaceNewsPage() {
   return (
+    <LoaderWrapper>
     <>
     <div className="fixed top-4 left-4 z-50 hidden md:block">
           {/* Back Button */}
@@ -26,6 +28,6 @@ export default function SpaceNewsPage() {
         </div>
     <ArticleList />
     </>
-      
+    </LoaderWrapper>
   );
 }

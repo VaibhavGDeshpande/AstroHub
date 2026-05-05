@@ -1,9 +1,11 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { MONTHS } from "@/lib/blogsDb";
 import type { Blog } from "@/lib/blogsDb";
 import { Calendar, Clock, ArrowLeft, ArrowRight, User, Telescope, BookOpen, Lightbulb, Wrench } from "lucide-react";
+import LoaderWrapper from "@/components/Loader";
 
 export const revalidate = 0;
 
@@ -16,6 +18,47 @@ const diffColors: Record<string, string> = {
   intermediate: "bg-amber-500/10 text-amber-400 border-amber-500/20",
   advanced: "bg-red-500/10 text-red-400 border-red-500/20",
 };
+
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params;
+  const supabase = await createClient();
+
+  const tables = ['whats_up', 'tutorials', 'explainers'];
+  let blog: Blog | null = null;
+
+  for (const table of tables) {
+    const { data } = await supabase.from(table).select("*").eq("slug", slug).single();
+    if (data) {
+      blog = data as Blog;
+      break;
+    }
+  }
+
+  if (!blog) {
+    return {
+      title: "Post Not Found",
+    };
+  }
+
+  return {
+    title: blog.title,
+    description: blog.excerpt || `Read about ${blog.title} on AstroHub Transmission.`,
+    openGraph: {
+      title: blog.title,
+      description: blog.excerpt,
+      images: blog.coverImage ? [blog.coverImage] : ["/assets/AstroHub.avif"],
+      type: "article",
+      publishedTime: blog.publishDate || blog.createdAt,
+      authors: [blog.author || "AstroHub"],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: blog.title,
+      description: blog.excerpt,
+      images: blog.coverImage ? [blog.coverImage] : ["/assets/AstroHub.avif"],
+    },
+  };
+}
 
 export default async function BlogPostPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -74,6 +117,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
     : "bg-purple-500/10 text-purple-400 border-purple-500/20";
 
   return (
+    <LoaderWrapper>
     <article className="min-h-screen bg-slate-950 text-slate-200 pb-24 relative overflow-hidden">
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-[400px] bg-blue-900/10 rounded-full blur-[100px] pointer-events-none" />
 
@@ -204,5 +248,6 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
         </div>
       </div>
     </article>
+    </LoaderWrapper>
   );
 }

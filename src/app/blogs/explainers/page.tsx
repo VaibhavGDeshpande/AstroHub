@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import type { Blog } from "@/lib/blogsDb";
 import { TOPIC_CATEGORIES } from "@/lib/blogsDb";
 import { Calendar, Clock, ArrowRight, ArrowLeft, Lightbulb, Star } from "lucide-react";
+import LoaderWrapper from "@/components/Loader";
 
 function getReadingTime(text: string) {
   return Math.ceil(text.trim().split(/\s+/).length / 200);
@@ -27,6 +28,7 @@ export default function ExplainersPage() {
   const filtered = filter === "all" ? posts : posts.filter((p) => p.topicCategory === filter);
 
   return (
+    <LoaderWrapper>
     <div className="min-h-screen bg-slate-950 text-slate-200 pt-32 pb-24 md:pt-40 px-4 relative overflow-hidden">
       <div className="absolute top-0 left-0 w-[600px] h-[500px] bg-purple-900/10 rounded-full blur-[140px] pointer-events-none" />
 
@@ -111,5 +113,6 @@ export default function ExplainersPage() {
         )}
       </div>
     </div>
+    </LoaderWrapper>
   );
 }

@@ -16,7 +16,10 @@ export async function GET(request: Request) {
     const safeHours = Number.isFinite(parsedHours) ? Math.min(Math.max(parsedHours, 1), 168) : 48;
 
     const data = await fetchOpenMeteoWeather({ lat, lon, hours: safeHours });
-    return NextResponse.json({ forecastHours: data.forecastHours }, { headers: { 'Cache-Control': 's-maxage=1800' } });
+    return NextResponse.json({ 
+      forecastHours: data.forecastHours,
+      timezone: data.timezone 
+    }, { headers: { 'Cache-Control': 's-maxage=1800' } });
   } catch (error) {
     console.error('Failed to fetch hourly forecast', error);
     return NextResponse.json({ error: 'Failed to fetch hourly forecast' }, { status: 500 });

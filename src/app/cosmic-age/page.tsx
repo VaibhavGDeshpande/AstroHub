@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Calendar, ArrowRight } from "lucide-react";
 import { findClosestStar, Star } from "@/lib/starsData";
 import CosmicAgeResultCard from "@/components/CosmicAgeResultCard";
+import LoaderWrapper from "@/components/Loader";
 
 export default function CosmicAgePage() {
   const [dob, setDob] = useState("");
@@ -67,6 +68,7 @@ export default function CosmicAgePage() {
   };
 
   return (
+    <LoaderWrapper>
     <div className="min-h-screen bg-slate-950 text-slate-200 pt-32 pb-24 md:pt-32 px-4 overflow-hidden relative">
       {/* Background ambient light */}
       <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-blue-900/20 rounded-full blur-[150px] pointer-events-none"></div>
@@ -152,5 +154,6 @@ export default function CosmicAgePage() {
         </AnimatePresence>
       </div>
     </div>
+    </LoaderWrapper>
   );
 }

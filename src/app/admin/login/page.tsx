@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { Lock, ArrowRight } from "lucide-react";
+import LoaderWrapper from "@/components/Loader";
 
 export default function AdminLogin() {
   const [password, setPassword] = useState("");
@@ -37,6 +38,7 @@ export default function AdminLogin() {
   };
 
   return (
+    <LoaderWrapper>
     <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center p-4">
       {/* Background glow */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-purple-900/20 rounded-full blur-[100px] pointer-events-none"></div>
@@ -87,5 +89,6 @@ export default function AdminLogin() {
         </div>
       </motion.div>
     </div>
+    </LoaderWrapper>
   );
 }

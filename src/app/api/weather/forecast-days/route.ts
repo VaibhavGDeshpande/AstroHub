@@ -12,7 +12,10 @@ export async function GET(request: Request) {
 
   try {
     const data = await fetchOpenMeteoWeather({ lat, lon, hours: 48 });
-    return NextResponse.json({ forecastDays: data.forecastDays }, { headers: { 'Cache-Control': 's-maxage=3600' } });
+    return NextResponse.json({ 
+      forecastDays: data.forecastDays,
+      timezone: data.timezone 
+    }, { headers: { 'Cache-Control': 's-maxage=3600' } });
   } catch (error) {
     console.error('Failed to fetch forecast days', error);
     return NextResponse.json({ error: 'Failed to fetch forecast' }, { status: 500 });

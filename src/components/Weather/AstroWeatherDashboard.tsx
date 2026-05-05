@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { type Dispatch, type ReactNode, type SetStateAction, useCallback, useEffect, useMemo, useState } from 'react';
 import dynamic from 'next/dynamic';
@@ -92,6 +92,7 @@ interface WeatherData {
   current: CurrentConditions | null;
   daily: ForecastDay[];
   hourly: ForecastHour[];
+  timezone?: string;
   loading: boolean;
   error: string | null;
 }
@@ -99,6 +100,15 @@ interface WeatherData {
 interface Coordinates {
   lat: number;
   lon: number;
+}
+
+interface WeatherResponse {
+  currentConditions?: CurrentConditions;
+  forecastDays?: ForecastDay[];
+  dailyForecasts?: ForecastDay[];
+  forecastHours?: ForecastHour[];
+  hourlyForecasts?: ForecastHour[];
+  timezone?: string;
 }
 
 interface SearchResult {
@@ -149,14 +159,14 @@ export default function AstroWeatherDashboard({ lat = 18.516726, lon = 73.856255
         }
 
         const [current, daily, hourly] = await Promise.all([
-          currentRes.json(),
-          dailyRes.json(),
-          hourlyRes.json()
+          currentRes.json() as Promise<WeatherResponse>,
+          dailyRes.json() as Promise<WeatherResponse>,
+          hourlyRes.json() as Promise<WeatherResponse>
         ]);
 
         if (!isMounted) return;
 
-        const normalizedCurrent = current?.currentConditions || current;
+        const normalizedCurrent = current?.currentConditions || null;
         const normalizedDaily = daily?.forecastDays || daily?.dailyForecasts || [];
         const normalizedHourly = hourly?.forecastHours || hourly?.hourlyForecasts || [];
 
@@ -164,6 +174,7 @@ export default function AstroWeatherDashboard({ lat = 18.516726, lon = 73.856255
           current: normalizedCurrent,
           daily: normalizedDaily,
           hourly: normalizedHourly,
+          timezone: hourly?.timezone || daily?.timezone || current?.timezone,
           loading: false,
           error: null
         });
@@ -499,6 +510,7 @@ export default function AstroWeatherDashboard({ lat = 18.516726, lon = 73.856255
                         isSelected={visibleDayOffset + idx === selectedDayIndex}
                         isToday={visibleDayOffset + idx === 0}
                         onSelect={() => setSelectedDayIndex(visibleDayOffset + idx)}
+                        timezone={weather.timezone}
                       />
                     ))}
                     {visibleDays.length < DAY_CARDS_PER_PAGE &&
@@ -559,11 +571,11 @@ export default function AstroWeatherDashboard({ lat = 18.516726, lon = 73.856255
                       <div className="mt-3 space-y-2 text-sm">
                         <div className="flex items-center justify-between text-slate-300">
                           <span>Sunrise</span>
-                          <span className="text-white">{formatTimeLabel(selectedDay?.sunEvents?.sunriseTime)}</span>
+                          <span className="text-white">{formatTimeLabel(selectedDay?.sunEvents?.sunriseTime, weather.timezone)}</span>
                         </div>
                         <div className="flex items-center justify-between text-slate-300">
                           <span>Sunset</span>
-                          <span className="text-white">{formatTimeLabel(selectedDay?.sunEvents?.sunsetTime)}</span>
+                          <span className="text-white">{formatTimeLabel(selectedDay?.sunEvents?.sunsetTime, weather.timezone)}</span>
                         </div>
                         <div className="flex items-center justify-between text-slate-300">
                           <span>Moon Phase</span>
@@ -571,7 +583,7 @@ export default function AstroWeatherDashboard({ lat = 18.516726, lon = 73.856255
                         </div>
                         <div className="flex items-center justify-between text-slate-300">
                           <span>Moonset</span>
-                          <span className="text-white">{formatTimeLabel(selectedDay?.moonEvents?.moonsetTimes?.[0])}</span>
+                          <span className="text-white">{formatTimeLabel(selectedDay?.moonEvents?.moonsetTimes?.[0], weather.timezone)}</span>
                         </div>
                       </div>
                     </div>
@@ -581,7 +593,14 @@ export default function AstroWeatherDashboard({ lat = 18.516726, lon = 73.856255
             </div>
           )}
 
-          {activeTab === 'hourly' && <HourlyForecastPanel hourly={hourlyWindow} hourPage={hourPage} setHourPage={setHourPage} />}
+          {activeTab === 'hourly' && (
+            <HourlyForecastPanel 
+              hourly={hourlyWindow} 
+              hourPage={hourPage} 
+              setHourPage={setHourPage} 
+              timezone={weather.timezone}
+            />
+          )}
         </>
       )}
       {!weather.loading && !current && (
@@ -634,8 +653,20 @@ function MetricCard({
 }
 
 
-function DailyPill({ day, isSelected, isToday, onSelect }: { day: ForecastDay; isSelected: boolean; isToday: boolean; onSelect: () => void }) {
-  const { weekday, monthDay } = getDayDisplay(day);
+function DailyPill({ 
+  day, 
+  isSelected, 
+  isToday, 
+  onSelect,
+  timezone 
+}: { 
+  day: ForecastDay; 
+  isSelected: boolean; 
+  isToday: boolean; 
+  onSelect: () => void;
+  timezone?: string;
+}) {
+  const { weekday, monthDay } = getDayDisplay(day, timezone);
   const high = Math.round(day?.maxTemperature?.degrees ?? day?.temperature?.high?.value ?? 0);
 
   return (
@@ -701,11 +732,13 @@ function DayNightDetailCard({ title, icon, forecast }: { title: string; icon: Re
 function HourlyForecastPanel({
   hourly,
   hourPage,
-  setHourPage
+  setHourPage,
+  timezone
 }: {
   hourly: ForecastHour[];
   hourPage: number;
   setHourPage: Dispatch<SetStateAction<number>>;
+  timezone?: string;
 }) {
   const trimmedHours = hourly.slice(0, 32);
   const totalHourPages = Math.max(1, Math.ceil(trimmedHours.length / HOURS_PER_PAGE));
@@ -713,7 +746,9 @@ function HourlyForecastPanel({
   const start = currentPage * HOURS_PER_PAGE;
   const visibleHours = trimmedHours.slice(start, start + HOURS_PER_PAGE);
   const panelDate = visibleHours[0]?.interval?.startTime
-    ? new Date(visibleHours[0].interval.startTime).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })
+    ? new Date(visibleHours[0].interval.startTime).toLocaleDateString(undefined, { 
+        year: 'numeric', month: 'long', day: 'numeric', timeZone: timezone 
+      })
     : '—';
 
   return (
@@ -749,15 +784,15 @@ function HourlyForecastPanel({
 
       <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
         {visibleHours.map((hour, idx) => (
-          <HourSummaryCard key={hour?.interval?.startTime || idx} hour={hour} />
+          <HourSummaryCard key={hour?.interval?.startTime || idx} hour={hour} timezone={timezone} />
         ))}
       </div>
     </div>
   );
 }
 
-function HourSummaryCard({ hour }: { hour: ForecastHour }) {
-  const label = formatHourLabel(hour);
+function HourSummaryCard({ hour, timezone }: { hour: ForecastHour; timezone?: string }) {
+  const label = formatHourLabel(hour, timezone);
   const temperature = Math.round(hour?.temperature?.degrees ?? hour?.temperature?.value ?? 0);
   const wind = formatNumber(hour?.wind?.speed?.value ?? hour?.windSpeed?.value ?? 0);
   const gust = formatNumber(hour?.wind?.gust?.value ?? hour?.windGust?.value ?? 0);
@@ -778,30 +813,30 @@ function HourSummaryCard({ hour }: { hour: ForecastHour }) {
   );
 }
 
-function getDayDisplay(day: ForecastDay | undefined) {
+function getDayDisplay(day: ForecastDay | undefined, timezone?: string) {
   if (!day?.interval?.startTime) {
     return { weekday: '--', monthDay: '--' };
   }
   const date = new Date(day.interval.startTime);
   if (Number.isNaN(date.getTime())) return { weekday: '--', monthDay: '--' };
   return {
-    weekday: date.toLocaleDateString('en-US', { weekday: 'short' }),
-    monthDay: date.toLocaleDateString('en-US', { month: '2-digit', day: '2-digit' })
+    weekday: date.toLocaleDateString('en-US', { weekday: 'short', timeZone: timezone }),
+    monthDay: date.toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', timeZone: timezone })
   };
 }
 
-function formatTimeLabel(value?: string) {
+function formatTimeLabel(value?: string, timezone?: string) {
   if (!value) return '--';
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return '--';
-  return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', timeZone: timezone });
 }
 
-function formatHourLabel(hour?: ForecastHour) {
+function formatHourLabel(hour?: ForecastHour, timezone?: string) {
   if (!hour?.interval?.startTime) return '--';
   const date = new Date(hour.interval.startTime);
   if (Number.isNaN(date.getTime())) return '--';
-  return date.toLocaleTimeString([], { hour: '2-digit' });
+  return date.toLocaleTimeString([], { hour: '2-digit', timeZone: timezone });
 }
 
 function clamp(value: number, min: number, max: number) {

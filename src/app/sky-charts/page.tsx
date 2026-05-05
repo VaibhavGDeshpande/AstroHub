@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { ArrowLeftIcon, HomeIcon } from '@heroicons/react/24/outline';
 import dynamic from 'next/dynamic';
+import LoaderWrapper from '@/components/Loader';
 
 // Dynamically import SkyMapsDownloader with SSR disabled
 const SkyMapsDownloader = dynamic(
@@ -19,6 +20,7 @@ const SkyMapsDownloader = dynamic(
 
 export default function SkyMapsPage() {
   return (
+    <LoaderWrapper>
     <>
       <div className="fixed top-4 left-4 z-50">
         <motion.div
@@ -38,5 +40,6 @@ export default function SkyMapsPage() {
       </div>
       <SkyMapsDownloader />
     </>
+    </LoaderWrapper>
   )
 }
