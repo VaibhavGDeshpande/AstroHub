@@ -117,7 +117,7 @@ export default function PostEditor({ blog, onSave, onCancel, existingWhatsUpPost
           <label className={labelClass}>Content Type</label>
           <div className="grid grid-cols-3 gap-3">
             {([
-              { value: "whats-up", label: "What's Up", color: "blue" },
+              { value: "whats-up", label: "Eyes on the Sky", color: "blue" },
               { value: "tutorial", label: "Tutorial", color: "emerald" },
               { value: "explainer", label: "Explainer", color: "purple" },
             ] as const).map((t) => (
@@ -158,7 +158,7 @@ export default function PostEditor({ blog, onSave, onCancel, existingWhatsUpPost
           </div>
           <div>
             <label className={labelClass}>Publish Date</label>
-            <input type="datetime-local" value={form.publishDate ? new Date(form.publishDate).toISOString().slice(0, 16) : ""} onChange={(e) => setForm({ ...form, publishDate: e.target.value ? new Date(e.target.value).toISOString() : null })} className={inputClass} />
+            <input type="date" value={form.publishDate ? new Date(form.publishDate).toISOString().slice(0, 10) : ""} onChange={(e) => setForm({ ...form, publishDate: e.target.value ? new Date(e.target.value).toISOString() : null })} className={inputClass} />
           </div>
         </div>
 
@@ -329,14 +329,18 @@ export default function PostEditor({ blog, onSave, onCancel, existingWhatsUpPost
         {/* Publish Toggle */}
         <div className="flex items-center gap-3">
           <input type="checkbox" id="published" checked={form.published || false} onChange={(e) => setForm({ ...form, published: e.target.checked })} className="w-5 h-5 rounded border-slate-700 bg-slate-900 focus:ring-blue-500 accent-blue-500" />
-          <label htmlFor="published" className="text-white font-medium cursor-pointer">Publish to live website</label>
+          <label htmlFor="published" className="text-white font-medium cursor-pointer">
+            {form.publishDate && new Date(form.publishDate) > new Date()
+              ? `Schedule post (will go live on ${new Date(form.publishDate).toLocaleDateString()})`
+              : "Publish to live website"}
+          </label>
         </div>
 
         {/* Actions */}
         <div className="flex gap-4 pt-4 border-t border-slate-800">
           <button type="button" onClick={onCancel} className="px-6 py-3 rounded-xl border border-slate-700 text-slate-300 hover:bg-slate-800 font-medium transition-colors">Cancel</button>
           <button type="submit" disabled={saving} className="px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-medium transition-colors disabled:opacity-50">
-            {saving ? "Saving..." : "Save Post"}
+            {saving ? "Saving..." : (form.published && form.publishDate && new Date(form.publishDate) > new Date() ? "Schedule Post" : "Save Post")}
           </button>
         </div>
       </form>

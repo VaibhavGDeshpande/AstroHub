@@ -14,11 +14,12 @@ const routes: RouteConfig[] = [
   { path: "/", priority: 1.0, changeFrequency: "daily" },
   { path: "/weather", priority: 0.9, changeFrequency: "hourly" }, // Real-time data
   { path: "/space-news", priority: 0.9, changeFrequency: "daily" }, // Frequent articles
+  { path: "/blogs", priority: 0.9, changeFrequency: "daily" }, // Blogs
   { path: "/neo", priority: 0.8, changeFrequency: "daily" }, // Updates daily
+  { path: "/apod", priority: 0.8, changeFrequency: "daily" },
   { path: "/epic", priority: 0.7, changeFrequency: "daily" }, 
 
   // TEMPORARILY SHUTDOWN - Uncomment when fixed
-  // { path: "/apod", priority: 0.8, changeFrequency: "daily" }, 
   // { path: "/mars-rover", priority: 0.8, changeFrequency: "daily" },
   // { path: "/solar-system", priority: 0.7, changeFrequency: "monthly" },
 
@@ -30,6 +31,7 @@ const routes: RouteConfig[] = [
   { path: "/satellite-map", priority: 0.7, changeFrequency: "monthly" },
   { path: "/telescope-calculator", priority: 0.7, changeFrequency: "monthly" },
   { path: "/exposure-calculator", priority: 0.7, changeFrequency: "monthly" },
+  { path: "/cosmic-age", priority: 0.7, changeFrequency: "monthly" },
   { path: "/light-pollution", priority: 0.7, changeFrequency: "monthly" },
   { path: "/messier", priority: 0.7, changeFrequency: "monthly" },
   { path: "/images", priority: 0.6, changeFrequency: "weekly" },

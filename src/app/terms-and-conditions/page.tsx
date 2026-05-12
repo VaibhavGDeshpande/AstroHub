@@ -104,6 +104,17 @@ export default function TermsConditionsPage() {
             </ul>
           </section>
 
+          {/* Cookies and Local Storage */}
+          <section>
+            <h2 className="text-2xl font-bold text-cyan-400 mb-4">Cookies and Local Storage</h2>
+            <p className="leading-relaxed mb-4">
+              To enhance your experience, AstroHub uses browser cookies and Local Storage. We use these technologies to store your preferences (such as your selected locations, themes, or tool configurations) directly on your device, and for basic analytics.
+            </p>
+            <p className="leading-relaxed mb-4">
+              By using our Service, you consent to our use of cookies and Local Storage as detailed in our Privacy Policy. You can choose to disable these features through your browser settings, though doing so may limit the functionality and personalized experience of certain tools on the Website.
+            </p>
+          </section>
+
           {/* Third-Party Data */}
           <section>
             <h2 className="text-2xl font-bold text-cyan-400 mb-4">Third-Party Data and Services</h2>

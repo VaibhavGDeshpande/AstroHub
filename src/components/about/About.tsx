@@ -126,7 +126,8 @@ const About = () => {
     { name: 'React/Next.js', purpose: 'Modern web framework for fast, interactive experiences' },
     { name: 'NASA APIs', purpose: 'Direct integration with official NASA data sources' },
     { name: 'WebGL/Three.js', purpose: '3D visualizations and interactive cosmic models' },
-    { name: 'Real-time Data', purpose: 'Live updates from space missions and observatories' }
+    { name: 'Real-time Data', purpose: 'Live updates from space missions and observatories' },
+    { name: 'Local Storage & Cookies', purpose: 'Used securely to save your preferences locally on your device' }
   ];
 
   const renderContent = () => {

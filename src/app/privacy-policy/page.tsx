@@ -108,16 +108,17 @@ export default function PrivacyPolicyPage() {
               </div>
 
               <div>
-                <h4 className="text-lg font-semibold text-white mb-2">Tracking Technologies and Cookies</h4>
+                <h4 className="text-lg font-semibold text-white mb-2">Tracking Technologies, Cookies, and Local Storage</h4>
                 <p className="leading-relaxed mb-3">
-                  We use Cookies and similar tracking technologies to track the activity on Our Service and store certain information. Tracking technologies We use include beacons, tags, and scripts to collect and track information and to improve and analyze Our Service. The technologies We use may include:
+                  We use Cookies, Local Storage, and similar tracking technologies to track the activity on Our Service and store certain information. Local storage allows us to save your preferences and application state directly on your device to improve your experience. Tracking technologies We use include:
                 </p>
                 <ul className="list-disc list-inside space-y-2 ml-4">
-                  <li><strong className="text-white">Cookies or Browser Cookies.</strong> A cookie is a small file placed on Your Device. You can instruct Your browser to refuse all Cookies or to indicate when a Cookie is being sent. However, if You do not accept Cookies, You may not be able to use some parts of our Service. Unless you have adjusted Your browser setting so that it will refuse Cookies, our Service may use Cookies.</li>
-                  <li><strong className="text-white">Web Beacons.</strong> Certain sections of our Service and our emails may contain small electronic files known as web beacons (also referred to as clear gifs, pixel tags, and single-pixel gifs) that permit the Company, for example, to count users who have visited those pages or opened an email and for other related website statistics (for example, recording the popularity of a certain section and verifying system and server integrity).</li>
+                  <li><strong className="text-white">Cookies or Browser Cookies.</strong> A cookie is a small file placed on Your Device. You can instruct Your browser to refuse all Cookies or to indicate when a Cookie is being sent. However, if You do not accept Cookies, You may not be able to use some parts of our Service.</li>
+                  <li><strong className="text-white">Local Storage.</strong> We use browser Local Storage to save your settings and preferences (such as your saved weather locations, theme preferences, and calculator settings) locally on your device. This data is not sent to our servers and remains on your device to provide a faster and more personalized experience upon your return.</li>
+                  <li><strong className="text-white">Web Beacons.</strong> Certain sections of our Service and our emails may contain small electronic files known as web beacons (also referred to as clear gifs, pixel tags, and single-pixel gifs) that permit the Company to count users who have visited those pages or opened an email and for other related website statistics.</li>
                 </ul>
                 <p className="leading-relaxed mt-3 mb-3">
-                  Cookies can be &quot;Persistent&quot; or &quot;Session&quot; Cookies. Persistent Cookies remain on Your personal computer or mobile device when You go offline, while Session Cookies are deleted as soon as You close Your web browser.
+                  Cookies can be &quot;Persistent&quot; or &quot;Session&quot; Cookies. Persistent Cookies remain on Your personal computer or mobile device when You go offline, while Session Cookies are deleted as soon as You close Your web browser. Local Storage acts similarly to Persistent Cookies but without an automatic expiration date; you can clear it anytime through your browser settings.
                 </p>
                 <p className="leading-relaxed mb-3">
                   We use both Session and Persistent Cookies for analytics, performance monitoring, and basic functionality.

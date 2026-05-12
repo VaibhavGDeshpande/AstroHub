@@ -41,7 +41,7 @@ export interface Blog {
   // Eyes on the Sky fields
   skyMonth?: number;
   skyYear?: number;
-  skyEvents?: SkyEvent[];
+  skyEvents?: SkyEvent[]; 
   previousMonthSlug?: string;
   // Tutorial fields
   difficultyLevel?: DifficultyLevel;

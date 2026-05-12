@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import type { Blog, ContentType } from "@/lib/blogsDb";
 import {
-  Plus, Edit2, Trash2, CheckCircle, XCircle,
+  Plus, Edit2, Trash2, CheckCircle, XCircle, Clock,
   Telescope, BookOpen, Lightbulb, BarChart3, FileText, Eye
 } from "lucide-react";
 import PostEditor from "@/components/admin/PostEditor";
@@ -66,8 +66,9 @@ export default function AdminDashboard() {
 
   const filteredBlogs = filterType === "all" ? blogs : blogs.filter((b) => b.contentType === filterType);
   const totalPosts = blogs.length;
-  const publishedPosts = blogs.filter((b) => b.published).length;
-  const draftPosts = totalPosts - publishedPosts;
+  const scheduledPosts = blogs.filter((b) => b.published && b.publishDate && new Date(b.publishDate) > new Date()).length;
+  const publishedPosts = blogs.filter((b) => b.published && !(b.publishDate && new Date(b.publishDate) > new Date())).length;
+  const draftPosts = totalPosts - publishedPosts - scheduledPosts;
   const whatsUpPosts = blogs.filter((b) => b.contentType === "whats-up");
 
   return (
@@ -96,8 +97,8 @@ export default function AdminDashboard() {
               {[
                 { label: "Total Posts", value: totalPosts, icon: FileText, color: "text-slate-400" },
                 { label: "Published", value: publishedPosts, icon: Eye, color: "text-emerald-400" },
+                { label: "Scheduled", value: scheduledPosts, icon: Clock, color: "text-blue-400" },
                 { label: "Drafts", value: draftPosts, icon: Edit2, color: "text-amber-400" },
-                { label: "Content Types", value: 3, icon: BarChart3, color: "text-blue-400" },
               ].map((s) => (
                 <div key={s.label} className="bg-slate-900/60 border border-slate-800 rounded-2xl p-5">
                   <div className="flex items-center gap-3 mb-2">
@@ -173,7 +174,11 @@ export default function AdminDashboard() {
                         </div>
                       </div>
                       <div className="flex items-center gap-4 shrink-0">
-                        {blog.published ? (
+                        {blog.published && blog.publishDate && new Date(blog.publishDate) > new Date() ? (
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                            <Clock className="w-3.5 h-3.5" /> Scheduled
+                          </span>
+                        ) : blog.published ? (
                           <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
                             <CheckCircle className="w-3.5 h-3.5" /> Published
                           </span>

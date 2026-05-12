@@ -4,6 +4,7 @@
 // import { useEffect } from 'react';
 // import Header from '@/components/Home/Header';
 import HeroSection from '@/components/Home/HeroSection';
+import LatestBlogBanner from '@/components/Home/LatestBlogBanner';
 import Cards from '@/components/Cards';
 import FactsSection from '../Facts/FactsSection';
 // import { toast } from 'react-toastify';
@@ -151,7 +152,8 @@ export default function Home() {
         }
       `}</style> */}
 
-      <div className="min-h-screen bg-black">
+      <div className="min-h-screen bg-black relative">
+        <LatestBlogBanner />
         {/* Header moved to page.tsx for LCP optimization */}
         <HeroSection />
         <Cards />

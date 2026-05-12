@@ -22,7 +22,9 @@ export async function GET(request: Request) {
   if (contentType && TABLE_MAP[contentType]) {
     const tableName = TABLE_MAP[contentType];
     let query = supabase.from(tableName).select('*').order('createdAt', { ascending: false });
-    if (!includeUnpublished) query = query.eq('published', true);
+    if (!includeUnpublished) {
+      query = query.eq('published', true).or(`publishDate.is.null,publishDate.lte.${new Date().toISOString()}`);
+    }
     if (limit) query = query.limit(limit);
 
     const { data, error } = await query;
@@ -43,7 +45,9 @@ export async function GET(request: Request) {
   const results = await Promise.all(
     tables.map(async ({ type, table }) => {
       let query = supabase.from(table).select('*').order('createdAt', { ascending: false });
-      if (!includeUnpublished) query = query.eq('published', true);
+      if (!includeUnpublished) {
+      query = query.eq('published', true).or(`publishDate.is.null,publishDate.lte.${new Date().toISOString()}`);
+    }
       if (limit) query = query.limit(limit);
       const { data } = await query;
       return (data || []).map((row: Record<string, unknown>) => ({ ...row, contentType: type }));
