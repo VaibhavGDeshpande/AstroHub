@@ -1,11 +1,13 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { MONTHS } from "@/lib/blogsDb";
 import type { Blog } from "@/lib/blogsDb";
-import { Calendar, Clock, ArrowLeft, ArrowRight, User, Telescope, BookOpen, Lightbulb, Wrench } from "lucide-react";
+import { Clock, ArrowLeft, ArrowRight, User, Telescope, BookOpen, Lightbulb, Wrench } from "lucide-react";
 import LoaderWrapper from "@/components/Loader";
+import BlogContent from "@/components/BlogContent";
 
 export const revalidate = 0;
 
@@ -118,50 +120,82 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 
   return (
     <LoaderWrapper>
-    <article className="min-h-screen bg-slate-950 text-slate-200 pb-24 relative overflow-hidden">
+    <article className="min-h-screen bg-slate-950 text-slate-200 pb-24 relative overflow-hidden font-sans">
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-[400px] bg-blue-900/10 rounded-full blur-[100px] pointer-events-none" />
 
-      {/* Hero */}
-      <div className={`relative w-full overflow-hidden mb-12 md:mb-16 ${post.coverImage ? "h-[50vh] min-h-[400px] max-h-[600px] bg-slate-900" : "pt-32"}`}>
-        {post.coverImage && (
-          <>
-            <img src={post.coverImage} alt={post.title} className="absolute inset-0 w-full h-full object-cover opacity-60" />
-            <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/60 to-transparent" />
-          </>
-        )}
-        <div className={`${post.coverImage ? "absolute inset-0 flex flex-col justify-end pt-28 md:pt-36" : ""} px-4 pb-8 md:pb-12 max-w-4xl mx-auto w-full z-10 relative`}>
-          <Link href={backLink} className="inline-flex items-center gap-2 text-sm font-medium text-slate-400 hover:text-white transition-colors mb-6 group w-fit">
-            <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" /> Back to {typeLabel}s
-          </Link>
+      {/* Header Content */}
+      <div className="max-w-3xl mx-auto px-4 pt-24 md:pt-32 pb-4 z-10 relative">
+        <Link href={backLink} className="inline-flex items-center gap-2 text-sm font-medium text-slate-400 hover:text-white transition-colors mb-8 group w-fit">
+          <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" /> Back to {typeLabel}s
+        </Link>
 
-          <div className="flex items-center gap-3 mb-4 flex-wrap">
-            <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border ${badgeColors}`}>
-              <TypeIcon className="w-3.5 h-3.5" /> {typeLabel}
+        <div className="flex items-center gap-3 mb-6 flex-wrap">
+          <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border ${badgeColors}`}>
+            <TypeIcon className="w-3.5 h-3.5" /> {typeLabel}
+          </span>
+          {post.contentType === "whats-up" && post.skyMonth && post.skyYear && (
+            <span className="px-3 py-1.5 rounded-full text-xs font-bold bg-slate-800 text-white">{MONTHS[post.skyMonth - 1]} {post.skyYear}</span>
+          )}
+          {post.contentType === "tutorial" && post.difficultyLevel && (
+            <span className={`px-3 py-1.5 rounded-full text-xs font-semibold border ${diffColors[post.difficultyLevel]}`}>
+              {post.difficultyLevel.charAt(0).toUpperCase() + post.difficultyLevel.slice(1)}
             </span>
-            {post.contentType === "whats-up" && post.skyMonth && post.skyYear && (
-              <span className="px-3 py-1.5 rounded-full text-xs font-bold bg-slate-800 text-white">{MONTHS[post.skyMonth - 1]} {post.skyYear}</span>
-            )}
-            {post.contentType === "tutorial" && post.difficultyLevel && (
-              <span className={`px-3 py-1.5 rounded-full text-xs font-semibold border ${diffColors[post.difficultyLevel]}`}>
-                {post.difficultyLevel.charAt(0).toUpperCase() + post.difficultyLevel.slice(1)}
-              </span>
-            )}
-            {post.contentType === "explainer" && post.topicCategory && (
-              <span className="px-3 py-1.5 rounded-full text-xs font-semibold bg-purple-500/10 text-purple-400 border border-purple-500/20">{post.topicCategory}</span>
-            )}
-          </div>
+          )}
+          {post.contentType === "explainer" && post.topicCategory && (
+            <span className="px-3 py-1.5 rounded-full text-xs font-semibold bg-purple-500/10 text-purple-400 border border-purple-500/20">{post.topicCategory}</span>
+          )}
+        </div>
 
-          <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight drop-shadow-lg">{post.title}</h1>
+        <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white mb-6 leading-tight tracking-tight">{post.title}</h1>
+        
+        {post.excerpt && (
+          <p className="text-xl text-slate-400 mb-8 leading-relaxed">{post.excerpt}</p>
+        )}
 
-          <div className="flex flex-wrap items-center gap-5 text-sm font-medium text-slate-300">
-            {post.author && <span className="flex items-center gap-2"><User className="w-4 h-4 text-slate-400" /> {post.author}</span>}
-            <span className="flex items-center gap-2"><Calendar className="w-4 h-4 text-blue-400" /> {new Date(post.publishDate || post.createdAt).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}</span>
-            <span className="flex items-center gap-2"><Clock className="w-4 h-4 text-purple-400" /> {post.estimatedReadTime || getReadingTime(post.content)} min read</span>
+        {/* Author & Meta */}
+        <div className="flex items-center justify-between border-y border-slate-800/60 py-5 mt-8 mb-8">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 rounded-full bg-slate-800 flex items-center justify-center text-slate-400 border border-slate-700 shrink-0">
+              <User className="w-6 h-6" />
+            </div>
+            <div>
+              {post.author ? (
+                <Link href={`/blogs?author=${encodeURIComponent(post.author)}`} className="text-base font-semibold text-white hover:text-blue-400 transition-colors block">
+                  {post.author}
+                </Link>
+              ) : (
+                <span className="text-base font-semibold text-white block">AstroHub Transmission</span>
+              )}
+              <div className="flex items-center gap-3 text-sm text-slate-400 mt-1">
+                <span className="flex items-center gap-1.5"><Clock className="w-3.5 h-3.5" /> {post.estimatedReadTime || getReadingTime(post.content)} min read</span>
+                <span className="w-1 h-1 rounded-full bg-slate-700" />
+                <span className="flex items-center gap-1.5">{new Date(post.publishDate || post.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
+      {/* Cover Image */}
+      {post.coverImage && (
+        <div className="max-w-4xl mx-auto px-4 mb-14">
+          <figure className="relative w-full aspect-[16/9] overflow-hidden rounded-2xl shadow-2xl border border-slate-800/60">
+            <Image
+              src={post.coverImage}
+              alt={post.title}
+              fill
+              priority
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 960px"
+              className="object-cover"
+            />
+          </figure>
+          <p className="text-center text-sm text-slate-500 mt-4">Image from AstroHub Media.</p>
+        </div>
+      )}
+
       <div className="max-w-3xl mx-auto px-4 relative z-10">
+        <div className="grid grid-cols-1 gap-12 items-start">
+          <div className="w-full">
         {/* Tutorial: Tools Needed */}
         {post.contentType === "tutorial" && post.toolsNeeded && post.toolsNeeded.length > 0 && (
           <div className="mb-10 p-5 rounded-2xl bg-emerald-500/5 border border-emerald-500/15">
@@ -204,9 +238,9 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
         )}
 
         {/* Main Content */}
-        <div
-          className="prose prose-invert prose-lg prose-headings:text-slate-100 prose-a:text-blue-400 hover:prose-a:text-blue-300 prose-p:text-slate-300 prose-strong:text-white prose-li:text-slate-300 w-full max-w-none prose-img:rounded-xl prose-img:shadow-xl"
-          dangerouslySetInnerHTML={{ __html: post.content }}
+        <BlogContent
+          html={post.content}
+          className="prose prose-invert prose-lg prose-headings:font-sans prose-headings:text-slate-100 prose-a:text-blue-400 hover:prose-a:text-blue-300 prose-p:text-slate-300 prose-p:font-serif prose-p:text-xl prose-p:leading-relaxed prose-strong:text-white prose-li:text-slate-300 prose-li:font-serif prose-li:text-xl w-full max-w-none prose-img:rounded-xl prose-img:shadow-xl [&>p:first-of-type]:first-letter:text-7xl [&>p:first-of-type]:first-letter:font-bold [&>p:first-of-type]:first-letter:text-white [&>p:first-of-type]:first-letter:mr-4 [&>p:first-of-type]:first-letter:float-left [&>p:first-of-type]:first-letter:leading-[0.8] [&>p:first-of-type]:first-letter:mt-2 [&>p:first-of-type]:first-letter:font-serif"
         />
 
         {/* Explainer: Visual Aids Gallery */}
@@ -216,7 +250,16 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {post.visualAids.map((aid, i) => (
                 <figure key={i} className="rounded-xl overflow-hidden border border-slate-800">
-                  <img src={aid.url} alt={aid.caption} className="w-full h-48 object-cover" />
+                  <div className="relative w-full h-48">
+                    <Image
+                      src={aid.url}
+                      alt={aid.caption || 'Visual aid'}
+                      fill
+                      loading="lazy"
+                      sizes="(max-width: 768px) 100vw, 50vw"
+                      className="object-cover"
+                    />
+                  </div>
                   {aid.caption && <figcaption className="text-sm text-slate-400 p-3 bg-slate-900">{aid.caption}</figcaption>}
                 </figure>
               ))}
@@ -241,10 +284,12 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
         )}
 
         {/* Footer */}
-        <div className="mt-16 pt-8 border-t border-slate-800">
+        <div className="mt-16 pt-8 border-t border-slate-800 flex flex-col sm:flex-row gap-4 justify-between items-center">
           <Link href={backLink} className="inline-flex items-center justify-center gap-2 w-full sm:w-auto px-6 py-3 rounded-xl bg-slate-900 border border-slate-800 hover:bg-slate-800 hover:border-slate-700 text-white font-medium transition-all">
             <ArrowLeft className="w-4 h-4" /> More {typeLabel}s
           </Link>
+        </div>
+          </div>
         </div>
       </div>
     </article>

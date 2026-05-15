@@ -22,11 +22,11 @@ export default function LatestBlogBanner() {
 
   if (!latestPost || !isVisible) return null;
 
-  const typeLabels: Record<string, string> = {
-    'whats-up': 'Eyes on the Sky',
-    'tutorial': 'Tutorial',
-    'explainer': 'Explainer'
-  };
+  // const typeLabels: Record<string, string> = {
+  //   'whats-up': 'Eyes on the Sky',
+  //   'tutorial': 'Tutorial',
+  //   'explainer': 'Explainer'
+  // };
 
   // const label = typeLabels[latestPost.contentType] || 'Blog';
 

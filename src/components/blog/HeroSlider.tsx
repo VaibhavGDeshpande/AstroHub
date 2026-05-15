@@ -194,7 +194,7 @@ export default function HeroSlider({ slides }: HeroSliderProps) {
 
         {/* Slider Controls */}
         {slides.length > 1 && (
-          <div className="flex items-center gap-4 mt-12">
+          <div className="flex flex-wrap justify-center sm:justify-start items-center gap-3 sm:gap-4 mt-8 md:mt-12">
             {/* Prev/Next arrows */}
             <button
               onClick={prev}

@@ -21,7 +21,7 @@ export default function PostEditor({ blog, onSave, onCancel, existingWhatsUpPost
   const [form, setForm] = useState<Partial<Blog>>({
     contentType: "explainer",
     published: false,
-    author: "AstroHub",
+    author: " ",
     skyEvents: [],
     toolsNeeded: [],
     keyConcepts: [],
@@ -36,7 +36,7 @@ export default function PostEditor({ blog, onSave, onCancel, existingWhatsUpPost
     setForm({
       contentType: "explainer",
       published: false,
-      author: "AstroHub",
+      author: " ",
       skyEvents: [],
       toolsNeeded: [],
       keyConcepts: [],
@@ -154,7 +154,7 @@ export default function PostEditor({ blog, onSave, onCancel, existingWhatsUpPost
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <label className={labelClass}>Author</label>
-            <input type="text" value={form.author || "AstroHub"} onChange={(e) => setForm({ ...form, author: e.target.value })} className={inputClass} />
+            <input type="text" value={form.author ?? ""} onChange={(e) => setForm({ ...form, author: e.target.value })} placeholder="AstroHub" className={inputClass} />
           </div>
           <div>
             <label className={labelClass}>Publish Date</label>

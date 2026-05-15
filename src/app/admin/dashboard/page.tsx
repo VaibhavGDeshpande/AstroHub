@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import type { Blog, ContentType } from "@/lib/blogsDb";
 import {
   Plus, Edit2, Trash2, CheckCircle, XCircle, Clock,
-  Telescope, BookOpen, Lightbulb, BarChart3, FileText, Eye
+  Telescope, BookOpen, Lightbulb, FileText, Eye
 } from "lucide-react";
 import PostEditor from "@/components/admin/PostEditor";
 import LoaderWrapper from "@/components/Loader";
