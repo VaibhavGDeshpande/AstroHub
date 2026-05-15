@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import type { Blog, ContentType, DifficultyLevel, SkyEvent, VisualAid } from "@/lib/blogsDb";
 import { TOPIC_CATEGORIES, MONTHS } from "@/lib/blogsDb";
 import RichTextEditor from "@/components/RichTextEditor";
+import { processContentImages } from "@/lib/processContentImages";
 import { X, Plus, Trash2, ChevronDown } from "lucide-react";
 
 interface PostEditorProps {
@@ -53,7 +54,13 @@ export default function PostEditor({ blog, onSave, onCancel, existingWhatsUpPost
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
-    try { await onSave(form); } finally { setSaving(false); }
+    try {
+      // Upload any base64 images in content to permanent storage
+      const processedContent = form.content
+        ? await processContentImages(form.content)
+        : form.content;
+      await onSave({ ...form, content: processedContent });
+    } finally { setSaving(false); }
   };
 
   // Sky events helpers

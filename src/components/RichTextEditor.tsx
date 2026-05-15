@@ -80,36 +80,15 @@ function getImageDimensions(src: string): Promise<{ width: number; height: numbe
   });
 }
 
-/* ─── upload helper (outside component to avoid recreating) */
-async function uploadImageFile(file: File): Promise<string | null> {
-  try {
-    const webpFile = await convertToWebP(file);
-    const formData = new FormData();
-    formData.append('image', webpFile);
-    const res = await fetch('/api/upload', { method: 'POST', body: formData });
-    if (res.ok) {
-      const data = await res.json();
-      return data.url ?? null;
-    }
-  } catch (err) {
-    console.error('Image upload failed:', err);
-  }
-  return null;
-}
-
-function base64FromFile(file: File): Promise<string> {
+/* ─── Convert file to WebP base64 data URL (no upload) ── */
+async function fileToWebPBase64(file: File): Promise<string> {
+  const webpFile = await convertToWebP(file);
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = (e) => resolve(e.target?.result as string);
     reader.onerror = reject;
-    reader.readAsDataURL(file);
+    reader.readAsDataURL(webpFile);
   });
-}
-
-async function resolveImageSrc(file: File): Promise<string> {
-  const webpFile = await convertToWebP(file);
-  const url = await uploadImageFile(webpFile);
-  return url ?? (await base64FromFile(webpFile));
 }
 
 /* ─── Extended Tiptap Image with loading, width, height ── */
@@ -222,7 +201,7 @@ export default function RichTextEditor({ content, onChange }: RichTextEditorProp
             if (file) {
               handled = true;
               event.preventDefault();
-              resolveImageSrc(file).then(async (src) => {
+              fileToWebPBase64(file).then(async (src) => {
                 const dims = await getImageDimensions(src);
                 const { schema } = view.state;
                 const node = schema.nodes.image.create({
@@ -247,7 +226,7 @@ export default function RichTextEditor({ content, onChange }: RichTextEditorProp
         const coords = view.posAtCoords({ left: event.clientX, top: event.clientY });
         const pos = coords?.pos ?? view.state.selection.from;
         files.forEach((file) => {
-          resolveImageSrc(file).then(async (src) => {
+          fileToWebPBase64(file).then(async (src) => {
             const dims = await getImageDimensions(src);
             const { schema } = view.state;
             view.dispatch(view.state.tr.insert(pos, schema.nodes.image.create({
@@ -314,7 +293,7 @@ export default function RichTextEditor({ content, onChange }: RichTextEditorProp
         f.type.startsWith('image/')
       );
       for (const file of files) {
-        const src = await resolveImageSrc(file);
+        const src = await fileToWebPBase64(file);
         const dims = await getImageDimensions(src);
         editor.chain().focus().setImage({
           src,
