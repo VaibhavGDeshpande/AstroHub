@@ -15,6 +15,7 @@ const routes: RouteConfig[] = [
   { path: "/weather", priority: 0.9, changeFrequency: "hourly" }, // Real-time data
   { path: "/space-news", priority: 0.9, changeFrequency: "daily" }, // Frequent articles
   { path: "/blogs", priority: 0.9, changeFrequency: "daily" }, // Blogs
+  { path: "/authors", priority: 0.7, changeFrequency: "weekly" }, // Authors
   { path: "/neo", priority: 0.8, changeFrequency: "daily" }, // Updates daily
   { path: "/apod", priority: 0.8, changeFrequency: "daily" },
   { path: "/epic", priority: 0.7, changeFrequency: "daily" }, 

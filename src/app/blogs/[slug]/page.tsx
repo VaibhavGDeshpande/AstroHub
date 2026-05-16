@@ -160,7 +160,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
             </div>
             <div>
               {post.author ? (
-                <Link href={`/blogs?author=${encodeURIComponent(post.author)}`} className="text-base font-semibold text-white hover:text-blue-400 transition-colors block">
+                <Link href={`/authors/${encodeURIComponent(post.author)}`} className="text-base font-semibold text-white hover:text-blue-400 transition-colors block">
                   {post.author}
                 </Link>
               ) : (
