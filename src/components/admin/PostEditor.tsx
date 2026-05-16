@@ -122,7 +122,7 @@ export default function PostEditor({ blog, onSave, onCancel, existingWhatsUpPost
         {/* Content Type Selector */}
         <div>
           <label className={labelClass}>Content Type</label>
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             {([
               { value: "whats-up", label: "Eyes on the Sky", color: "blue" },
               { value: "tutorial", label: "Tutorial", color: "emerald" },
@@ -188,7 +188,7 @@ export default function PostEditor({ blog, onSave, onCancel, existingWhatsUpPost
         {contentType === "whats-up" && (
           <div className="space-y-6 p-5 rounded-xl border border-blue-500/20 bg-blue-500/5">
             <h3 className="text-lg font-semibold text-blue-400">Sky Update Details</h3>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="relative">
                 <label className={labelClass}>Month *</label>
                 <select value={form.skyMonth ?? ""} onChange={(e) => setForm({ ...form, skyMonth: parseInt(e.target.value) })} className={selectClass}>
@@ -228,7 +228,7 @@ export default function PostEditor({ blog, onSave, onCancel, existingWhatsUpPost
                 {(form.skyEvents || []).map((evt, idx) => (
                   <div key={idx} className="p-4 bg-slate-950/50 rounded-xl border border-slate-800 space-y-3">
                     <div className="flex items-start gap-3">
-                      <div className="flex-1 grid grid-cols-2 gap-3">
+                      <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <input type="text" placeholder="Event title" value={evt.title} onChange={(e) => updateSkyEvent(idx, "title", e.target.value)} className={inputClass + " text-sm"} />
                         <input type="text" placeholder="Date (e.g. May 5)" value={evt.date} onChange={(e) => updateSkyEvent(idx, "date", e.target.value)} className={inputClass + " text-sm"} />
                       </div>
@@ -247,7 +247,7 @@ export default function PostEditor({ blog, onSave, onCancel, existingWhatsUpPost
         {contentType === "tutorial" && (
           <div className="space-y-6 p-5 rounded-xl border border-emerald-500/20 bg-emerald-500/5">
             <h3 className="text-lg font-semibold text-emerald-400">Tutorial Details</h3>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="relative">
                 <label className={labelClass}>Difficulty Level</label>
                 <select value={form.difficultyLevel || ""} onChange={(e) => setForm({ ...form, difficultyLevel: e.target.value as DifficultyLevel })} className={selectClass}>
@@ -316,7 +316,7 @@ export default function PostEditor({ blog, onSave, onCancel, existingWhatsUpPost
               </div>
               {(form.visualAids || []).map((aid, idx) => (
                 <div key={idx} className="flex gap-3 mb-3 items-start">
-                  <div className="flex-1 grid grid-cols-2 gap-3">
+                  <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <input type="url" placeholder="Image URL" value={aid.url} onChange={(e) => updateVisualAid(idx, "url", e.target.value)} className={inputClass + " text-sm"} />
                     <input type="text" placeholder="Caption" value={aid.caption} onChange={(e) => updateVisualAid(idx, "caption", e.target.value)} className={inputClass + " text-sm"} />
                   </div>
@@ -344,9 +344,9 @@ export default function PostEditor({ blog, onSave, onCancel, existingWhatsUpPost
         </div>
 
         {/* Actions */}
-        <div className="flex gap-4 pt-4 border-t border-slate-800">
-          <button type="button" onClick={onCancel} className="px-6 py-3 rounded-xl border border-slate-700 text-slate-300 hover:bg-slate-800 font-medium transition-colors">Cancel</button>
-          <button type="submit" disabled={saving} className="px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-medium transition-colors disabled:opacity-50">
+        <div className="flex flex-col sm:flex-row gap-4 pt-4 border-t border-slate-800">
+          <button type="button" onClick={onCancel} className="w-full sm:w-auto px-6 py-3 rounded-xl border border-slate-700 text-slate-300 hover:bg-slate-800 font-medium transition-colors order-2 sm:order-1">Cancel</button>
+          <button type="submit" disabled={saving} className="w-full sm:w-auto px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-medium transition-colors disabled:opacity-50 order-1 sm:order-2">
             {saving ? "Saving..." : (form.published && form.publishDate && new Date(form.publishDate) > new Date() ? "Schedule Post" : "Save Post")}
           </button>
         </div>

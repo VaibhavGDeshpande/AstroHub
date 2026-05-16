@@ -171,8 +171,6 @@ export default function RichTextEditor({ content, onChange }: RichTextEditorProp
     '[&_h3]:text-2xl [&_h3]:font-bold [&_h3]:text-white [&_h3]:mb-2 [&_h3]:mt-4 [&_h3]:leading-tight',
     // Paragraphs
     '[&_p]:text-slate-300 [&_p]:leading-relaxed [&_p]:mb-5 [&_p]:font-serif [&_p]:text-xl',
-    // Drop cap
-    '[&>p:first-of-type]:first-letter:text-7xl [&>p:first-of-type]:first-letter:font-bold [&>p:first-of-type]:first-letter:text-white [&>p:first-of-type]:first-letter:mr-4 [&>p:first-of-type]:first-letter:float-left [&>p:first-of-type]:first-letter:leading-[0.8] [&>p:first-of-type]:first-letter:mt-2 [&>p:first-of-type]:first-letter:font-serif',
     // Lists
     '[&_ul]:list-disc [&_ul]:pl-6 [&_ul]:mb-5 [&_ul]:text-slate-300 [&_ul]:font-serif [&_ul]:text-xl',
     '[&_ol]:list-decimal [&_ol]:pl-6 [&_ol]:mb-5 [&_ol]:text-slate-300 [&_ol]:font-serif [&_ol]:text-xl',

@@ -93,41 +93,41 @@ export default function AdminDashboard() {
         ) : (
           <>
             {/* Stats Row */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 mb-8">
               {[
                 { label: "Total Posts", value: totalPosts, icon: FileText, color: "text-slate-400" },
                 { label: "Published", value: publishedPosts, icon: Eye, color: "text-emerald-400" },
                 { label: "Scheduled", value: scheduledPosts, icon: Clock, color: "text-blue-400" },
                 { label: "Drafts", value: draftPosts, icon: Edit2, color: "text-amber-400" },
               ].map((s) => (
-                <div key={s.label} className="bg-slate-900/60 border border-slate-800 rounded-2xl p-5">
-                  <div className="flex items-center gap-3 mb-2">
-                    <s.icon className={`w-5 h-5 ${s.color}`} />
-                    <span className="text-sm text-slate-400">{s.label}</span>
+                <div key={s.label} className="bg-slate-900/60 border border-slate-800 rounded-2xl p-4 md:p-5">
+                  <div className="flex items-center gap-2 md:gap-3 mb-1 md:mb-2">
+                    <s.icon className={`w-4 h-4 md:w-5 md:h-5 ${s.color}`} />
+                    <span className="text-xs md:text-sm text-slate-400 truncate">{s.label}</span>
                   </div>
-                  <div className="text-3xl font-bold text-white">{s.value}</div>
+                  <div className="text-2xl md:text-3xl font-bold text-white">{s.value}</div>
                 </div>
               ))}
             </div>
 
             {/* Quick Actions */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-4 mb-8">
               {([
-                { type: "whats-up" as ContentType, label: "Eyes on the Sky Update", desc: "Monthly sky guide", icon: Telescope, gradient: "from-blue-600 to-cyan-600" },
+                { type: "whats-up" as ContentType, label: "Eyes on the Sky", desc: "Monthly sky guide", icon: Telescope, gradient: "from-blue-600 to-cyan-600" },
                 { type: "tutorial" as ContentType, label: "New Tutorial", desc: "Step-by-step guide", icon: BookOpen, gradient: "from-emerald-600 to-teal-600" },
                 { type: "explainer" as ContentType, label: "New Explainer", desc: "Concept article", icon: Lightbulb, gradient: "from-purple-600 to-violet-600" },
               ]).map((action) => (
                 <button
                   key={action.type}
                   onClick={() => setEditingBlog({ published: false, contentType: action.type })}
-                  className={`bg-gradient-to-r ${action.gradient} p-5 rounded-2xl text-left hover:scale-[1.02] transition-transform group`}
+                  className={`bg-gradient-to-r ${action.gradient} p-4 md:p-5 rounded-2xl text-left hover:scale-[1.02] transition-transform group`}
                 >
                   <div className="flex items-center gap-3 mb-2">
-                    <action.icon className="w-6 h-6 text-white/80" />
-                    <Plus className="w-4 h-4 text-white/60 group-hover:rotate-90 transition-transform" />
+                    <action.icon className="w-5 h-5 md:w-6 md:h-6 text-white/80" />
+                    <Plus className="w-3 h-3 md:w-4 md:h-4 text-white/60 group-hover:rotate-90 transition-transform" />
                   </div>
-                  <div className="font-semibold text-white text-lg">{action.label}</div>
-                  <div className="text-sm text-white/60">{action.desc}</div>
+                  <div className="font-semibold text-white text-base md:text-lg leading-tight">{action.label}</div>
+                  <div className="text-xs text-white/60 mt-0.5">{action.desc}</div>
                 </button>
               ))}
             </div>
@@ -161,35 +161,43 @@ export default function AdminDashboard() {
               ) : (
                 <div className="divide-y divide-slate-800/50">
                   {filteredBlogs.map((blog) => (
-                    <div key={blog.id} className="flex items-center justify-between p-4 md:px-6 hover:bg-slate-800/20 transition-colors group">
-                      <div className="flex-1 min-w-0 mr-4">
-                        <div className="flex items-center gap-3 mb-1 flex-wrap">
-                          <span className="font-medium text-white truncate">{blog.title}</span>
+                    <div key={blog.id} className="flex flex-col md:flex-row md:items-center justify-between p-4 md:px-6 hover:bg-slate-800/20 transition-colors group gap-4 md:gap-0">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex flex-wrap items-center gap-2 mb-1">
+                          <span className="font-semibold text-white truncate max-w-[200px] sm:max-w-md">{blog.title}</span>
                           <TypeBadge type={blog.contentType || "explainer"} />
                         </div>
-                        <div className="flex items-center gap-4 text-xs text-slate-500">
-                          <span className="font-mono">/{blog.slug}</span>
+                        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-500">
+                          <span className="font-mono hidden sm:inline">/{blog.slug}</span>
                           <span>{new Date(blog.createdAt).toLocaleDateString()}</span>
-                          {blog.author && <span>by {blog.author}</span>}
+                          {blog.author && <span className="hidden sm:inline">by {blog.author}</span>}
                         </div>
                       </div>
-                      <div className="flex items-center gap-4 shrink-0">
-                        {blog.published && blog.publishDate && new Date(blog.publishDate) > new Date() ? (
-                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-blue-500/10 text-blue-400 border border-blue-500/20">
-                            <Clock className="w-3.5 h-3.5" /> Scheduled
-                          </span>
-                        ) : blog.published ? (
-                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                            <CheckCircle className="w-3.5 h-3.5" /> Published
-                          </span>
-                        ) : (
-                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-amber-500/10 text-amber-400 border border-amber-500/20">
-                            <XCircle className="w-3.5 h-3.5" /> Draft
-                          </span>
-                        )}
-                        <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <button onClick={() => setEditingBlog(blog)} className="text-slate-400 hover:text-blue-400 p-1.5 rounded-lg hover:bg-slate-800" title="Edit"><Edit2 className="w-4 h-4" /></button>
-                          <button onClick={() => handleDelete(blog.slug)} className="text-slate-400 hover:text-red-400 p-1.5 rounded-lg hover:bg-slate-800" title="Delete"><Trash2 className="w-4 h-4" /></button>
+                      
+                      <div className="flex items-center justify-between md:justify-end gap-4 shrink-0 border-t border-slate-800/50 md:border-0 pt-3 md:pt-0">
+                        <div className="flex items-center gap-2">
+                          {blog.published && blog.publishDate && new Date(blog.publishDate) > new Date() ? (
+                            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] md:text-xs font-medium bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                              <Clock className="w-3 h-3 md:w-3.5 md:h-3.5" /> Scheduled
+                            </span>
+                          ) : blog.published ? (
+                            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] md:text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                              <CheckCircle className="w-3 h-3 md:w-3.5 md:h-3.5" /> Published
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] md:text-xs font-medium bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                              <XCircle className="w-3 h-3 md:w-3.5 md:h-3.5" /> Draft
+                            </span>
+                          )}
+                        </div>
+                        
+                        <div className="flex gap-1 md:gap-2 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
+                          <button onClick={() => setEditingBlog(blog)} className="text-slate-400 hover:text-blue-400 p-2 rounded-lg hover:bg-slate-800 bg-slate-800/50 md:bg-transparent" title="Edit">
+                            <Edit2 className="w-4 h-4" />
+                          </button>
+                          <button onClick={() => handleDelete(blog.slug)} className="text-slate-400 hover:text-red-400 p-2 rounded-lg hover:bg-slate-800 bg-slate-800/50 md:bg-transparent" title="Delete">
+                            <Trash2 className="w-4 h-4" />
+                          </button>
                         </div>
                       </div>
                     </div>
