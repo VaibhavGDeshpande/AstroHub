@@ -39,7 +39,7 @@ export default function OnboardingTour() {
             }
           },
           {
-            element: '#astro-bot',
+            element: '#nova',
             popover: {
               title: 'Meet AstroBot',
               description: 'Got questions about space? Chat directly with our AI astronomy assistant!',

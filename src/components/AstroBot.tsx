@@ -105,27 +105,19 @@ export default function AstroBot() {
     setLoading(true)
 
     try {
-      const prompt = [
-        `You are AstroBot inside a space/astronomy app.`,
-        `Reply in the most appropriate length for the user's question.`,
-        ``,
-        `Output rules:`,
-        `- If it's a quick fact/definition/yes-no: answer in 1 line (max ~20 words).`,
-        `- If the user says \"explain\", \"how\", \"why\", \"compare\", or \"tell me about\": answer in 12–20 short lines.`,
-        `- If the user asks for steps: use a numbered list (3–8 steps).`,
-        `- If unclear: ask exactly 1 clarifying question.`,
-        `- Keep it factual; no filler; astronomy-focused.`,
-        ``,
-        `User: ${term}`,
-      ].join('\n')
+      // Map current chat messages to the format expected by the API
+      const history = messages.map(m => ({
+        role: m.sender === 'bot' ? 'model' : 'user',
+        text: m.text
+      }));
 
       const res = await fetch('/api/genai', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          model: 'google/gemma-4-26b-a4b-it:free',
-          prompt,
-          temperature: 0.4,
+          prompt: term,
+          history,
+          temperature: 0.5,
         }),
       })
 
@@ -182,8 +174,8 @@ export default function AstroBot() {
             Ask astronomy related questions
           </div>
         )}
-        <button id="astro-bot"
-          aria-label="Open AstroBot"
+        <button id="nova"
+          aria-label="Open Nova"
           className={`relative h-12 w-12 rounded-full flex items-center justify-center hover:scale-105 transition-transform shadow-lg ${launcherPalette}`}
           onClick={() => setOpen(true)}
         >
@@ -207,12 +199,12 @@ export default function AstroBot() {
           } flex flex-col ${drawerPalette}`}
           role="dialog"
           aria-modal="true"
-          aria-label="AstroBot Chat"
+          aria-label="Nova"
         >
           <div className={`flex items-center justify-between px-4 py-3 border-b ${headerBorderClass}`}>
             <div className="flex items-center gap-2">
               <FaSun className={headerIconClass} />
-              <h2 className="font-semibold">AstroBot</h2>
+              <h2 className="font-semibold">Nova</h2>
             </div>
             <button aria-label="Close" className={`p-2 rounded transition-colors ${closeButtonPalette}`} onClick={() => setOpen(false)}>
               <IoClose className="text-xl" />
@@ -260,7 +252,7 @@ export default function AstroBot() {
                     </div>
 
                     <div className="min-w-0">
-                      <p className={`text-xs font-semibold ${nightMode ? 'text-red-100/90' : 'text-white/80'}`}>AstroBot is thinking…</p>
+                      <p className={`text-xs font-semibold ${nightMode ? 'text-red-100/90' : 'text-white/80'}`}>Nova is thinking…</p>
                       <div className="mt-1 flex items-center gap-2">
                         <span className="relative inline-flex items-center" aria-hidden="true">
                           <span className={`w-2 h-2 rounded-full mr-1 animate-typing-dot ${typingDotClass}`}></span>
