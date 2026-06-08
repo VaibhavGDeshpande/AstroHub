@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
 import { createClient } from '@/lib/supabase/server';
+import { signAdminSession, getAdminSession } from '@/lib/auth';
 
 export async function POST(request: Request) {
   try {
@@ -30,12 +31,14 @@ export async function POST(request: Request) {
     }
 
     // Build the session payload
-    const session = {
+    const sessionPayload = {
       author_id: author.id,
       author_name: author.name,
       display_name: author.display_name || author.name,
       role: author.role || 'author',
     };
+
+    const sessionToken = await signAdminSession(sessionPayload);
 
     const response = NextResponse.json({
       success: true,
@@ -48,7 +51,7 @@ export async function POST(request: Request) {
     });
 
     // Set secure HTTP-only cookie with session info
-    response.cookies.set('admin_session', JSON.stringify(session), {
+    response.cookies.set('admin_session', sessionToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
@@ -73,20 +76,13 @@ export async function POST(request: Request) {
 
 // GET: return the current session info
 export async function GET() {
-  const { cookies: getCookies } = await import('next/headers');
-  const cookieStore = await getCookies();
-  const raw = cookieStore.get('admin_session')?.value;
+  const session = await getAdminSession();
 
-  if (!raw) {
+  if (!session) {
     return NextResponse.json({ authenticated: false }, { status: 401 });
   }
 
-  try {
-    const session = JSON.parse(raw);
-    return NextResponse.json({ authenticated: true, ...session });
-  } catch {
-    return NextResponse.json({ authenticated: false }, { status: 401 });
-  }
+  return NextResponse.json({ authenticated: true, ...session });
 }
 
 // DELETE: logout — clear both cookies

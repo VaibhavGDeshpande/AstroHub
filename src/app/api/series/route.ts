@@ -94,6 +94,20 @@ export async function DELETE(request: Request) {
 
   const supabase = await createClient();
 
+  const { data: series, error: lookupError } = await supabase
+    .from('custom_series')
+    .select('id, created_by')
+    .eq('id', id)
+    .single();
+
+  if (lookupError || !series) {
+    return NextResponse.json({ error: 'Series not found' }, { status: 404 });
+  }
+
+  if (session.role !== 'admin' && series.created_by !== session.author_id) {
+    return NextResponse.json({ error: 'You can only delete your own series' }, { status: 403 });
+  }
+
   const { error } = await supabase
     .from('custom_series')
     .delete()

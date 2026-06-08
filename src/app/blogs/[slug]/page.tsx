@@ -4,8 +4,8 @@ import Image from "next/image";
 import { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { MONTHS } from "@/lib/blogsDb";
-import type { Blog } from "@/lib/blogsDb";
-import { Clock, ArrowLeft, ArrowRight, User, Telescope, BookOpen, Lightbulb, Wrench } from "lucide-react";
+import type { Author, Blog, ContentType } from "@/lib/blogsDb";
+import { Clock, ArrowLeft, ArrowRight, User, Telescope, BookOpen, Lightbulb, Wrench, Sparkles } from "lucide-react";
 import LoaderWrapper from "@/components/Loader";
 import BlogContent from "@/components/BlogContent";
 
@@ -21,17 +21,24 @@ const diffColors: Record<string, string> = {
   advanced: "bg-red-500/10 text-red-400 border-red-500/20",
 };
 
+type AuthorProfile = Pick<Author, "id" | "name" | "display_name" | "avatar_url">;
+
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
   const supabase = await createClient();
 
-  const tables = ['whats_up', 'tutorials', 'explainers'];
-  let blog: Blog | null = null;
+  const tables: { type: ContentType; table: string; select: string }[] = [
+    { type: "whats-up", table: "whats_up", select: "*" },
+    { type: "tutorial", table: "tutorials", select: "*" },
+    { type: "explainer", table: "explainers", select: "*" },
+    { type: "custom-series", table: "custom_series_posts", select: "*, custom_series(name, slug)" },
+  ];
+  let blog: (Blog & { custom_series?: { name: string; slug: string } | null }) | null = null;
 
-  for (const table of tables) {
-    const { data } = await supabase.from(table).select("*").eq("slug", slug).single();
+  for (const { table, select } of tables) {
+    const { data } = await supabase.from(table).select(select).eq("slug", slug).single();
     if (data) {
-      blog = data as Blog;
+      blog = data as unknown as Blog & { custom_series?: { name: string; slug: string } | null };
       break;
     }
   }
@@ -66,21 +73,20 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
   const { slug } = await params;
   const supabase = await createClient();
 
-  // Search across all three tables for the slug
-  type ContentType = 'whats-up' | 'tutorial' | 'explainer';
-  const tables: { type: ContentType; table: string }[] = [
-    { type: 'whats-up', table: 'whats_up' },
-    { type: 'tutorial', table: 'tutorials' },
-    { type: 'explainer', table: 'explainers' },
+  const tables: { type: ContentType; table: string; select: string }[] = [
+    { type: 'whats-up', table: 'whats_up', select: "*" },
+    { type: 'tutorial', table: 'tutorials', select: "*" },
+    { type: 'explainer', table: 'explainers', select: "*" },
+    { type: 'custom-series', table: 'custom_series_posts', select: "*, custom_series(name, slug)" },
   ];
 
   let blog: Record<string, unknown> | null = null;
   let foundType: ContentType = 'explainer';
 
-  for (const { type, table } of tables) {
-    const { data } = await supabase.from(table).select("*").eq("slug", slug).single();
+  for (const { type, table, select } of tables) {
+    const { data } = await supabase.from(table).select(select).eq("slug", slug).single();
     if (data) {
-      blog = data;
+      blog = data as unknown as Record<string, unknown>;
       foundType = type;
       break;
     }
@@ -88,12 +94,50 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 
   if (!blog || !blog.published) notFound();
 
-  const post = { ...blog, contentType: foundType } as Blog;
-  const typeIcon = post.contentType === "whats-up" ? Telescope : post.contentType === "tutorial" ? BookOpen : Lightbulb;
+  const series = blog.custom_series as { name: string; slug: string } | null | undefined;
+  const post = {
+    ...blog,
+    contentType: foundType,
+    seriesName: series?.name,
+    seriesSlug: series?.slug,
+    custom_series: undefined,
+  } as unknown as Blog;
+  const typeIcon = post.contentType === "whats-up"
+    ? Telescope
+    : post.contentType === "tutorial"
+      ? BookOpen
+      : post.contentType === "custom-series"
+        ? Sparkles
+        : Lightbulb;
   const TypeIcon = typeIcon;
-  const typeLabel = post.contentType === "whats-up" ? "What's Up" : post.contentType === "tutorial" ? "Tutorial" : "Explainer";
-  const typeColor = post.contentType === "whats-up" ? "blue" : post.contentType === "tutorial" ? "emerald" : "purple";
-  const backLink = post.contentType === "whats-up" ? "/blogs/eyes-on-the-sky" : post.contentType === "tutorial" ? "/blogs/tutorials" : "/blogs/explainers";
+  const typeLabel = post.contentType === "whats-up"
+    ? "What's Up"
+    : post.contentType === "tutorial"
+      ? "Tutorial"
+      : post.contentType === "custom-series"
+        ? (post.seriesName || "Series")
+        : "Explainer";
+  const typeColor = post.contentType === "whats-up" ? "blue" : post.contentType === "tutorial" ? "emerald" : post.contentType === "custom-series" ? "amber" : "purple";
+  const backLink = post.contentType === "whats-up" ? "/blogs/eyes-on-the-sky" : post.contentType === "tutorial" ? "/blogs/tutorials" : post.contentType === "explainer" ? "/blogs/explainers" : "/blogs";
+
+  let authorProfile: AuthorProfile | null = null;
+  if (post.app_author_id) {
+    const { data } = await supabase
+      .from("authors")
+      .select("id, name, display_name, avatar_url")
+      .eq("id", post.app_author_id)
+      .maybeSingle();
+    authorProfile = data as AuthorProfile | null;
+  } else if (post.author) {
+    const { data } = await supabase
+      .from("authors")
+      .select("id, name, display_name, avatar_url")
+      .or(`name.ilike.${post.author},display_name.ilike.${post.author}`)
+      .maybeSingle();
+    authorProfile = data as AuthorProfile | null;
+  }
+  const bylineName = authorProfile?.display_name || post.author || "AstroHub Transmission";
+  const authorRouteName = authorProfile?.name || post.author;
 
   // Fetch previous/next for what's-up
   let prevPost: Blog | null = null;
@@ -116,6 +160,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 
   const badgeColors = typeColor === "blue" ? "bg-blue-500/10 text-blue-400 border-blue-500/20"
     : typeColor === "emerald" ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
+    : typeColor === "amber" ? "bg-amber-500/10 text-amber-400 border-amber-500/20"
     : "bg-purple-500/10 text-purple-400 border-purple-500/20";
 
   return (
@@ -156,15 +201,19 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
         <div className="flex items-center justify-between border-y border-slate-800/60 py-5 mt-8 mb-8">
           <div className="flex items-center gap-4">
             <div className="w-12 h-12 rounded-full bg-slate-800 flex items-center justify-center text-slate-400 border border-slate-700 shrink-0">
-              <User className="w-6 h-6" />
+              {authorProfile?.avatar_url ? (
+                <img src={authorProfile.avatar_url} alt={bylineName} className="w-full h-full object-cover rounded-full" />
+              ) : (
+                <User className="w-6 h-6" />
+              )}
             </div>
             <div>
-              {post.author ? (
-                <Link href={`/authors/${encodeURIComponent(post.author)}`} className="text-base font-semibold text-white hover:text-blue-400 transition-colors block">
-                  {post.author}
+              {authorRouteName ? (
+                <Link href={`/authors/${encodeURIComponent(authorRouteName)}`} className="text-base font-semibold text-white hover:text-blue-400 transition-colors block">
+                  {bylineName}
                 </Link>
               ) : (
-                <span className="text-base font-semibold text-white block">AstroHub Transmission</span>
+                <span className="text-base font-semibold text-white block">{bylineName}</span>
               )}
               <div className="flex items-center gap-3 text-sm text-slate-400 mt-1">
                 <span className="flex items-center gap-1.5"><Clock className="w-3.5 h-3.5" /> {post.estimatedReadTime || getReadingTime(post.content)} min read</span>

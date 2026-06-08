@@ -27,8 +27,7 @@ export async function GET(request: Request) {
     if (!includeUnpublished) {
       query = query.eq('published', true).or(`publishDate.is.null,publishDate.lte.${new Date().toISOString()}`);
     } else if (session && session.role !== 'admin') {
-      // Author isolation: show own posts + legacy unowned posts
-      query = query.or(`app_author_id.eq.${session.author_id},app_author_id.is.null`);
+      query = query.eq('app_author_id', session.author_id);
     }
     if (limit) query = query.limit(limit);
 
@@ -49,7 +48,7 @@ export async function GET(request: Request) {
     if (!includeUnpublished) {
       query = query.eq('published', true);
     } else if (session && session.role !== 'admin') {
-      query = query.or(`app_author_id.eq.${session.author_id},app_author_id.is.null`);
+      query = query.eq('app_author_id', session.author_id);
     }
     if (limit) query = query.limit(limit);
 
@@ -82,7 +81,7 @@ export async function GET(request: Request) {
       if (!includeUnpublished) {
         query = query.eq('published', true).or(`publishDate.is.null,publishDate.lte.${new Date().toISOString()}`);
       } else if (session && session.role !== 'admin') {
-        query = query.or(`app_author_id.eq.${session.author_id},app_author_id.is.null`);
+        query = query.eq('app_author_id', session.author_id);
       }
       if (limit) query = query.limit(limit);
       const { data } = await query;
@@ -99,7 +98,7 @@ export async function GET(request: Request) {
   if (!includeUnpublished) {
     csQuery = csQuery.eq('published', true);
   } else if (session && session.role !== 'admin') {
-    csQuery = csQuery.or(`app_author_id.eq.${session.author_id},app_author_id.is.null`);
+    csQuery = csQuery.eq('app_author_id', session.author_id);
   }
   if (limit) csQuery = csQuery.limit(limit);
 

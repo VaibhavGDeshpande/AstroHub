@@ -151,6 +151,7 @@ const Header = () => {
       items: [
         { name: 'Space News & Updates', path: '/space-news' },
         { name: 'AstroHub Transmission', path: '/blogs' },
+        { name: 'Transmission Authors', path: '/authors' },
         { name: 'Space Quiz', path: '/space-quiz' },
         { name: 'Space Wallpapers', path: '/wallpapers' }
       ]
@@ -351,6 +352,9 @@ const Header = () => {
             </Link>
             <Link href="/blogs" className="flex items-center px-5 py-4 text-white font-semibold bg-white/5 rounded-2xl border border-white/10 hover:border-cyan-400/30 transition-all" onClick={() => setIsMobileMenuOpen(false)}>
               AstroHub Transmission
+            </Link>
+            <Link href="/authors" className="flex items-center px-5 py-4 text-white font-semibold bg-white/5 rounded-2xl border border-white/10 hover:border-cyan-400/30 transition-all" onClick={() => setIsMobileMenuOpen(false)}>
+              Transmission Authors
             </Link>
             <Link href="/resources" className="flex items-center px-5 py-4 text-white font-semibold bg-white/5 rounded-2xl border border-white/10 hover:border-cyan-400/30 transition-all" onClick={() => setIsMobileMenuOpen(false)}>
               Space Resources

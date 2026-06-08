@@ -25,6 +25,9 @@ export async function GET(
     if (!session) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+    if (session.role !== 'admin' && post.app_author_id !== session.author_id) {
+      return NextResponse.json({ error: 'Post not found' }, { status: 404 });
+    }
   }
 
   const series = post.custom_series as { name: string; slug: string } | null;
@@ -58,7 +61,11 @@ export async function PUT(
       .eq('slug', slug)
       .single();
 
-    if (existing && existing.app_author_id && existing.app_author_id !== session.author_id) {
+    if (!existing) {
+      return NextResponse.json({ error: 'Post not found' }, { status: 404 });
+    }
+
+    if (existing.app_author_id !== session.author_id) {
       return NextResponse.json({ error: 'You can only edit your own posts' }, { status: 403 });
     }
   }
@@ -117,7 +124,11 @@ export async function DELETE(
       .eq('slug', slug)
       .single();
 
-    if (existing && existing.app_author_id && existing.app_author_id !== session.author_id) {
+    if (!existing) {
+      return NextResponse.json({ error: 'Post not found' }, { status: 404 });
+    }
+
+    if (existing.app_author_id !== session.author_id) {
       return NextResponse.json({ error: 'You can only delete your own posts' }, { status: 403 });
     }
   }

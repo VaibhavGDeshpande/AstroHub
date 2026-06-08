@@ -1,7 +1,10 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+import { jwtVerify } from 'jose';
 
-export function middleware(request: NextRequest) {
+const getSecret = () => new TextEncoder().encode(process.env.SESSION_SECRET || 'fallback-dev-secret-key-at-least-32-chars-long');
+
+export async function middleware(request: NextRequest) {
   // Protect all /admin routes except /admin/login
   if (request.nextUrl.pathname.startsWith('/admin') && !request.nextUrl.pathname.startsWith('/admin/login')) {
     // Check new session cookie first, fall back to legacy token
@@ -12,7 +15,8 @@ export function middleware(request: NextRequest) {
 
     if (sessionCookie) {
       try {
-        const session = JSON.parse(sessionCookie);
+        const { payload } = await jwtVerify(sessionCookie, getSecret());
+        const session = payload as Record<string, unknown>;
         isAuthenticated = !!(session.author_id && session.author_name);
       } catch {
         isAuthenticated = false;

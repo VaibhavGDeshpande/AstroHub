@@ -54,6 +54,9 @@ export async function GET(request: Request, { params }: { params: Promise<{ slug
     if (!session) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+    if (session.role !== 'admin' && post.app_author_id !== session.author_id) {
+      return NextResponse.json({ error: 'Post not found' }, { status: 404 });
+    }
   }
 
   return NextResponse.json(post);
@@ -84,7 +87,11 @@ export async function PUT(request: Request, { params }: { params: Promise<{ slug
       .eq('slug', slug)
       .single();
 
-    if (existing && existing.app_author_id && existing.app_author_id !== session.author_id) {
+    if (!existing) {
+      return NextResponse.json({ error: 'Post not found' }, { status: 404 });
+    }
+
+    if (existing.app_author_id !== session.author_id) {
       return NextResponse.json({ error: 'You can only edit your own posts' }, { status: 403 });
     }
   }
@@ -150,10 +157,8 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ s
   }
 
   // Verify ownership (unless admin)
-  if (session.role !== 'admin') {
-    if (post.app_author_id && post.app_author_id !== session.author_id) {
-      return NextResponse.json({ error: 'You can only delete your own posts' }, { status: 403 });
-    }
+  if (session.role !== 'admin' && post.app_author_id !== session.author_id) {
+    return NextResponse.json({ error: 'You can only delete your own posts' }, { status: 403 });
   }
 
   const { error } = await supabase.from(post._table).delete().eq('slug', slug);

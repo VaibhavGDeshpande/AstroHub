@@ -1,15 +1,15 @@
 import Link from "next/link";
 import { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
-import type { Blog } from "@/lib/blogsDb";
-import { User, FileText, ArrowRight, Users } from "lucide-react";
+import type { Author, Blog, ContentType } from "@/lib/blogsDb";
+import { ArrowRight, FileText, Sparkles, User, Users } from "lucide-react";
 import LoaderWrapper from "@/components/Loader";
 
 export const revalidate = 0;
 
 export const metadata: Metadata = {
   title: "Authors | AstroHub Transmission",
-  description: "Meet the writers behind AstroHub Transmission — astronomers, educators, and space enthusiasts sharing their knowledge of the cosmos.",
+  description: "Meet the writers behind AstroHub Transmission and explore their published astronomy articles.",
   openGraph: {
     title: "Authors | AstroHub Transmission",
     description: "Meet the writers behind AstroHub Transmission.",
@@ -17,155 +17,211 @@ export const metadata: Metadata = {
   },
 };
 
+type PublicAuthor = Pick<Author, "id" | "name" | "display_name" | "avatar_url" | "created_at">;
+
 interface AuthorSummary {
-  name: string;
+  key: string;
+  routeName: string;
+  displayName: string;
+  avatarUrl: string;
+  joinedAt?: string;
   postCount: number;
-  latestPost: Blog;
-  contentTypes: Set<string>;
+  latestPost?: Blog;
+  contentTypes: Set<ContentType>;
 }
+
+const typeLabels: Record<ContentType, string> = {
+  "whats-up": "Eyes on the Sky",
+  tutorial: "Tutorials",
+  explainer: "Explainers",
+  "custom-series": "Series",
+};
+
+const typeColors: Record<ContentType, string> = {
+  "whats-up": "bg-blue-500/10 text-blue-400 border-blue-500/20",
+  tutorial: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
+  explainer: "bg-purple-500/10 text-purple-400 border-purple-500/20",
+  "custom-series": "bg-amber-500/10 text-amber-400 border-amber-500/20",
+};
 
 export default async function AuthorsPage() {
   const supabase = await createClient();
+  const now = new Date().toISOString();
 
-  // Fetch published posts from all three tables
-  const [whatsUpRes, tutorialsRes, explainersRes] = await Promise.all([
-    supabase.from("whats_up").select("*").eq("published", true).order("createdAt", { ascending: false }),
-    supabase.from("tutorials").select("*").eq("published", true).order("createdAt", { ascending: false }),
-    supabase.from("explainers").select("*").eq("published", true).order("createdAt", { ascending: false }),
+  const [authorsRes, whatsUpRes, tutorialsRes, explainersRes, seriesPostsRes] = await Promise.all([
+    supabase
+      .from("authors")
+      .select("id, name, display_name, avatar_url, created_at")
+      .order("display_name", { ascending: true }),
+    supabase.from("whats_up").select("*").eq("published", true).or(`publishDate.is.null,publishDate.lte.${now}`),
+    supabase.from("tutorials").select("*").eq("published", true).or(`publishDate.is.null,publishDate.lte.${now}`),
+    supabase.from("explainers").select("*").eq("published", true).or(`publishDate.is.null,publishDate.lte.${now}`),
+    supabase
+      .from("custom_series_posts")
+      .select("*, custom_series(name, slug)")
+      .eq("published", true)
+      .or(`publishDate.is.null,publishDate.lte.${now}`),
   ]);
 
+  const registeredAuthors = (authorsRes.data || []) as PublicAuthor[];
   const allBlogs: Blog[] = [
-    ...(whatsUpRes.data || []).map((r) => ({ ...r, contentType: "whats-up" as const })),
-    ...(tutorialsRes.data || []).map((r) => ({ ...r, contentType: "tutorial" as const })),
-    ...(explainersRes.data || []).map((r) => ({ ...r, contentType: "explainer" as const })),
-  ].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()) as Blog[];
+    ...(whatsUpRes.data || []).map((row) => ({ ...row, contentType: "whats-up" as const })),
+    ...(tutorialsRes.data || []).map((row) => ({ ...row, contentType: "tutorial" as const })),
+    ...(explainersRes.data || []).map((row) => ({ ...row, contentType: "explainer" as const })),
+    ...(seriesPostsRes.data || []).map((row) => {
+      const series = row.custom_series as { name: string; slug: string } | null;
+      return {
+        ...row,
+        contentType: "custom-series" as const,
+        seriesName: series?.name,
+        seriesSlug: series?.slug,
+        custom_series: undefined,
+      };
+    }),
+  ].sort((a, b) => new Date(b.publishDate || b.createdAt).getTime() - new Date(a.publishDate || a.createdAt).getTime());
 
-  // Group by author
-  const authorMap = new Map<string, AuthorSummary>();
+  const summaries = new Map<string, AuthorSummary>();
+  const registeredById = new Map(registeredAuthors.map((author) => [author.id, author]));
+  const registeredByName = new Map<string, PublicAuthor>();
+
+  for (const author of registeredAuthors) {
+    if (author.name) {
+      registeredByName.set(author.name.toLowerCase().trim(), author);
+    }
+    if (author.display_name) {
+      registeredByName.set(author.display_name.toLowerCase().trim(), author);
+    }
+  }
+
+  for (const author of registeredAuthors) {
+    summaries.set(author.id, {
+      key: author.id,
+      routeName: author.name,
+      displayName: author.display_name || author.name,
+      avatarUrl: author.avatar_url || "",
+      joinedAt: author.created_at,
+      postCount: 0,
+      contentTypes: new Set(),
+    });
+  }
+
   for (const blog of allBlogs) {
-    const authorName = blog.author?.trim() || "AstroHub";
-    if (!authorMap.has(authorName)) {
-      authorMap.set(authorName, {
-        name: authorName,
+    let registered = blog.app_author_id ? registeredById.get(blog.app_author_id) : undefined;
+    if (!registered && blog.author) {
+      registered = registeredByName.get(blog.author.toLowerCase().trim());
+    }
+    const legacyName = blog.author?.trim() || "AstroHub";
+    const key = registered?.id || `legacy:${legacyName.toLowerCase()}`;
+
+    if (!summaries.has(key)) {
+      summaries.set(key, {
+        key,
+        routeName: legacyName,
+        displayName: legacyName,
+        avatarUrl: "",
         postCount: 0,
-        latestPost: blog,
         contentTypes: new Set(),
       });
     }
-    const entry = authorMap.get(authorName)!;
-    entry.postCount++;
-    entry.contentTypes.add(blog.contentType);
+
+    const summary = summaries.get(key)!;
+    summary.postCount += 1;
+    summary.contentTypes.add(blog.contentType);
+    if (!summary.latestPost) summary.latestPost = blog;
   }
 
-  const authors = Array.from(authorMap.values()).sort((a, b) => b.postCount - a.postCount);
-
-  const typeLabels: Record<string, string> = {
-    "whats-up": "Eyes on the Sky",
-    tutorial: "Tutorials",
-    explainer: "Explainers",
-  };
+  const authors = Array.from(summaries.values()).sort(
+    (a, b) => b.postCount - a.postCount || a.displayName.localeCompare(b.displayName)
+  );
+  const totalArticles = allBlogs.length;
 
   return (
     <LoaderWrapper>
-      <div className="min-h-screen bg-slate-950 text-slate-200 pb-24 relative overflow-hidden">
-        {/* Background glows */}
-        <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-indigo-900/15 rounded-full blur-[140px] pointer-events-none" />
-        <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-purple-900/10 rounded-full blur-[120px] pointer-events-none" />
-
-        {/* Header */}
-        <div className="max-w-4xl mx-auto px-4 pt-28 md:pt-36 pb-16 relative z-10">
-          <div className="flex items-center gap-4 mb-6">
-            <div className="w-14 h-14 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center">
-              <Users className="w-7 h-7 text-indigo-400" />
+      <main className="min-h-screen bg-slate-950 text-slate-200 pb-24">
+        <section className="border-b border-slate-800/70 bg-slate-900/30">
+          <div className="max-w-5xl mx-auto px-4 pt-28 md:pt-36 pb-12">
+            <div className="flex items-center gap-4 mb-5">
+              <div className="w-12 h-12 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center">
+                <Users className="w-6 h-6 text-indigo-400" />
+              </div>
+              <div>
+                <h1 className="text-4xl md:text-5xl font-extrabold text-white">Authors</h1>
+                <p className="text-slate-400 mt-1">{authors.length} contributors, {totalArticles} published articles</p>
+              </div>
             </div>
-            <div>
-              <h1 className="text-4xl md:text-5xl font-extrabold text-white tracking-tight">Our Authors</h1>
-              <p className="text-slate-400 mt-1">The minds behind AstroHub Transmission</p>
-            </div>
+            <p className="text-lg text-slate-400 leading-relaxed max-w-2xl">
+              Meet the astronomers, educators, and space enthusiasts writing for AstroHub.
+            </p>
           </div>
+        </section>
 
-          <p className="text-lg text-slate-400 leading-relaxed max-w-2xl">
-            Meet the astronomers, educators, and space enthusiasts who write for AstroHub.
-            Each author brings their unique perspective on the cosmos.
-          </p>
-        </div>
-
-        {/* Authors Grid */}
-        <div className="max-w-4xl mx-auto px-4 relative z-10">
+        <section className="max-w-5xl mx-auto px-4 py-12">
           {authors.length === 0 ? (
-            <div className="text-center py-20 text-slate-500 text-lg border border-slate-800 rounded-3xl bg-slate-900/50 backdrop-blur-sm">
-              <p>No authors found yet. Check back soon!</p>
+            <div className="text-center py-20 text-slate-500 border border-slate-800 rounded-2xl">
+              No authors found yet.
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               {authors.map((author) => (
                 <Link
-                  key={author.name}
-                  href={`/authors/${encodeURIComponent(author.name)}`}
-                  className="group block bg-slate-900/60 border border-slate-800/60 rounded-3xl p-6 hover:border-indigo-500/30 hover:bg-slate-900/80 transition-all duration-300"
+                  key={author.key}
+                  href={`/authors/${encodeURIComponent(author.routeName)}`}
+                  className="group border border-slate-800 bg-slate-900/55 rounded-xl p-5 hover:border-indigo-500/40 hover:bg-slate-900 transition-colors"
                 >
-                  {/* Author Header */}
-                  <div className="flex items-center gap-4 mb-5">
-                    <div className="w-14 h-14 rounded-full bg-gradient-to-br from-indigo-500/20 to-purple-500/20 border border-slate-700 flex items-center justify-center text-slate-400 group-hover:border-indigo-500/40 transition-colors shrink-0">
-                      <User className="w-7 h-7" />
+                  <div className="flex items-start gap-4">
+                    <div className="w-16 h-16 rounded-full bg-slate-800 border border-slate-700 overflow-hidden flex items-center justify-center shrink-0">
+                      {author.avatarUrl ? (
+                        <img src={author.avatarUrl} alt={author.displayName} className="w-full h-full object-cover" />
+                      ) : (
+                        <User className="w-7 h-7 text-slate-500" />
+                      )}
                     </div>
-                    <div className="min-w-0">
-                      <h2 className="text-xl font-bold text-white group-hover:text-indigo-400 transition-colors truncate">
-                        {author.name}
-                      </h2>
-                      <p className="text-sm text-slate-500">
-                        {author.postCount} {author.postCount === 1 ? "article" : "articles"} published
-                      </p>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-start justify-between gap-3">
+                        <div>
+                          <h2 className="text-xl font-bold text-white group-hover:text-indigo-400 transition-colors">
+                            {author.displayName}
+                          </h2>
+                          <p className="text-sm text-slate-500">
+                            {author.postCount} {author.postCount === 1 ? "article" : "articles"}
+                          </p>
+                        </div>
+                        <ArrowRight className="w-4 h-4 text-slate-600 group-hover:text-indigo-400 group-hover:translate-x-1 transition-all mt-1" />
+                      </div>
+
+                      {author.contentTypes.size > 0 ? (
+                        <div className="flex flex-wrap gap-2 mt-4">
+                          {Array.from(author.contentTypes).map((type) => (
+                            <span key={type} className={`px-2.5 py-1 rounded-md text-xs font-medium border ${typeColors[type]}`}>
+                              {typeLabels[type]}
+                            </span>
+                          ))}
+                        </div>
+                      ) : (
+                        <p className="text-xs text-slate-600 mt-4">Profile created, no published articles yet.</p>
+                      )}
                     </div>
                   </div>
 
-                  {/* Content Types */}
-                  <div className="flex flex-wrap gap-2 mb-5">
-                    {Array.from(author.contentTypes).map((type) => {
-                      const colors: Record<string, string> = {
-                        "whats-up": "bg-blue-500/10 text-blue-400 border-blue-500/20",
-                        tutorial: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
-                        explainer: "bg-purple-500/10 text-purple-400 border-purple-500/20",
-                      };
-                      return (
-                        <span
-                          key={type}
-                          className={`px-2.5 py-1 rounded-lg text-xs font-medium border ${colors[type] || "bg-slate-800 text-slate-400 border-slate-700"}`}
-                        >
-                          {typeLabels[type] || type}
-                        </span>
-                      );
-                    })}
-                  </div>
-
-                  {/* Latest Post Preview */}
-                  <div className="bg-slate-950/50 rounded-xl p-4 border border-slate-800/40">
-                    <div className="flex items-center gap-2 text-xs text-slate-500 mb-2">
-                      <FileText className="w-3.5 h-3.5" />
-                      <span>Latest article</span>
+                  {author.latestPost && (
+                    <div className="mt-5 pt-4 border-t border-slate-800/80">
+                      <div className="flex items-center gap-2 text-xs text-slate-500 mb-2">
+                        {author.latestPost.contentType === "custom-series" ? (
+                          <Sparkles className="w-3.5 h-3.5" />
+                        ) : (
+                          <FileText className="w-3.5 h-3.5" />
+                        )}
+                        Latest article
+                      </div>
+                      <p className="text-sm font-medium text-slate-300 line-clamp-2">{author.latestPost.title}</p>
                     </div>
-                    <p className="text-sm text-slate-300 font-medium line-clamp-2 leading-relaxed">
-                      {author.latestPost.title}
-                    </p>
-                    <p className="text-xs text-slate-500 mt-2">
-                      {new Date(author.latestPost.publishDate || author.latestPost.createdAt).toLocaleDateString("en-US", {
-                        month: "short",
-                        day: "numeric",
-                        year: "numeric",
-                      })}
-                    </p>
-                  </div>
-
-                  {/* CTA */}
-                  <div className="flex items-center justify-end gap-2 mt-5 text-sm font-medium text-indigo-400 opacity-0 group-hover:opacity-100 transition-opacity">
-                    View profile <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                  </div>
+                  )}
                 </Link>
               ))}
             </div>
           )}
-        </div>
-      </div>
+        </section>
+      </main>
     </LoaderWrapper>
   );
 }
