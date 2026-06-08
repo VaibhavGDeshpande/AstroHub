@@ -3,7 +3,7 @@ import Link from "next/link";
 import { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import type { Blog } from "@/lib/blogsDb";
-import { User, Clock, ArrowLeft, Star, Telescope, BookOpen, Lightbulb, FileText } from "lucide-react";
+import { User, Clock, ArrowLeft, Star, Telescope, BookOpen, Lightbulb, FileText, Sparkles } from "lucide-react";
 import LoaderWrapper from "@/components/Loader";
 
 export const revalidate = 0;
@@ -61,12 +61,14 @@ export default async function AuthorProfilePage({ params }: { params: Promise<{ 
     "whats-up": { label: "Eyes on the Sky", icon: Telescope, color: "blue" },
     tutorial: { label: "Tutorial", icon: BookOpen, color: "emerald" },
     explainer: { label: "Explainer", icon: Lightbulb, color: "purple" },
+    "custom-series": { label: "Series", icon: Sparkles, color: "amber" },
   };
 
   const typeColors: Record<string, string> = {
     "whats-up": "bg-blue-500/10 text-blue-400 border-blue-500/20",
     tutorial: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
     explainer: "bg-purple-500/10 text-purple-400 border-purple-500/20",
+    "custom-series": "bg-amber-500/10 text-amber-400 border-amber-500/20",
   };
 
   return (

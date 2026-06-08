@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import type { Blog } from "@/lib/blogsDb";
 import { MONTHS } from "@/lib/blogsDb";
-import { ArrowRight, Telescope, BookOpen, Lightbulb, ChevronLeft, ChevronRight } from "lucide-react";
+import { ArrowRight, Telescope, BookOpen, Lightbulb, Sparkles, ChevronLeft, ChevronRight } from "lucide-react";
 
 interface HeroSliderProps {
   slides: Blog[];
@@ -37,6 +37,15 @@ const TYPE_CONFIG = {
     ctaText: "Read Article",
     sectionLink: "/blogs/explainers",
     sectionLabel: "All Explainers",
+  },
+  "custom-series": {
+    icon: Sparkles,
+    label: "Featured Series",
+    badgeColor: "bg-amber-500/15 text-amber-400 border-amber-500/25",
+    accentColor: "from-amber-600 to-orange-600",
+    ctaText: "Read Article",
+    sectionLink: "/blogs",
+    sectionLabel: "All Articles",
   },
 } as const;
 
@@ -213,6 +222,8 @@ export default function HeroSlider({ slides }: HeroSliderProps) {
                     ? "bg-blue-400"
                     : dotType === "tutorial"
                     ? "bg-emerald-400"
+                    : dotType === "custom-series"
+                    ? "bg-amber-400"
                     : "bg-purple-400";
                 return (
                   <button

@@ -1,10 +1,10 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { cookies } from 'next/headers';
+import { getAdminSession } from '@/lib/auth';
 import type { ContentType } from '@/lib/blogsDb';
 import { TABLE_MAP } from '@/lib/blogsDb';
 
-// Helper: find which table a slug belongs to
+// Helper: find which table a slug belongs to (now includes custom_series_posts)
 async function findPostBySlug(supabase: Awaited<ReturnType<typeof createClient>>, slug: string) {
   const tables: { type: ContentType; table: string }[] = [
     { type: 'whats-up', table: 'whats_up' },
@@ -16,6 +16,26 @@ async function findPostBySlug(supabase: Awaited<ReturnType<typeof createClient>>
     const { data } = await supabase.from(table).select('*').eq('slug', slug).single();
     if (data) return { ...data, contentType: type, _table: table };
   }
+
+  // Also check custom_series_posts
+  const { data: csPost } = await supabase
+    .from('custom_series_posts')
+    .select('*, custom_series(name, slug)')
+    .eq('slug', slug)
+    .single();
+
+  if (csPost) {
+    const series = csPost.custom_series as { name: string; slug: string } | null;
+    return {
+      ...csPost,
+      contentType: 'custom-series' as const,
+      _table: 'custom_series_posts',
+      seriesName: series?.name,
+      seriesSlug: series?.slug,
+      custom_series: undefined,
+    };
+  }
+
   return null;
 }
 
@@ -30,8 +50,8 @@ export async function GET(request: Request, { params }: { params: Promise<{ slug
   }
 
   if (!post.published) {
-    const cookieStore = await cookies();
-    if (cookieStore.get('admin_token')?.value !== 'authenticated') {
+    const session = await getAdminSession();
+    if (!session) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
   }
@@ -40,8 +60,8 @@ export async function GET(request: Request, { params }: { params: Promise<{ slug
 }
 
 export async function PUT(request: Request, { params }: { params: Promise<{ slug: string }> }) {
-  const cookieStore = await cookies();
-  if (cookieStore.get('admin_token')?.value !== 'authenticated') {
+  const session = await getAdminSession();
+  if (!session) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
@@ -50,7 +70,24 @@ export async function PUT(request: Request, { params }: { params: Promise<{ slug
   const supabase = await createClient();
 
   const contentType = (data.contentType || 'explainer') as ContentType;
-  const tableName = TABLE_MAP[contentType];
+  const tableName = contentType === 'custom-series' ? 'custom_series_posts' : TABLE_MAP[contentType];
+
+  if (!tableName) {
+    return NextResponse.json({ error: 'Invalid content type' }, { status: 400 });
+  }
+
+  // Verify ownership (unless admin)
+  if (session.role !== 'admin') {
+    const { data: existing } = await supabase
+      .from(tableName)
+      .select('app_author_id')
+      .eq('slug', slug)
+      .single();
+
+    if (existing && existing.app_author_id && existing.app_author_id !== session.author_id) {
+      return NextResponse.json({ error: 'You can only edit your own posts' }, { status: 403 });
+    }
+  }
 
   // Build update data — common fields
   const updateData: Record<string, unknown> = {
@@ -79,6 +116,8 @@ export async function PUT(request: Request, { params }: { params: Promise<{ slug
     updateData.topicCategory = data.topicCategory || null;
     updateData.keyConcepts = data.keyConcepts || [];
     updateData.visualAids = data.visualAids || [];
+  } else if (contentType === 'custom-series') {
+    updateData.metadata = data.metadata || {};
   }
 
   const { data: updated, error } = await supabase
@@ -96,8 +135,8 @@ export async function PUT(request: Request, { params }: { params: Promise<{ slug
 }
 
 export async function DELETE(request: Request, { params }: { params: Promise<{ slug: string }> }) {
-  const cookieStore = await cookies();
-  if (cookieStore.get('admin_token')?.value !== 'authenticated') {
+  const session = await getAdminSession();
+  if (!session) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
@@ -108,6 +147,13 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ s
   const post = await findPostBySlug(supabase, slug);
   if (!post) {
     return NextResponse.json({ error: 'Post not found' }, { status: 404 });
+  }
+
+  // Verify ownership (unless admin)
+  if (session.role !== 'admin') {
+    if (post.app_author_id && post.app_author_id !== session.author_id) {
+      return NextResponse.json({ error: 'You can only delete your own posts' }, { status: 403 });
+    }
   }
 
   const { error } = await supabase.from(post._table).delete().eq('slug', slug);

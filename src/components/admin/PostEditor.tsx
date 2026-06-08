@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import type { Blog, ContentType, DifficultyLevel, SkyEvent, VisualAid } from "@/lib/blogsDb";
+import type { Blog, ContentType, DifficultyLevel, SkyEvent, VisualAid, CustomSeries } from "@/lib/blogsDb";
 import { TOPIC_CATEGORIES, MONTHS } from "@/lib/blogsDb";
 import RichTextEditor from "@/components/RichTextEditor";
 import { processContentImages } from "@/lib/processContentImages";
@@ -12,17 +12,19 @@ interface PostEditorProps {
   onSave: (blog: Partial<Blog>) => Promise<void>;
   onCancel: () => void;
   existingWhatsUpPosts: { slug: string; title: string }[];
+  customSeries?: CustomSeries[];
+  authorName?: string;
 }
 
 const inputClass = "w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-blue-500 transition-colors";
 const labelClass = "block text-sm font-medium text-slate-400 mb-2";
 const selectClass = "w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-blue-500 appearance-none cursor-pointer";
 
-export default function PostEditor({ blog, onSave, onCancel, existingWhatsUpPosts }: PostEditorProps) {
+export default function PostEditor({ blog, onSave, onCancel, existingWhatsUpPosts, customSeries = [], authorName }: PostEditorProps) {
   const [form, setForm] = useState<Partial<Blog>>({
     contentType: "explainer",
     published: false,
-    author: " ",
+    author: authorName || " ",
     skyEvents: [],
     toolsNeeded: [],
     keyConcepts: [],
@@ -37,14 +39,14 @@ export default function PostEditor({ blog, onSave, onCancel, existingWhatsUpPost
     setForm({
       contentType: "explainer",
       published: false,
-      author: " ",
+      author: authorName || " ",
       skyEvents: [],
       toolsNeeded: [],
       keyConcepts: [],
       visualAids: [],
       ...blog,
     });
-  }, [blog]);
+  }, [blog, authorName]);
 
   const handleTitleChange = (title: string) => {
     const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
@@ -107,6 +109,45 @@ export default function PostEditor({ blog, onSave, onCancel, existingWhatsUpPost
 
   const contentType = form.contentType || "explainer";
 
+  // Build content type options — include custom series
+  const typeOptions: { value: string; label: string; color: string }[] = [
+    { value: "whats-up", label: "Eyes on the Sky", color: "blue" },
+    { value: "tutorial", label: "Tutorial", color: "emerald" },
+    { value: "explainer", label: "Explainer", color: "purple" },
+    ...customSeries.map((s) => ({
+      value: `custom:${s.id}`,
+      label: s.name,
+      color: "amber",
+    })),
+  ];
+
+  // Determine the selected value for the type selector
+  const selectedTypeValue = contentType === "custom-series" && form.series_id
+    ? `custom:${form.series_id}`
+    : contentType;
+
+  const handleTypeSelect = (value: string) => {
+    if (value.startsWith("custom:")) {
+      const seriesId = value.replace("custom:", "");
+      const seriesInfo = customSeries.find((s) => s.id === seriesId);
+      setForm({
+        ...form,
+        contentType: "custom-series",
+        series_id: seriesId,
+        seriesSlug: seriesInfo?.slug,
+        seriesName: seriesInfo?.name,
+      });
+    } else {
+      setForm({
+        ...form,
+        contentType: value as ContentType,
+        series_id: undefined,
+        seriesSlug: undefined,
+        seriesName: undefined,
+      });
+    }
+  };
+
   return (
     <div className="bg-slate-900/80 backdrop-blur-sm border border-slate-800 rounded-2xl p-6 md:p-8 shadow-xl">
       <div className="flex items-center justify-between mb-8">
@@ -122,27 +163,27 @@ export default function PostEditor({ blog, onSave, onCancel, existingWhatsUpPost
         {/* Content Type Selector */}
         <div>
           <label className={labelClass}>Content Type</label>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            {([
-              { value: "whats-up", label: "Eyes on the Sky", color: "blue" },
-              { value: "tutorial", label: "Tutorial", color: "emerald" },
-              { value: "explainer", label: "Explainer", color: "purple" },
-            ] as const).map((t) => (
-              <button
-                key={t.value}
-                type="button"
-                onClick={() => setForm({ ...form, contentType: t.value as ContentType })}
-                className={`py-3 px-4 rounded-xl border text-sm font-semibold transition-all ${
-                  contentType === t.value
-                    ? t.color === "blue" ? "bg-blue-500/20 border-blue-500/50 text-blue-400"
-                    : t.color === "emerald" ? "bg-emerald-500/20 border-emerald-500/50 text-emerald-400"
-                    : "bg-purple-500/20 border-purple-500/50 text-purple-400"
-                    : "border-slate-700 text-slate-400 hover:border-slate-600"
-                }`}
-              >
-                {t.label}
-              </button>
-            ))}
+          <div className="flex flex-wrap gap-3">
+            {typeOptions.map((t) => {
+              const isSelected = selectedTypeValue === t.value;
+              const colorClasses = t.color === "blue" ? "bg-blue-500/20 border-blue-500/50 text-blue-400"
+                : t.color === "emerald" ? "bg-emerald-500/20 border-emerald-500/50 text-emerald-400"
+                : t.color === "amber" ? "bg-amber-500/20 border-amber-500/50 text-amber-400"
+                : "bg-purple-500/20 border-purple-500/50 text-purple-400";
+
+              return (
+                <button
+                  key={t.value}
+                  type="button"
+                  onClick={() => handleTypeSelect(t.value)}
+                  className={`py-3 px-4 rounded-xl border text-sm font-semibold transition-all ${
+                    isSelected ? colorClasses : "border-slate-700 text-slate-400 hover:border-slate-600"
+                  }`}
+                >
+                  {t.label}
+                </button>
+              );
+            })}
           </div>
         </div>
 
@@ -324,6 +365,18 @@ export default function PostEditor({ blog, onSave, onCancel, existingWhatsUpPost
                 </div>
               ))}
             </div>
+          </div>
+        )}
+
+        {/* ========== CUSTOM SERIES INFO ========== */}
+        {contentType === "custom-series" && form.seriesName && (
+          <div className="space-y-4 p-5 rounded-xl border border-amber-500/20 bg-amber-500/5">
+            <h3 className="text-lg font-semibold text-amber-400">
+              Series: {form.seriesName}
+            </h3>
+            <p className="text-sm text-slate-400">
+              This post will be added to the <span className="font-mono text-amber-400">/{form.seriesSlug}</span> series.
+            </p>
           </div>
         )}
 
