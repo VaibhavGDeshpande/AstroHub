@@ -65,6 +65,7 @@ export interface Blog {
   createdAt: string;
   updatedAt: string;
   contentType: ContentType;
+  notifySubscribers?: boolean;
   // Eyes on the Sky fields
   skyMonth?: number;
   skyYear?: number;

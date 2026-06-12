@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { createClient as createSupabaseClient } from '@supabase/supabase-js';
 import { createClient } from '@/lib/supabase/server';
 import { getAdminSession } from '@/lib/auth';
 import type { ContentType } from '@/lib/blogsDb';
@@ -70,7 +71,9 @@ export async function PUT(request: Request, { params }: { params: Promise<{ slug
 
   const { slug } = await params;
   const data = await request.json();
-  const supabase = await createClient();
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+  const supabase = createSupabaseClient(supabaseUrl, supabaseKey);
 
   const contentType = (data.contentType || 'explainer') as ContentType;
   const tableName = contentType === 'custom-series' ? 'custom_series_posts' : TABLE_MAP[contentType];
@@ -138,6 +141,32 @@ export async function PUT(request: Request, { params }: { params: Promise<{ slug
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
+  if (data.notifySubscribers && data.published) {
+    try {
+      const { notifySubscribers } = await import('@/lib/sendEmail');
+      const { data: subsData } = await supabase
+        .from('subscriptions')
+        .select('subscriber_id, subscribers(email)')
+        .or(`author_id.is.null,author_id.eq.${session.author_id}`);
+
+      if (subsData && subsData.length > 0) {
+        const emails = Array.from(
+          new Set(
+            (subsData as unknown as { subscribers: { email: string } | { email: string }[] | null }[]).map(s => {
+              const sub = s.subscribers;
+              return Array.isArray(sub) ? sub[0]?.email : sub?.email;
+            }).filter(Boolean)
+          )
+        ) as string[];
+        const subject = `Updated Post on AstroHub: ${data.title}`;
+        const content = `Hello from AstroHub!\n\nA post titled "${data.title}" has just been published/updated by ${data.author || session.display_name}.\n\nRead it now at AstroHub!\n\n${data.excerpt || ''}`;
+        notifySubscribers(emails, subject, content).catch(console.error);
+      }
+    } catch (err) {
+      console.error("Failed to send notifications:", err);
+    }
+  }
+
   return NextResponse.json({ ...updated, contentType });
 }
 
@@ -148,7 +177,9 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ s
   }
 
   const { slug } = await params;
-  const supabase = await createClient();
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+  const supabase = createSupabaseClient(supabaseUrl, supabaseKey);
 
   // Find which table the slug belongs to and delete from there
   const post = await findPostBySlug(supabase, slug);

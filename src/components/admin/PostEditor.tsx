@@ -387,13 +387,22 @@ export default function PostEditor({ blog, onSave, onCancel, existingWhatsUpPost
         </div>
 
         {/* Publish Toggle */}
-        <div className="flex items-center gap-3">
-          <input type="checkbox" id="published" checked={form.published || false} onChange={(e) => setForm({ ...form, published: e.target.checked })} className="w-5 h-5 rounded border-slate-700 bg-slate-900 focus:ring-blue-500 accent-blue-500" />
-          <label htmlFor="published" className="text-white font-medium cursor-pointer">
-            {form.publishDate && new Date(form.publishDate) > new Date()
-              ? `Schedule post (will go live on ${new Date(form.publishDate).toLocaleDateString()})`
-              : "Publish to live website"}
-          </label>
+        <div className="flex flex-col gap-4">
+          <div className="flex items-center gap-3">
+            <input type="checkbox" id="published" checked={form.published || false} onChange={(e) => setForm({ ...form, published: e.target.checked })} className="w-5 h-5 rounded border-slate-700 bg-slate-900 focus:ring-blue-500 accent-blue-500" />
+            <label htmlFor="published" className="text-white font-medium cursor-pointer">
+              {form.publishDate && new Date(form.publishDate) > new Date()
+                ? `Schedule post (will go live on ${new Date(form.publishDate).toLocaleDateString()})`
+                : "Publish to live website"}
+            </label>
+          </div>
+          
+          <div className="flex items-center gap-3">
+            <input type="checkbox" id="notifySubscribers" checked={form.notifySubscribers || false} onChange={(e) => setForm({ ...form, notifySubscribers: e.target.checked })} className="w-5 h-5 rounded border-slate-700 bg-slate-900 focus:ring-blue-500 accent-blue-500" />
+            <label htmlFor="notifySubscribers" className="text-white font-medium cursor-pointer">
+              Notify subscribers via email
+            </label>
+          </div>
         </div>
 
         {/* Actions */}

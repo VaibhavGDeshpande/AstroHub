@@ -64,6 +64,15 @@ interface AuthorSession {
   role: 'author' | 'admin';
 }
 
+interface Author {
+  id: string;
+  name: string;
+  display_name: string;
+  avatar_url?: string;
+  role: 'admin' | 'author';
+  created_at: string;
+}
+
 export default function AdminDashboard() {
   const [blogs, setBlogs] = useState<Blog[]>([]);
   const [loading, setLoading] = useState(true);
@@ -75,11 +84,13 @@ export default function AdminDashboard() {
   const [showAddAuthor, setShowAddAuthor] = useState(false);
   const [newAuthor, setNewAuthor] = useState({ name: "", password: "", display_name: "", role: "author" });
   const [addingAuthor, setAddingAuthor] = useState(false);
+  const [authorsList, setAuthorsList] = useState<Author[]>([]);
 
   useEffect(() => {
     fetchSession();
     fetchBlogs();
     fetchSeries();
+    fetchAuthors();
   }, []);
 
   const fetchSession = async () => {
@@ -104,6 +115,13 @@ export default function AdminDashboard() {
     try {
       const res = await fetch("/api/series");
       if (res.ok) setCustomSeries(await res.json());
+    } catch (e) { console.error(e); }
+  };
+
+  const fetchAuthors = async () => {
+    try {
+      const res = await fetch("/api/authors");
+      if (res.ok) setAuthorsList(await res.json());
     } catch (e) { console.error(e); }
   };
 
@@ -181,6 +199,7 @@ export default function AdminDashboard() {
         setNewAuthor({ name: "", password: "", display_name: "", role: "author" });
         setShowAddAuthor(false);
         alert("Author created successfully!");
+        fetchAuthors();
       } else {
         const data = await res.json();
         alert(data.error || "Error creating author");
@@ -507,6 +526,51 @@ export default function AdminDashboard() {
                     </div>
                   </form>
                 )}
+
+                <div className="overflow-hidden bg-slate-900/40 border border-slate-800 rounded-2xl">
+                  <div className="px-6 py-4 border-b border-slate-800/80 bg-slate-900/60 flex items-center justify-between">
+                    <h3 className="text-sm font-semibold text-slate-200">Existing Authors</h3>
+                    <span className="text-xs px-2.5 py-1 bg-slate-800 text-slate-400 border border-slate-700/60 rounded-full font-medium">
+                      {authorsList.length} Total
+                    </span>
+                  </div>
+                  <div className="divide-y divide-slate-800/60">
+                    {authorsList.map((author) => (
+                      <div key={author.id} className="flex items-center justify-between px-6 py-4 hover:bg-slate-800/20 transition-colors">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-xl bg-slate-800 border border-slate-700/50 flex items-center justify-center text-slate-450 font-bold overflow-hidden">
+                            {author.avatar_url ? (
+                              <img src={author.avatar_url} alt={author.display_name} className="w-full h-full object-cover" />
+                            ) : (
+                              author.display_name.charAt(0).toUpperCase()
+                            )}
+                          </div>
+                          <div>
+                            <div className="font-semibold text-white text-sm">{author.display_name}</div>
+                            <div className="text-xs text-slate-500">Username: {author.name}</div>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-4">
+                          <span className={`text-xs px-2.5 py-1 rounded-full font-medium border ${
+                            author.role === 'admin'
+                              ? 'bg-blue-500/10 text-blue-400 border-blue-500/20'
+                              : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+                          }`}>
+                            {author.role === 'admin' ? 'Admin' : 'Author'}
+                          </span>
+                          <span className="text-xs text-slate-500">
+                            Joined {new Date(author.created_at).toLocaleDateString()}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                    {authorsList.length === 0 && (
+                      <div className="px-6 py-8 text-center text-slate-500 text-sm">
+                        No authors found.
+                      </div>
+                    )}
+                  </div>
+                </div>
 
                 <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-6">
                   <p className="text-sm text-slate-400">

@@ -8,13 +8,13 @@ import type { Author, Blog, ContentType } from "@/lib/blogsDb";
 import { Clock, ArrowLeft, ArrowRight, User, Telescope, BookOpen, Lightbulb, Wrench, Sparkles } from "lucide-react";
 import LoaderWrapper from "@/components/Loader";
 import BlogContent from "@/components/BlogContent";
+import SubscribeModal from "@/components/SubscribeModal";
 
 export const revalidate = 0;
 
 function getReadingTime(text: string) {
   return Math.ceil(text.trim().split(/\s+/).length / 200);
 }
-
 const diffColors: Record<string, string> = {
   beginner: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
   intermediate: "bg-amber-500/10 text-amber-400 border-amber-500/20",
@@ -341,6 +341,8 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
           </div>
         </div>
       </div>
+      
+      <SubscribeModal />
     </article>
     </LoaderWrapper>
   );

@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { createClient as createSupabaseClient } from '@supabase/supabase-js';
 import { createClient } from '@/lib/supabase/server';
 import { getAdminSession } from '@/lib/auth';
 import type { ContentType } from '@/lib/blogsDb';
@@ -128,8 +129,9 @@ export async function POST(request: Request) {
   if (!session) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
-
-  const supabase = await createClient();
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+  const supabase = createSupabaseClient(supabaseUrl, supabaseKey);
 
   try {
     const data = await request.json();
@@ -173,6 +175,33 @@ export async function POST(request: Request) {
       if (error) {
         return NextResponse.json({ error: error.message }, { status: 500 });
       }
+
+      if (data.notifySubscribers && data.published) {
+        try {
+          const { notifySubscribers } = await import('@/lib/sendEmail');
+          const { data: subsData } = await supabase
+            .from('subscriptions')
+            .select('subscriber_id, subscribers(email)')
+            .or(`author_id.is.null,author_id.eq.${session.author_id}`);
+
+          if (subsData && subsData.length > 0) {
+            const emails = Array.from(
+              new Set(
+                (subsData as unknown as { subscribers: { email: string } | { email: string }[] | null }[]).map(s => {
+                  const sub = s.subscribers;
+                  return Array.isArray(sub) ? sub[0]?.email : sub?.email;
+                }).filter(Boolean)
+              )
+            ) as string[];
+            const subject = `New Series Post on AstroHub: ${data.title}`;
+            const content = `Hello from AstroHub!\n\nA new post titled "${data.title}" has just been published by ${data.author || session.display_name}.\n\nRead it now at AstroHub!\n\n${data.excerpt || ''}`;
+            notifySubscribers(emails, subject, content).catch(console.error);
+          }
+        } catch (err) {
+          console.error("Failed to send notifications:", err);
+        }
+      }
+
       return NextResponse.json({ ...inserted, contentType: 'custom-series' }, { status: 201 });
     }
 
@@ -220,6 +249,36 @@ export async function POST(request: Request) {
 
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+
+    if (data.notifySubscribers && data.published) {
+      try {
+        const { notifySubscribers } = await import('@/lib/sendEmail');
+        
+        // Fetch all generic subscribers and subscribers specifically for this author
+        const { data: subsData } = await supabase
+          .from('subscriptions')
+          .select('subscriber_id, subscribers(email)')
+          .or(`author_id.is.null,author_id.eq.${session.author_id}`);
+
+        if (subsData && subsData.length > 0) {
+          const emails = Array.from(
+            new Set(
+              (subsData as unknown as { subscribers: { email: string } | { email: string }[] | null }[]).map(s => {
+                const sub = s.subscribers;
+                return Array.isArray(sub) ? sub[0]?.email : sub?.email;
+              }).filter(Boolean)
+            )
+          ) as string[];
+          const subject = `New Post on AstroHub: ${data.title}`;
+          const content = `Hello from AstroHub!\n\nA new post titled "${data.title}" has just been published by ${data.author || session.display_name}.\n\nRead it now at AstroHub!\n\n${data.excerpt || ''}`;
+          
+          // Send emails asynchronously
+          notifySubscribers(emails, subject, content).catch(console.error);
+        }
+      } catch (err) {
+        console.error("Failed to send notifications:", err);
+      }
     }
 
     return NextResponse.json({ ...inserted, contentType }, { status: 201 });

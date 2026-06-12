@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import type { Author, Blog, ContentType } from "@/lib/blogsDb";
 import { ArrowRight, FileText, Sparkles, User, Users } from "lucide-react";
 import LoaderWrapper from "@/components/Loader";
+import SubscribeForm from "@/components/SubscribeForm";
 
 export const revalidate = 0;
 
@@ -220,6 +221,11 @@ export default async function AuthorsPage() {
               ))}
             </div>
           )}
+        </section>
+        
+        {/* Subscribe Section */}
+        <section className="max-w-5xl mx-auto px-4 pb-20">
+          <SubscribeForm />
         </section>
       </main>
     </LoaderWrapper>
