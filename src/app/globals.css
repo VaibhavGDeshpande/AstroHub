@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@plugin "@tailwindcss/typography";
 @import 'cesium/Build/Cesium/Widgets/widgets.css';
 
 :root {

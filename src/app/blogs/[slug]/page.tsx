@@ -5,7 +5,7 @@ import { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { MONTHS } from "@/lib/blogsDb";
 import type { Author, Blog, ContentType } from "@/lib/blogsDb";
-import { Clock, ArrowLeft, ArrowRight, User, Telescope, BookOpen, Lightbulb, Wrench, Sparkles } from "lucide-react";
+import { Clock, ArrowLeft, ArrowRight, User, Telescope, BookOpen, Lightbulb, Wrench, Sparkles, Globe, Compass, Satellite } from "lucide-react";
 import LoaderWrapper from "@/components/Loader";
 import BlogContent from "@/components/BlogContent";
 import SubscribeModal from "@/components/SubscribeModal";
@@ -158,6 +158,17 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
     if (nxt) nextPost = nxt as Blog;
   }
 
+  // Fetch related posts of the same content type
+  const targetTable = tables.find((t) => t.type === foundType)?.table || "explainers";
+  const { data: relatedPostsRaw } = await supabase
+    .from(targetTable)
+    .select("slug, title, publishDate, createdAt")
+    .eq("published", true)
+    .neq("slug", slug)
+    .order("createdAt", { ascending: false })
+    .limit(3);
+  const relatedPosts = (relatedPostsRaw || []) as { slug: string; title: string; publishDate: string | null; createdAt: string }[];
+
   const badgeColors = typeColor === "blue" ? "bg-blue-500/10 text-blue-400 border-blue-500/20"
     : typeColor === "emerald" ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
     : typeColor === "amber" ? "bg-amber-500/10 text-amber-400 border-amber-500/20"
@@ -193,9 +204,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 
         <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white mb-6 leading-tight tracking-tight">{post.title}</h1>
         
-        {post.excerpt && (
-          <p className="text-xl text-slate-400 mb-8 leading-relaxed">{post.excerpt}</p>
-        )}
+
 
         {/* Author & Meta */}
         <div className="flex items-center justify-between border-y border-slate-800/60 py-5 mt-8 mb-8">
@@ -225,120 +234,185 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
         </div>
       </div>
 
-      {/* Cover Image */}
-      {post.coverImage && (
-        <div className="max-w-4xl mx-auto px-4 mb-14">
-          <figure className="relative w-full aspect-[16/9] overflow-hidden rounded-2xl shadow-2xl border border-slate-800/60">
-            <Image
-              src={post.coverImage}
-              alt={post.title}
-              fill
-              priority
-              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 960px"
-              className="object-cover"
-            />
-          </figure>
-          <p className="text-center text-sm text-slate-500 mt-4">Image from AstroHub Media.</p>
-        </div>
-      )}
 
-      <div className="max-w-3xl mx-auto px-4 relative z-10">
-        <div className="grid grid-cols-1 gap-12 items-start">
-          <div className="w-full">
-        {/* Tutorial: Tools Needed */}
-        {post.contentType === "tutorial" && post.toolsNeeded && post.toolsNeeded.length > 0 && (
-          <div className="mb-10 p-5 rounded-2xl bg-emerald-500/5 border border-emerald-500/15">
-            <div className="flex items-center gap-2 text-emerald-400 font-semibold mb-3"><Wrench className="w-4 h-4" /> Tools & Equipment</div>
-            <div className="flex flex-wrap gap-2">
-              {post.toolsNeeded.map((t, i) => <span key={i} className="text-sm bg-slate-800 text-slate-200 px-3 py-1.5 rounded-lg">{t}</span>)}
+
+      <div className="max-w-7xl mx-auto px-4 lg:px-8 relative z-10">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
+          
+          {/* Left Column: Explore AstroHub (Desktop Only) */}
+          <aside className="lg:col-span-3 lg:sticky lg:top-32 space-y-6 hidden lg:block self-start">
+            {/* Back link */}
+            <div className="bg-slate-900/40 backdrop-blur-md border border-slate-800/60 rounded-2xl p-5 shadow-lg shadow-black/20">
+              <Link href={backLink} className="inline-flex items-center gap-2 text-sm font-semibold text-slate-350 hover:text-blue-450 transition-colors group">
+                <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" /> Back to {typeLabel}s
+              </Link>
             </div>
-          </div>
-        )}
 
-        {/* Explainer: Key Concepts */}
-        {post.contentType === "explainer" && post.keyConcepts && post.keyConcepts.length > 0 && (
-          <div className="mb-10 p-5 rounded-2xl bg-purple-500/5 border border-purple-500/15">
-            <div className="text-purple-400 font-semibold mb-3">Key Concepts</div>
-            <div className="flex flex-wrap gap-2">
-              {post.keyConcepts.map((c, i) => <span key={i} className="text-sm bg-purple-500/10 text-purple-300 border border-purple-500/15 px-3 py-1.5 rounded-lg">{c}</span>)}
+            {/* Quick Explore */}
+            <div className="bg-slate-900/40 backdrop-blur-md border border-slate-800/60 rounded-2xl p-5 space-y-4 shadow-lg shadow-black/20">
+              <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500 border-b border-slate-800/80 pb-2">Interactive Tools</h4>
+              <nav className="flex flex-col gap-1.5">
+                {[
+                  { label: "Stellarium", href: "/stellarium", icon: Sparkles, color: "text-emerald-400 hover:text-emerald-305" },
+                  { label: "Star Charts", href: "/sky-charts", icon: Compass, color: "text-amber-400 hover:text-amber-305" },
+                  { label: "3D Earth View", href: "/3d-earth", icon: Globe, color: "text-cyan-400 hover:text-cyan-305" },
+                  { label: "Space News Feed", href: "/space-news", icon: BookOpen, color: "text-rose-400 hover:text-rose-305" },
+                ].map((item) => (
+                  <Link
+                    key={item.label}
+                    href={item.href}
+                    className="flex items-center gap-3 px-3 py-2 text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800/40 rounded-xl transition-all group"
+                  >
+                    <item.icon className="w-4 h-4 text-slate-400 group-hover:text-white group-hover:scale-110 transition-all duration-300" />
+                    {item.label}
+                  </Link>
+                ))}
+              </nav>
             </div>
-          </div>
-        )}
+          </aside>
 
-        {/* What's Up: Sky Events */}
-        {post.contentType === "whats-up" && post.skyEvents && post.skyEvents.length > 0 && (
-          <div className="mb-10 p-5 rounded-2xl bg-blue-500/5 border border-blue-500/15">
-            <div className="flex items-center gap-2 text-blue-400 font-semibold mb-4"><Telescope className="w-4 h-4" /> Sky Events This Month</div>
-            <div className="space-y-4">
-              {post.skyEvents.map((evt, i) => (
-                <div key={i} className="flex gap-4 items-start">
-                  <div className="shrink-0 w-20 text-center">
-                    <span className="text-xs font-bold bg-blue-500/10 text-blue-400 px-2.5 py-1 rounded-lg border border-blue-500/20">{evt.date || "TBD"}</span>
-                  </div>
-                  <div className="flex-1 border-l border-slate-800 pl-4">
-                    <div className="font-semibold text-white text-sm">{evt.title}</div>
-                    <div className="text-sm text-slate-400 mt-1">{evt.description}</div>
-                    {evt.visibility && <div className="text-xs text-slate-500 mt-1">Visibility: {evt.visibility}</div>}
-                  </div>
+          {/* Center Column: Main Content */}
+          <main className="col-span-1 lg:col-span-6 w-full max-w-3xl mx-auto">
+            {/* Tutorial: Tools Needed */}
+            {post.contentType === "tutorial" && post.toolsNeeded && post.toolsNeeded.length > 0 && (
+              <div className="mb-10 p-5 rounded-2xl bg-emerald-500/5 border border-emerald-500/15">
+                <div className="flex items-center gap-2 text-emerald-400 font-semibold mb-3"><Wrench className="w-4 h-4" /> Tools & Equipment</div>
+                <div className="flex flex-wrap gap-2">
+                  {post.toolsNeeded.map((t, i) => <span key={i} className="text-sm bg-slate-800 text-slate-200 px-3 py-1.5 rounded-lg">{t}</span>)}
                 </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Main Content */}
-        <BlogContent
-          html={post.content}
-          className="prose prose-invert prose-lg prose-headings:font-sans prose-headings:text-slate-100 prose-a:text-blue-400 hover:prose-a:text-blue-300 prose-p:text-slate-300 prose-p:font-serif prose-p:text-xl prose-p:leading-relaxed prose-strong:text-white prose-li:text-slate-300 prose-li:font-serif prose-li:text-xl w-full max-w-none prose-img:rounded-xl prose-img:shadow-xl [&>p:first-of-type]:first-letter:text-7xl [&>p:first-of-type]:first-letter:font-bold [&>p:first-of-type]:first-letter:text-white [&>p:first-of-type]:first-letter:mr-4 [&>p:first-of-type]:first-letter:float-left [&>p:first-of-type]:first-letter:leading-[0.8] [&>p:first-of-type]:first-letter:mt-2 [&>p:first-of-type]:first-letter:font-serif"
-        />
-
-        {/* Explainer: Visual Aids Gallery */}
-        {post.contentType === "explainer" && post.visualAids && post.visualAids.length > 0 && (
-          <div className="mt-12">
-            <h3 className="text-xl font-bold text-white mb-6">Visual Aids</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {post.visualAids.map((aid, i) => (
-                <figure key={i} className="rounded-xl overflow-hidden border border-slate-800">
-                  <div className="relative w-full h-48">
-                    <Image
-                      src={aid.url}
-                      alt={aid.caption || 'Visual aid'}
-                      fill
-                      loading="lazy"
-                      sizes="(max-width: 768px) 100vw, 50vw"
-                      className="object-cover"
-                    />
-                  </div>
-                  {aid.caption && <figcaption className="text-sm text-slate-400 p-3 bg-slate-900">{aid.caption}</figcaption>}
-                </figure>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* What's Up: Previous/Next Navigation */}
-        {post.contentType === "whats-up" && (prevPost || nextPost) && (
-          <div className="mt-12 flex justify-between gap-4 border-t border-slate-800 pt-8">
-            {prevPost ? (
-              <Link href={`/blogs/${prevPost.slug}`} className="flex items-center gap-2 text-sm text-slate-400 hover:text-blue-400 transition-colors group">
-                <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" /> Previous Month
-              </Link>
-            ) : <div />}
-            {nextPost && (
-              <Link href={`/blogs/${nextPost.slug}`} className="flex items-center gap-2 text-sm text-slate-400 hover:text-blue-400 transition-colors group ml-auto">
-                Next Month <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-              </Link>
+              </div>
             )}
-          </div>
-        )}
 
-        {/* Footer */}
-        <div className="mt-16 pt-8 border-t border-slate-800 flex flex-col sm:flex-row gap-4 justify-between items-center">
-          <Link href={backLink} className="inline-flex items-center justify-center gap-2 w-full sm:w-auto px-6 py-3 rounded-xl bg-slate-900 border border-slate-800 hover:bg-slate-800 hover:border-slate-700 text-white font-medium transition-all">
-            <ArrowLeft className="w-4 h-4" /> More {typeLabel}s
-          </Link>
-        </div>
-          </div>
+            {/* Explainer: Key Concepts */}
+            {post.contentType === "explainer" && post.keyConcepts && post.keyConcepts.length > 0 && (
+              <div className="mb-10 p-5 rounded-2xl bg-purple-500/5 border border-purple-500/15">
+                <div className="text-purple-400 font-semibold mb-3">Key Concepts</div>
+                <div className="flex flex-wrap gap-2">
+                  {post.keyConcepts.map((c, i) => <span key={i} className="text-sm bg-purple-500/10 text-purple-300 border border-purple-500/15 px-3 py-1.5 rounded-lg">{c}</span>)}
+                </div>
+              </div>
+            )}
+
+            {/* What's Up: Sky Events */}
+            {post.contentType === "whats-up" && post.skyEvents && post.skyEvents.length > 0 && (
+              <div className="mb-10 p-5 rounded-2xl bg-blue-500/5 border border-blue-500/15">
+                <div className="flex items-center gap-2 text-blue-400 font-semibold mb-4"><Telescope className="w-4 h-4" /> Sky Events This Month</div>
+                <div className="space-y-4">
+                  {post.skyEvents.map((evt, i) => (
+                    <div key={i} className="flex gap-4 items-start">
+                      <div className="shrink-0 w-20 text-center">
+                        <span className="text-xs font-bold bg-blue-500/10 text-blue-400 px-2.5 py-1 rounded-lg border border-blue-500/20">{evt.date || "TBD"}</span>
+                      </div>
+                      <div className="flex-1 border-l border-slate-800 pl-4">
+                        <div className="font-semibold text-white text-sm">{evt.title}</div>
+                        <div className="text-sm text-slate-400 mt-1">{evt.description}</div>
+                        {evt.visibility && <div className="text-xs text-slate-500 mt-1">Visibility: {evt.visibility}</div>}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Main Content */}
+            <BlogContent
+              html={post.content}
+              className="prose prose-invert prose-lg prose-headings:font-sans prose-headings:text-slate-100 prose-a:text-blue-400 hover:prose-a:text-blue-300 prose-p:text-slate-300 prose-p:font-serif prose-p:text-xl prose-p:leading-relaxed prose-strong:text-white prose-li:text-slate-300 prose-li:font-serif prose-li:text-xl w-full max-w-none prose-img:rounded-xl prose-img:shadow-xl [&>p:first-of-type]:first-letter:text-7xl [&>p:first-of-type]:first-letter:font-bold [&>p:first-of-type]:first-letter:text-white [&>p:first-of-type]:first-letter:mr-4 [&>p:first-of-type]:first-letter:float-left [&>p:first-of-type]:first-letter:leading-[0.8] [&>p:first-of-type]:first-letter:mt-2 [&>p:first-of-type]:first-letter:font-serif"
+            />
+
+            {/* Explainer: Visual Aids Gallery */}
+            {post.contentType === "explainer" && post.visualAids && post.visualAids.length > 0 && (
+              <div className="mt-12">
+                <h3 className="text-xl font-bold text-white mb-6">Visual Aids</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {post.visualAids.map((aid, i) => (
+                    <figure key={i} className="rounded-xl overflow-hidden border border-slate-800">
+                      <div className="relative w-full h-48">
+                        <Image
+                          src={aid.url}
+                          alt={aid.caption || 'Visual aid'}
+                          fill
+                          loading="lazy"
+                          sizes="(max-width: 768px) 100vw, 50vw"
+                          className="object-cover"
+                        />
+                      </div>
+                      {aid.caption && <figcaption className="text-sm text-slate-400 p-3 bg-slate-900">{aid.caption}</figcaption>}
+                    </figure>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* What's Up: Previous/Next Navigation */}
+            {post.contentType === "whats-up" && (prevPost || nextPost) && (
+              <div className="mt-12 flex justify-between gap-4 border-t border-slate-800 pt-8">
+                {prevPost ? (
+                  <Link href={`/blogs/${prevPost.slug}`} className="flex items-center gap-2 text-sm text-slate-400 hover:text-blue-400 transition-colors group">
+                    <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" /> Previous Month
+                  </Link>
+                ) : <div />}
+                {nextPost && (
+                  <Link href={`/blogs/${nextPost.slug}`} className="flex items-center gap-2 text-sm text-slate-400 hover:text-blue-400 transition-colors group ml-auto">
+                    Next Month <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  </Link>
+                )}
+              </div>
+            )}
+
+            {/* Footer */}
+            <div className="mt-16 pt-8 border-t border-slate-800 flex flex-col sm:flex-row gap-4 justify-between items-center">
+              <Link href={backLink} className="inline-flex items-center justify-center gap-2 w-full sm:w-auto px-6 py-3 rounded-xl bg-slate-900 border border-slate-800 hover:bg-slate-800 hover:border-slate-700 text-white font-medium transition-all">
+                <ArrowLeft className="w-4 h-4" /> More {typeLabel}s
+              </Link>
+            </div>
+          </main>
+
+          {/* Right Column: Metadata & Related Posts (Desktop Only) */}
+          <aside className="lg:col-span-3 lg:sticky lg:top-32 space-y-6 hidden lg:block self-start">
+            {/* Metadata Card */}
+            <div className="bg-slate-900/40 backdrop-blur-md border border-slate-800/60 rounded-2xl p-5 space-y-4 shadow-lg shadow-black/20">
+              <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500 border-b border-slate-800/80 pb-2">About This Post</h4>
+              <div className="space-y-3.5 text-sm">
+                <div className="flex items-center justify-between">
+                  <span className="text-slate-400">Reading Time</span>
+                  <span className="font-semibold text-slate-200 flex items-center gap-1.5"><Clock className="w-3.5 h-3.5 text-blue-400" /> {post.estimatedReadTime || getReadingTime(post.content)} min</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-slate-400">Published</span>
+                  <span className="text-slate-200 font-medium">{new Date(post.publishDate || post.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-slate-400">Author</span>
+                  <span className="text-slate-200 font-semibold">{bylineName}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Related Posts Card */}
+            {relatedPosts && relatedPosts.length > 0 && (
+              <div className="bg-slate-900/40 backdrop-blur-md border border-slate-800/60 rounded-2xl p-5 space-y-4 shadow-lg shadow-black/20">
+                <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500 border-b border-slate-800/80 pb-2">Recent Articles</h4>
+                <div className="space-y-4">
+                  {relatedPosts.map((p) => (
+                    <Link
+                      key={p.slug}
+                      href={`/blogs/${p.slug}`}
+                      className="group block space-y-1 hover:bg-slate-800/20 p-2 -mx-2 rounded-xl transition-all"
+                    >
+                      <h5 className="text-sm font-semibold text-slate-300 group-hover:text-blue-400 transition-colors line-clamp-2 leading-snug">
+                        {p.title}
+                      </h5>
+                      <span className="text-[11px] text-slate-500 block">
+                        {new Date(p.publishDate || p.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+                      </span>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            )}
+          </aside>
+
         </div>
       </div>
       

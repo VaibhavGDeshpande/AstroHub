@@ -50,8 +50,6 @@ export async function POST(request: Request) {
         author_id: author_id || null, // null means "All Authors"
       });
 
-    // If there is an error but it's a unique constraint violation, we can just ignore it
-    // because they are already subscribed.
     if (subscriptionError && subscriptionError.code !== '23505') {
       return NextResponse.json({ error: "Error saving subscription" }, { status: 500 });
     }
