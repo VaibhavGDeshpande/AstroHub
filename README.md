@@ -26,11 +26,11 @@
 
 ![alt text](/public/assets/images/image5.png)
 
-![alt text](image.png)
+![alt text](/public/assets/images/image6.png)
 
-![alt text](image-1.png)
+![alt text](/public/assets/images/image7.png)
 
-![alt text](image-2.png)
+![alt text](/public/assets/images/image8.png)
 
 AstroHub presents astronomy imagery from NASA's APOD, EPIC, Mars rover, and image-library services. Interactive 3D views include Earth, the Moon, Mars, and the solar system. The repository includes the AstroHub logo and application assets; the astronomy photos and live data are served by their respective providers.
 
