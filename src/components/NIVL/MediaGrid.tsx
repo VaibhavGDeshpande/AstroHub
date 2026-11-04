@@ -80,7 +80,7 @@ const MediaGrid: React.FC<MediaGridProps> = ({ items, onItemClick, loading }) =>
               {previewUrl ? (
                 <img
                   src={previewUrl}
-                  alt={item.data[0]?.title}
+                  alt={item.data[0]?.title || 'Untitled NASA media'}
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                   onError={(e) => {
                     (e.target as HTMLImageElement).style.display = 'none';

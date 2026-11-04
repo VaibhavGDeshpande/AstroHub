@@ -21,7 +21,7 @@ export default function BlogContent({ html, className }: BlogContentProps) {
     replace(domNode: DOMNode) {
       if (!(domNode instanceof Element) || domNode.name !== "img") return;
 
-      const { src, alt, width, height, class: cls } = domNode.attribs;
+      const { src, alt, title, width, height, class: cls } = domNode.attribs;
       if (!src) return;
 
       const w = parseInt(width, 10) || 800;
@@ -30,7 +30,7 @@ export default function BlogContent({ html, className }: BlogContentProps) {
       return (
         <Image
           src={src}
-          alt={alt || ""}
+          alt={alt ?? title ?? "Blog content image"}
           width={w}
           height={h}
           loading="lazy"

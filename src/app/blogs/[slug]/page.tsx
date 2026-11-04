@@ -5,7 +5,7 @@ import { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { MONTHS } from "@/lib/blogsDb";
 import type { Author, Blog, ContentType } from "@/lib/blogsDb";
-import { Clock, ArrowLeft, ArrowRight, User, Telescope, BookOpen, Lightbulb, Wrench, Sparkles, Globe, Compass, Satellite } from "lucide-react";
+import { Clock, ArrowLeft, ArrowRight, User, Telescope, BookOpen, Lightbulb, Wrench, Sparkles, Globe, Compass} from "lucide-react";
 import LoaderWrapper from "@/components/Loader";
 import BlogContent from "@/components/BlogContent";
 import SubscribeModal from "@/components/SubscribeModal";

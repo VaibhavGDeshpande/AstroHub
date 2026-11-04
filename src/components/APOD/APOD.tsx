@@ -8,6 +8,7 @@ import {
   ChevronRightIcon,
 } from '@heroicons/react/24/outline';
 import { useState } from 'react';
+import parse, { domToReact, Element, type DOMNode, type HTMLReactParserOptions } from 'html-react-parser';
 
 interface APODData {
   copyright?: string;
@@ -30,6 +31,39 @@ interface APODImageInfoProps {
   openImageInNewTab: (url: string) => void;
   navigateImages?: (direction: 'prev' | 'next') => void;
   searchSection?: React.ReactNode;
+}
+
+function renderAPODHtml(html: string) {
+  const options: HTMLReactParserOptions = {
+    replace(node: DOMNode) {
+      if (!(node instanceof Element)) return;
+      if (node.name === 'script' || node.name === 'style') return <></>;
+
+      const children = domToReact(
+        node.children.filter((child): child is DOMNode => child.type !== 'cdata'),
+        options,
+      );
+      switch (node.name) {
+        case 'a': {
+          const href = node.attribs.href;
+          return href && /^https?:\/\//i.test(href) ? (
+            <a href={href} target="_blank" rel="noopener noreferrer" className="text-blue-300 underline">
+              {children}
+            </a>
+          ) : <>{children}</>;
+        }
+        case 'strong': return <strong>{children}</strong>;
+        case 'b': return <b>{children}</b>;
+        case 'em': return <em>{children}</em>;
+        case 'i': return <i>{children}</i>;
+        case 'br': return <br />;
+        case 'p': return <p>{children}</p>;
+        default: return <>{children}</>;
+      }
+    },
+  };
+
+  return parse(html, options);
 }
 
 function getVideoInfo(url: string): { kind: 'file' | 'embed'; src: string } | null {
@@ -120,17 +154,11 @@ const APODImageInfo: React.FC<APODImageInfoProps> = ({
 
   const currentAPOD = getCurrentData();
   const imageUrl = useHD && currentAPOD.hdurl ? currentAPOD.hdurl : currentAPOD.url;
-  const hasHDVersion = !!currentAPOD.hdurl;
+  const hasHDVersion = !!currentAPOD.hdurl && currentAPOD.hdurl !== currentAPOD.url;
   const isMultipleImages = Array.isArray(data) && data.length > 1;
 
   // State for "See More"
   const [seeMore, setSeeMore] = useState(false);
-
-  // Function to shorten text
-  const getShortText = (text: string, limit: number) => {
-    if (text.length <= limit) return text;
-    return text.slice(0, limit) + "...";
-  };
 
   return (
     <div className="h-full flex flex-col">
@@ -261,9 +289,9 @@ const APODImageInfo: React.FC<APODImageInfoProps> = ({
             <ClockIcon className="h-4 w-4 sm:h-5 sm:w-5 text-blue-400" />
             <h3 className="text-base sm:text-lg font-semibold text-white">Discovery Details</h3>
           </div>
-          <motion.p className="text-slate-300 text-xs sm:text-sm leading-relaxed mb-2">
-            {seeMore ? currentAPOD.explanation : getShortText(currentAPOD.explanation, 200)}
-          </motion.p>
+          <motion.div className={`text-slate-300 text-xs sm:text-sm leading-relaxed mb-2 ${seeMore ? '' : 'line-clamp-3'}`}>
+            {renderAPODHtml(currentAPOD.explanation)}
+          </motion.div>
           {currentAPOD.explanation.length > 200 && (
             <button
               onClick={() => setSeeMore(!seeMore)}
@@ -281,7 +309,7 @@ const APODImageInfo: React.FC<APODImageInfoProps> = ({
             {currentAPOD.copyright && (
               <div className="flex flex-col sm:flex-row sm:justify-between gap-1 text-xs sm:text-sm">
                 <span className="text-slate-400">Copyright</span>
-                <span className="text-white font-medium">© {currentAPOD.copyright}</span>
+                <span className="text-white font-medium">{renderAPODHtml(currentAPOD.copyright)}</span>
               </div>
             )}
             <div className="flex flex-col sm:flex-row sm:justify-between gap-1 text-xs sm:text-sm">
@@ -349,9 +377,9 @@ const APODImageInfo: React.FC<APODImageInfoProps> = ({
               <ClockIcon className="h-5 w-5 text-blue-400" />
               <h3 className="text-lg font-semibold text-white">Discovery Details</h3>
             </div>
-            <motion.p className="text-slate-300 text-sm leading-relaxed mb-2">
-              {seeMore ? currentAPOD.explanation : getShortText(currentAPOD.explanation, 300)}
-            </motion.p>
+            <motion.div className={`text-slate-300 text-sm leading-relaxed mb-2 ${seeMore ? '' : 'line-clamp-3'}`}>
+              {renderAPODHtml(currentAPOD.explanation)}
+            </motion.div>
             {currentAPOD.explanation.length > 300 && (
               <button
                 onClick={() => setSeeMore(!seeMore)}
@@ -369,7 +397,7 @@ const APODImageInfo: React.FC<APODImageInfoProps> = ({
               {currentAPOD.copyright && (
                 <div className="flex justify-between text-sm">
                   <span className="text-slate-400">Copyright</span>
-                  <span className="text-white font-medium">© {currentAPOD.copyright}</span>
+                  <span className="text-white font-medium">{renderAPODHtml(currentAPOD.copyright)}</span>
                 </div>
               )}
               <div className="flex justify-between text-sm">

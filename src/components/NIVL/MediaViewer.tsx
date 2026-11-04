@@ -134,7 +134,7 @@ const MediaViewer: React.FC<MediaViewerProps> = ({
                   ) : (
                     <motion.img
                       src={assetUrl}
-                      alt={item.data[0]?.title}
+                      alt={item.data[0]?.title || 'Untitled NASA media'}
                       className="max-w-full max-h-full object-contain rounded-xl"
                       style={{
                         transform: `scale(${zoom}) translate(${pan.x / zoom}px, ${pan.y / zoom}px)`,

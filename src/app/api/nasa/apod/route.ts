@@ -1,75 +1,56 @@
-// app/api/nasa/apod/route.ts
 import { NextResponse } from 'next/server';
 
-// Remove force-static or change to force-dynamic
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
+type ApodEntry = {
+  date?: string;
+  title?: string;
+  explanation?: string;
+  media_type?: string;
+  url?: string;
+  hdurl?: string;
+};
+
+function normalizeEntry(entry: ApodEntry): ApodEntry | null {
+  if (!entry.date || !entry.title || !entry.explanation || !entry.media_type) return null;
+
+  if (entry.media_type === 'image') {
+    const imageUrl = entry.hdurl;
+    if (!imageUrl || /nasa-logo/i.test(imageUrl)) return null;
+    return { ...entry, url: imageUrl, hdurl: imageUrl };
+  }
+
+  return entry.url ? entry : null;
+}
+
 export async function GET(request: Request) {
   try {
-    const { searchParams } = new URL(request.url);
-    const date = searchParams.get('date') || undefined;
-    const startDate = searchParams.get('start_date') || undefined;
-    const endDate = searchParams.get('end_date') || undefined;
-    
-    // Use server-only environment variable
-    const apiKey = process.env.NEXT_PUBLIC_NASA_API_KEY;
+    const incoming = new URL(request.url).searchParams;
+    const url = new URL('https://science.nasa.gov/wp-json/wp/v2/apod-basic');
 
-    if (!apiKey) {
-      return NextResponse.json({
-        error: 'NASA API key not configured',
-        solution: 'Add NASA_API_KEY to your .env.local file'
-      }, { status: 500 });
+    for (const name of ['date', 'start_date', 'end_date'] as const) {
+      const value = incoming.get(name);
+      if (value) url.searchParams.set(name, value);
     }
 
-    // Existing validation code...
-    
-    const params = new URLSearchParams({ api_key: apiKey });
-    if (date) params.set('date', date);
-    if (startDate && endDate) {
-      params.set('start_date', startDate);
-      params.set('end_date', endDate);
-    }
-
-    const url = `https://api.nasa.gov/planetary/apod?${params.toString()}`;
-    const response = await fetch(url, {
-      next: { revalidate: 3600 }, // Cache for 1 hour
-      headers: { 'User-Agent': 'NASA-Explorer/1.0' }
-    });
-
-    // Check rate limit headers
-    const rateLimitRemaining = response.headers.get('X-RateLimit-Remaining');
-    
+    const response = await fetch(url, { next: { revalidate: 3600 } });
+    const payload = await response.json();
     if (!response.ok) {
-      if (response.status === 403) {
-        return NextResponse.json({
-          error: 'NASA API access denied',
-          details: 'Invalid API key or rate limit exceeded',
-          rateLimitRemaining: rateLimitRemaining || 'unknown',
-          solutions: [
-            'Check your NASA_API_KEY',
-            'Get a new API key from https://api.nasa.gov/',
-            'Wait for rate limit reset (rolling hourly basis)'
-          ]
-        }, { status: 403 });
-      }
-      // Handle other errors...
+      return NextResponse.json({ error: 'NASA APOD request failed' }, { status: response.status });
     }
 
-    const data = await response.json();
-    
-    // Include rate limit info in successful responses
-    const responseHeaders = new Headers();
-    if (rateLimitRemaining) {
-      responseHeaders.set('X-RateLimit-Remaining', rateLimitRemaining);
+    const entries = Array.isArray(payload) ? payload : [payload];
+    const normalized = entries.map(normalizeEntry);
+    if (!normalized.length || normalized.some((entry) => !entry)) {
+      return NextResponse.json({ error: 'NASA returned invalid APOD data' }, { status: 502 });
     }
-    
-    return NextResponse.json(data, { headers: responseHeaders });
 
+    return NextResponse.json(Array.isArray(payload) ? normalized : normalized[0]);
   } catch (error) {
-    return NextResponse.json({
-      error: 'Internal server error',
-      details: error instanceof Error ? error.message : 'Unknown error'
-    }, { status: 500 });
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : 'NASA APOD request failed' },
+      { status: 502 },
+    );
   }
 }
