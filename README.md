@@ -2,16 +2,16 @@
 
 ![AstroHub logo](public/assets/AstroHub.avif)
 
-[AstroHub](https://astrohub.live) is a production astronomy website for exploring space, observing the night sky, and learning about the universe. This repository contains the web application behind the live site.
+[AstroHub](https://www.astrohub.live) is a production astronomy website for exploring space, observing the night sky, and learning about the universe. This repository contains the web application behind the live site.
 
 ## Explore the site
 
-- [NASA imagery and data](https://astrohub.live/apod): Astronomy Picture of the Day, EPIC Earth imagery, Mars rover photos, near-Earth objects, and NASA's image and video library.
-- [Interactive space](https://astrohub.live/solar-system): 3D Earth, Moon, and Mars experiences, solar system exploration, NASA Eyes, and satellite tracking.
-- [Sky and observing tools](https://astrohub.live/stellarium): Stellarium sky map, monthly sky charts, local astronomy, weather, and light-pollution maps.
-- [Calculators](https://astrohub.live/telescope-calculator): Telescope and eyepiece planning, astrophotography exposure planning, and a cosmic-age calculator.
-- [AstroHub Transmission](https://astrohub.live/blogs): The astronomy blog, with monthly sky guides, tutorials, explainers, and author pages. The site also features space news and interactive quizzes.
-- [Nova AI](https://astrohub.live): Ask astronomy questions and get a daily celestial briefing, powered by Gemini 2.5 Flash.
+- [NASA imagery and data](https://www.astrohub.live/apod): Astronomy Picture of the Day, EPIC Earth imagery, Mars rover photos, near-Earth objects, and NASA's image and video library.
+- [Interactive space](https://www.astrohub.live/solar-system): 3D Earth, Moon, and Mars experiences, solar system exploration, NASA Eyes, and satellite tracking.
+- [Sky and observing tools](https://www.astrohub.live/stellarium): Stellarium sky map, monthly sky charts, local astronomy, weather, and light-pollution maps.
+- [Calculators](https://www.astrohub.live/telescope-calculator): Telescope and eyepiece planning, astrophotography exposure planning, and a cosmic-age calculator.
+- [AstroHub Transmission](https://www.astrohub.live/blogs): The astronomy blog, with monthly sky guides, tutorials, explainers, and author pages. The site also features space news and interactive quizzes.
+- [Nova AI](https://www.astrohub.live): Ask astronomy questions and get a daily celestial briefing, powered by Gemini 2.5 Flash.
 
 ## Images and visualizations
 ![alt text](/public/assets/images/image.png)
