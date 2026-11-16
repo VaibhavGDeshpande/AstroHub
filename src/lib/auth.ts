@@ -8,7 +8,14 @@ export interface AdminSession {
   role: 'author' | 'admin';
 }
 
-const getSecret = () => new TextEncoder().encode(process.env.SESSION_SECRET || 'fallback-dev-secret-key-at-least-32-chars-long');
+// The dev fallback is public in the repo, so production must never sign or verify with it
+export const getSecret = () => {
+  const secret = process.env.SESSION_SECRET;
+  if (!secret && process.env.NODE_ENV === 'production') {
+    throw new Error('SESSION_SECRET is not set');
+  }
+  return new TextEncoder().encode(secret || 'fallback-dev-secret-key-at-least-32-chars-long');
+};
 
 /**
  * Sign a session payload into a JWT.

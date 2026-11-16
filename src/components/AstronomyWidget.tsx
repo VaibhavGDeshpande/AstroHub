@@ -353,8 +353,7 @@ export default function AstronomyWidget() {
   };
 
   useEffect(() => {
-    fetchData(location); // cached if available
-    fetchBriefing(); // fetch briefing in bg
+    fetchData(location); // cached if available; the briefing (Gemini) waits until the widget opens
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

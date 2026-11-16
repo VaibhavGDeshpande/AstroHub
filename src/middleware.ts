@@ -1,15 +1,12 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { jwtVerify } from 'jose';
-
-const getSecret = () => new TextEncoder().encode(process.env.SESSION_SECRET || 'fallback-dev-secret-key-at-least-32-chars-long');
+import { getSecret } from '@/lib/auth';
 
 export async function middleware(request: NextRequest) {
   // Protect all /admin routes except /admin/login
   if (request.nextUrl.pathname.startsWith('/admin') && !request.nextUrl.pathname.startsWith('/admin/login')) {
-    // Check new session cookie first, fall back to legacy token
     const sessionCookie = request.cookies.get('admin_session')?.value;
-    const legacyToken = request.cookies.get('admin_token')?.value;
 
     let isAuthenticated = false;
 
@@ -21,9 +18,6 @@ export async function middleware(request: NextRequest) {
       } catch {
         isAuthenticated = false;
       }
-    } else if (legacyToken === 'authenticated') {
-      // Backwards compat — old single-password sessions still work
-      isAuthenticated = true;
     }
 
     if (!isAuthenticated) {

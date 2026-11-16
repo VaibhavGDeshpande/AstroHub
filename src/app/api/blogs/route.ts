@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
-import { createClient as createSupabaseClient } from '@supabase/supabase-js';
-import { createClient } from '@/lib/supabase/server';
+import { createClient, createAdminClient } from '@/lib/supabase/server';
 import { getAdminSession } from '@/lib/auth';
 import type { ContentType } from '@/lib/blogsDb';
 import { TABLE_MAP } from '@/lib/blogsDb';
@@ -129,9 +128,7 @@ export async function POST(request: Request) {
   if (!session) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
-  const supabase = createSupabaseClient(supabaseUrl, supabaseKey);
+  const supabase = createAdminClient();
 
   try {
     const data = await request.json();

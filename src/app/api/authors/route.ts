@@ -1,13 +1,13 @@
 import { NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
-import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/server';
 import { getAdminSession } from '@/lib/auth';
 
 // GET: list all authors (admin only, or return public author list)
 export async function GET() {
   const session = await getAdminSession();
 
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { data, error } = await supabase
     .from('authors')
     .select('id, name, display_name, avatar_url, role, created_at')
@@ -30,7 +30,7 @@ export async function GET() {
 
 // POST: create a new author
 export async function POST(request: Request) {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
 
   // Check if any authors exist — if not, allow first-run seed without auth
   const { count } = await supabase.from('authors').select('*', { count: 'exact', head: true });

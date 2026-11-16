@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
   try {
     const response = await fetch(
       `https://api.n2yo.com/rest/v1/satellite/positions/${noradId}/${observerLat}/${observerLng}/${observerAlt}/${seconds}&apiKey=${N2YO_API_KEY}`,
-      { cache: 'no-store' }
+      { next: { revalidate: 60 } }
     );
 
     if (!response.ok) {

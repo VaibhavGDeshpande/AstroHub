@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
-import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/server';
 import { signAdminSession, getAdminSession } from '@/lib/auth';
 
 export async function POST(request: Request) {
@@ -11,7 +11,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Name and password are required' }, { status: 400 });
     }
 
-    const supabase = await createClient();
+    const supabase = createAdminClient();
 
     // Look up the author by name (case-insensitive)
     const { data: author, error } = await supabase
@@ -57,15 +57,6 @@ export async function POST(request: Request) {
       sameSite: 'strict',
       path: '/',
       maxAge: 60 * 60 * 24 * 7, // 1 week
-    });
-
-    // Also keep the old cookie for backwards compatibility during transition
-    response.cookies.set('admin_token', 'authenticated', {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      path: '/',
-      maxAge: 60 * 60 * 24 * 7,
     });
 
     return response;

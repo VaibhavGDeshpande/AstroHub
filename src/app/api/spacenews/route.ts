@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { unstable_cache } from 'next/cache';
 import Parser from 'rss-parser';
 
 type CustomFeed = {
@@ -45,8 +46,8 @@ function extractImageUrl(htmlContent: string): string | null {
   return null;
 }
 
-export async function GET() {
-  try {
+// One upstream RSS fetch per 15 minutes, shared by every visitor; a throw is never cached
+const getFeed = unstable_cache(async () => {
     const parser: Parser<CustomFeed, CustomItem> = new Parser({
       customFields: {
         item: [
@@ -61,9 +62,7 @@ export async function GET() {
 
     const feed = await parser.parseURL('https://spacenews.com/feed');
 
-    return NextResponse.json({
-      success: true,
-      data: {
+    return {
         title: feed.title,
         description: feed.description,
         items: feed.items.map(item => {
@@ -101,8 +100,16 @@ export async function GET() {
             imageUrl: imageUrl
           };
         })
-      }
-    });
+    };
+}, ['spacenews-feed'], { revalidate: 900 });
+
+export async function GET() {
+  try {
+    const data = await getFeed();
+    return NextResponse.json(
+      { success: true, data },
+      { headers: { 'Cache-Control': 's-maxage=900, stale-while-revalidate=3600' } }
+    );
   } catch (error) {
     console.error('Error fetching RSS feed:', error);
     return NextResponse.json(

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { use, useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import SatelliteMap from '@/components/Satellite/SatelliteMap';
 import LoaderWrapper from "@/components/Loader";
@@ -43,13 +43,13 @@ const FAMOUS_SATELLITES: PresetSatellite[] = [
 ];
 
 interface SatelliteTrackerPageProps {
-  params: { noradId?: string[] };
+  params: Promise<{ noradId?: string[] }>;
 }
 
 export default function SatelliteTrackerPage({ params }: SatelliteTrackerPageProps) {
   const router = useRouter();
 
-  const currentParam = params?.noradId?.[0] ?? '';
+  const currentParam = use(params)?.noradId?.[0] ?? '';
   const parsedInitial = Number(currentParam);
   const matchedPreset = Number.isNaN(parsedInitial)
     ? undefined

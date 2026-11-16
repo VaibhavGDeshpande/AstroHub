@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { fetchWeatherApi } from 'openmeteo';
+import { unstable_cache } from 'next/cache';
 
 export type OpenMeteoWeather = {
   currentConditions: Record<string, unknown>;
@@ -93,7 +94,10 @@ function safeValuesArray(variable: any): number[] {
   }
 }
 
-export async function fetchOpenMeteoWeather({
+// Cached 10 min per (lat, lon, hours): the dashboard's three routes share one upstream call
+export const fetchOpenMeteoWeather = unstable_cache(fetchOpenMeteoWeatherUncached, ['open-meteo-weather'], { revalidate: 600 });
+
+async function fetchOpenMeteoWeatherUncached({
   lat,
   lon,
   hours = 48

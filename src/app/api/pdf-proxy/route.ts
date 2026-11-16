@@ -11,8 +11,18 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Fetch the PDF from the external source
-    const response = await fetch(url, {
+    // Only proxy the sky-map PDFs; anything else would make this an open proxy (SSRF)
+    let target: URL;
+    try {
+      target = new URL(url);
+    } catch {
+      return NextResponse.json({ error: 'Invalid url' }, { status: 400 });
+    }
+    if (target.protocol !== 'https:' || target.hostname !== 'www.skymaps.com') {
+      return NextResponse.json({ error: 'Host not allowed' }, { status: 403 });
+    }
+
+    const response = await fetch(target, {
       headers: {
         'User-Agent': 'Mozilla/5.0 (compatible; NextJS/14.0)',
       },

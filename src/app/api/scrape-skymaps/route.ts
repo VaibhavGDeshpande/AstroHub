@@ -1,5 +1,4 @@
 import { NextResponse } from 'next/server';
-import axios from 'axios';
 import * as cheerio from 'cheerio';
 
 interface SkyMapPDF {
@@ -14,7 +13,10 @@ interface SkyMapPDF {
 export async function GET() {
   try {
     const targetUrl = 'https://www.skymaps.com/downloads.html';
-    const { data: html } = await axios.get(targetUrl);
+    // The list changes monthly; scrape at most once a day
+    const res = await fetch(targetUrl, { next: { revalidate: 86400 } });
+    if (!res.ok) throw new Error(`skymaps.com responded ${res.status}`);
+    const html = await res.text();
     const $ = cheerio.load(html);
 
     const pdfLinks: SkyMapPDF[] = [];
@@ -65,8 +67,8 @@ export async function GET() {
     return NextResponse.json({ 
       success: true, 
       count: pdfLinks.length,
-      data: pdfLinks 
-    });
+      data: pdfLinks
+    }, { headers: { 'Cache-Control': 's-maxage=86400, stale-while-revalidate=86400' } });
   } catch (error) {
     console.error('Scraping error:', error);
     return NextResponse.json({ 

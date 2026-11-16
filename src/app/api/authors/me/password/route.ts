@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
-import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/server';
 import { getAdminSession } from '@/lib/auth';
 
 export async function PUT(request: Request) {
@@ -28,7 +28,7 @@ export async function PUT(request: Request) {
       return NextResponse.json({ error: 'New password must be different from the current password' }, { status: 400 });
     }
 
-    const supabase = await createClient();
+    const supabase = createAdminClient();
     const { data: author, error } = await supabase
       .from('authors')
       .select('id, password_hash')

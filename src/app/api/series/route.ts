@@ -1,10 +1,10 @@
 import { NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/server';
 import { getAdminSession } from '@/lib/auth';
 
 // GET: list all custom series
 export async function GET() {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
 
   const { data, error } = await supabase
     .from('custom_series')
@@ -34,7 +34,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const supabase = await createClient();
+  const supabase = createAdminClient();
 
   try {
     const body = await request.json();
@@ -92,7 +92,7 @@ export async function DELETE(request: Request) {
     return NextResponse.json({ error: 'Series id is required' }, { status: 400 });
   }
 
-  const supabase = await createClient();
+  const supabase = createAdminClient();
 
   const { data: series, error: lookupError } = await supabase
     .from('custom_series')

@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
-import { createClient as createSupabaseClient } from '@supabase/supabase-js';
-import { createClient } from '@/lib/supabase/server';
+import { createClient, createAdminClient } from '@/lib/supabase/server';
 import { getAdminSession } from '@/lib/auth';
 import type { ContentType } from '@/lib/blogsDb';
 import { TABLE_MAP } from '@/lib/blogsDb';
@@ -71,9 +70,7 @@ export async function PUT(request: Request, { params }: { params: Promise<{ slug
 
   const { slug } = await params;
   const data = await request.json();
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
-  const supabase = createSupabaseClient(supabaseUrl, supabaseKey);
+  const supabase = createAdminClient();
 
   const contentType = (data.contentType || 'explainer') as ContentType;
   const tableName = contentType === 'custom-series' ? 'custom_series_posts' : TABLE_MAP[contentType];
@@ -177,9 +174,7 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ s
   }
 
   const { slug } = await params;
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
-  const supabase = createSupabaseClient(supabaseUrl, supabaseKey);
+  const supabase = createAdminClient();
 
   // Find which table the slug belongs to and delete from there
   const post = await findPostBySlug(supabase, slug);

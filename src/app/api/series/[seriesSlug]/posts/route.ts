@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
-import { createClient as createSupabaseClient } from '@supabase/supabase-js';
-import { createClient } from '@/lib/supabase/server';
+import { createClient, createAdminClient } from '@/lib/supabase/server';
 import { getAdminSession } from '@/lib/auth';
 
 // GET: list posts for a series
@@ -73,9 +72,7 @@ export async function POST(
   }
 
   const { seriesSlug } = await params;
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
-  const supabase = createSupabaseClient(supabaseUrl, supabaseKey);
+  const supabase = createAdminClient();
 
   // Resolve series
   const { data: series } = await supabase

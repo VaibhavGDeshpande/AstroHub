@@ -1,11 +1,11 @@
 import { NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
-import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/server';
+import { getAdminSession } from '@/lib/auth';
+
+const MAX_UPLOAD_BYTES = 10 * 1024 * 1024;
 
 export async function POST(request: Request) {
-  // Verify admin auth
-  const cookieStore = await cookies();
-  if (cookieStore.get('admin_token')?.value !== 'authenticated') {
+  if (!(await getAdminSession())) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
@@ -17,7 +17,16 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'No image uploaded' }, { status: 400 });
     }
 
-    const supabase = await createClient();
+    // SVG can carry scripts, so it is refused even though it is an image type
+    if (!file.type.startsWith('image/') || file.type === 'image/svg+xml') {
+      return NextResponse.json({ error: 'Only image files can be uploaded' }, { status: 400 });
+    }
+
+    if (file.size > MAX_UPLOAD_BYTES) {
+      return NextResponse.json({ error: 'Image must be 10 MB or smaller' }, { status: 413 });
+    }
+
+    const supabase = createAdminClient();
 
     // Generate unique filename
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);

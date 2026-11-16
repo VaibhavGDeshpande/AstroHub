@@ -1,32 +1,20 @@
 import { NextResponse } from 'next/server';
+import { unstable_cache } from 'next/cache';
 
 const GEMINI_KEY = process.env.GEMINI_KEY;
 
 export const dynamic = 'force-dynamic';
 
-let cachedBriefing: unknown = null;
-let lastCacheDate: string | null = null;
+// One Gemini call per UTC day, shared across every server instance; a throw is never cached
+const getBriefing = unstable_cache(
+  async (todayKey: string) => {
+    const todayStr = new Date(`${todayKey}T00:00:00Z`).toLocaleDateString('en-US', {
+      month: 'long',
+      day: 'numeric',
+      year: 'numeric',
+      timeZone: 'UTC',
+    });
 
-export async function GET() {
-  if (!GEMINI_KEY) {
-    return NextResponse.json({ error: 'Missing GEMINI_KEY' }, { status: 500 });
-  }
-
-  const todayRaw = new Date();
-  const todayKey = todayRaw.toISOString().split('T')[0]; // Format: YYYY-MM-DD
-
-  // Return cached briefing if the date hasn't changed (changes exactly at 00:00)
-  if (cachedBriefing && lastCacheDate === todayKey) {
-    return NextResponse.json(cachedBriefing);
-  }
-
-  const todayStr = todayRaw.toLocaleDateString('en-US', {
-    month: 'long',
-    day: 'numeric',
-    year: 'numeric'
-  });
-
-  try {
     const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_KEY}`, {
       method: 'POST',
       headers: {
@@ -44,26 +32,34 @@ export async function GET() {
     });
 
     if (!response.ok) {
-      const error = await response.json();
-      return NextResponse.json({ error: 'Gemini API failed', details: error }, { status: response.status });
+      const details = await response.text();
+      throw new Error(`Gemini API failed (${response.status}): ${details}`);
     }
 
     const result = await response.json();
     const content = result.candidates[0].content.parts[0].text;
-    
-    // Parse the JSON from Gemini's response
     try {
-      const briefing = JSON.parse(content);
-      
-      // Cache the result for today
-      cachedBriefing = briefing;
-      lastCacheDate = todayKey;
-      
-      return NextResponse.json(briefing);
+      return JSON.parse(content);
     } catch {
-      console.error('Failed to parse Gemini response:', content);
-      return NextResponse.json({ error: 'Invalid response format from AI' }, { status: 500 });
+      throw new Error(`Invalid response format from AI: ${content}`);
     }
+  },
+  ['celestial-briefing'],
+  { revalidate: 86400 }
+);
+
+export async function GET() {
+  if (!GEMINI_KEY) {
+    return NextResponse.json({ error: 'Missing GEMINI_KEY' }, { status: 500 });
+  }
+
+  const todayKey = new Date().toISOString().split('T')[0]; // YYYY-MM-DD, changes at 00:00 UTC
+
+  try {
+    const briefing = await getBriefing(todayKey);
+    return NextResponse.json(briefing, {
+      headers: { 'Cache-Control': 's-maxage=3600, stale-while-revalidate=3600' },
+    });
   } catch (error: unknown) {
     console.error('Celestial Briefing Error:', error);
     return NextResponse.json({ error: 'Failed to fetch briefing' }, { status: 500 });

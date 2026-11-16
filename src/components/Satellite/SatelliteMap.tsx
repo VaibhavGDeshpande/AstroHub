@@ -50,6 +50,13 @@ export default function SatelliteMap({ noradId, satelliteName }: SatelliteMapPro
   
   const [mapReady, setMapReady] = useState(false);
   const [positions, setPositions] = useState<SatellitePosition[]>([]);
+  // Local clock that walks the marker through the fetched hour of positions
+  const [nowSec, setNowSec] = useState(() => Date.now() / 1000);
+
+  useEffect(() => {
+    const t = setInterval(() => setNowSec(Date.now() / 1000), 10_000);
+    return () => clearInterval(t);
+  }, []);
   const [observer, setObserver] = useState({ lat: 0, lng: 0, alt: 0.2 });
   
   // Removed unused 'setShowTerminator'
@@ -110,9 +117,10 @@ export default function SatelliteMap({ noradId, satelliteName }: SatelliteMapPro
     // Add zoom control to bottom right
     leaflet.control.zoom({ position: 'bottomright' }).addTo(map);
 
-    const darkMatterLayer = leaflet.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-      attribution: '© OpenStreetMap, © CartoDB',
-      maxZoom: 19
+    // CARTO dark_all now needs an API key; Esri's dark canvas is keyless
+    const darkMatterLayer = leaflet.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
+      attribution: '© Esri, HERE, Garmin, © OpenStreetMap contributors',
+      maxZoom: 16
     });
 
     const streetLayer = leaflet.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -254,7 +262,8 @@ export default function SatelliteMap({ noradId, satelliteName }: SatelliteMapPro
     };
 
     fetchPositions();
-    const intervalId = setInterval(fetchPositions, 60 * 1000);
+    // Each fetch covers 3600 s of positions; refetch at the halfway mark, not every minute
+    const intervalId = setInterval(fetchPositions, 30 * 60 * 1000);
 
     return () => {
       isCancelled = true;
@@ -266,7 +275,7 @@ export default function SatelliteMap({ noradId, satelliteName }: SatelliteMapPro
   useEffect(() => {
     if (!mapRef.current || positions.length === 0 || !leaflet) return;
 
-    const latest = positions[0];
+    const latest = positions.filter((p) => p.timestamp <= nowSec).pop() ?? positions[0];
     if (markerRef.current) {
       markerRef.current.setLatLng([latest.satlatitude, latest.satlongitude]).bringToFront();
     } else {
@@ -305,7 +314,7 @@ export default function SatelliteMap({ noradId, satelliteName }: SatelliteMapPro
         </div>
       </div>
     `);
-  }, [leaflet, noradId, positions, satelliteName]);
+  }, [leaflet, noradId, positions, satelliteName, nowSec]);
 
   // Draw orbit path
   useEffect(() => {

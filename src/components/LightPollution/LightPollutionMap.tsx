@@ -36,7 +36,7 @@ export default function LightPollutionMap({ className = "", frameClassName = "" 
         <iframe
           title="Global light pollution overlay"
           src="https://djlorenz.github.io/astronomy/lp/overlay/dark.html"
-          className="absolute inset-0 w-full h-full border-0 grayscale invert opacity-80 brightness-75 contrast-125"
+          className="absolute inset-0 w-full h-full border-0"
           loading="lazy"
           allowFullScreen
         />

@@ -1,5 +1,16 @@
 import { createServerClient } from '@supabase/ssr'
+import { createClient as createSupabaseClient } from '@supabase/supabase-js'
 import { cookies } from 'next/headers'
+
+// Server-only client that bypasses RLS. Call it only after the route's own auth check.
+// No anon fallback: a missing key must fail loudly, never quietly downgrade to public access.
+export function createAdminClient() {
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY
+  if (!key) throw new Error('SUPABASE_SERVICE_ROLE_KEY is not set')
+  return createSupabaseClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, key, {
+    auth: { persistSession: false },
+  })
+}
 
 export async function createClient() {
   const cookieStore = await cookies()

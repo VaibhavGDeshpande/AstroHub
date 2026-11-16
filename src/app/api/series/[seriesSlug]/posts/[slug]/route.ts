@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/server';
 import { getAdminSession } from '@/lib/auth';
 
 // GET: get a single series post by slug
@@ -8,7 +8,7 @@ export async function GET(
   { params }: { params: Promise<{ seriesSlug: string; slug: string }> }
 ) {
   const { slug } = await params;
-  const supabase = await createClient();
+  const supabase = createAdminClient();
 
   const { data: post, error } = await supabase
     .from('custom_series_posts')
@@ -51,7 +51,7 @@ export async function PUT(
   }
 
   const { slug } = await params;
-  const supabase = await createClient();
+  const supabase = createAdminClient();
 
   // Verify ownership (unless admin)
   if (session.role !== 'admin') {
@@ -114,7 +114,7 @@ export async function DELETE(
   }
 
   const { slug } = await params;
-  const supabase = await createClient();
+  const supabase = createAdminClient();
 
   // Verify ownership (unless admin)
   if (session.role !== 'admin') {
