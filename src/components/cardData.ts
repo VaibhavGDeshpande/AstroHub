@@ -204,6 +204,17 @@ export const cardSections: CardSection[] = [
         status:"Live"
       },
       {
+        title: 'Live Sky Chart',
+        description: 'Interactive star chart centered on the sky above your location right now, with constellations and deep-sky objects.',
+        icon: Eye,
+        color: 'from-cyan-500 to-blue-600',
+        path: '/sky-chart',
+        features: ['Overhead now', 'Your location', 'Time control'],
+        glow: 'indigo',
+        ctaText: 'Look Up',
+        status:"Live"
+      },
+      {
         title: 'Sky Charts',
         description: 'Printable and interactive monthly updated sky charts to help plan your nights of stargazing.',
         icon: Eye,

@@ -27,6 +27,7 @@ const routes: RouteConfig[] = [
   // --- 2. TOOLS & RESOURCES (Weekly/Monthly Updates) ---
   // These are high value, but the tool interface itself doesn't change often
   { path: "/stellarium", priority: 0.7, changeFrequency: "monthly" },
+  { path: "/sky-chart", priority: 0.7, changeFrequency: "monthly" },
   { path: "/sky-charts", priority: 0.7, changeFrequency: "monthly" },
   { path: "/satellite-tracker", priority: 0.7, changeFrequency: "monthly" },
   { path: "/satellite-map", priority: 0.7, changeFrequency: "monthly" },
