@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Satellite Tracker & NORAD Lookup | AstroHub",
+  title: "Satellite Tracker & NORAD Lookup",
   description:
     "Track real-time satellite positions, view orbital footprints, and search the NORAD catalog with AstroHub's satellite tracker.",
   keywords: [
@@ -17,7 +17,7 @@ export const metadata: Metadata = {
     type: "website",
     images: [
       {
-        url: "/assets/AstroHub.avif",
+        url: "/opengraph-image",
         width: 1200,
         height: 630,
         alt: "Satellite tracker preview",

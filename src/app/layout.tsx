@@ -25,17 +25,6 @@ export const metadata: Metadata = {
     default: "AstroHub - Space Platform with Professional Observation Tools",
     template: "%s | AstroHub"
   },
-  icons: {
-    icon: [
-      {
-        url: "/assets/AstroHub.avif",
-        type: "image/avif",
-        sizes: "16x16",
-      },
-    ],
-    shortcut: "/assets/Astrohub.avif",
-    apple: "/assets/AstroHub.avif",
-  },
   description: "Explore the cosmos with NASA's public APIs including Astronomy Picture of the Day (APOD), Earth Polychromatic Imaging Camera (EPIC), and more stunning space imagery and data.",
   keywords: [
     "NASA", "space", "astronomy", "APOD", "EPIC", "earth imagery",
@@ -51,20 +40,21 @@ export const metadata: Metadata = {
     address: false,
     telephone: false,
   },
-  metadataBase: new URL("https://astrohub.live"),
+  // www is the host that actually serves the site; the apex returns a 404.
+  metadataBase: new URL("https://www.astrohub.live"),
   alternates: {
-    canonical: "/",
+    // "./" resolves per route; a hard-coded "/" told Google every page was the homepage.
+    canonical: "./",
   },
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://astrohub.live",
-    siteName: "AstroHub", 
+    siteName: "AstroHub",
     title: "AstroHub - Astronomy Hub for Astrophiles and Amateur Astronomers",
     description: "Explore the cosmos with NASA's public APIs including APOD, EPIC, and more stunning space imagery and data.",
     images: [
       {
-        url: "/assets/AstroHub.avif",
+        url: "/opengraph-image",
         width: 1200,
         height: 630,
         alt: "AstroHub - Astronomy Hub for Astrophiles and young astronomers",
@@ -75,7 +65,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "AstroHub - Astronomy Hub for Astrophiles and young astronomers",
     description: "Explore the cosmos with NASA's public APIs including APOD, EPIC, and more stunning space imagery and data.",
-    images: ["/assets/AstroHub.avif"],
+    images: ["/opengraph-image"],
     // creator: "@yourtwitterhandle", // Commented out until you have a real handle
   },
   robots: {
@@ -121,6 +111,30 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@graph": [
+                {
+                  "@type": "Organization",
+                  "@id": "https://www.astrohub.live/#org",
+                  name: "AstroHub",
+                  url: "https://www.astrohub.live",
+                  logo: "https://www.astrohub.live/icon.png",
+                },
+                {
+                  "@type": "WebSite",
+                  "@id": "https://www.astrohub.live/#website",
+                  url: "https://www.astrohub.live",
+                  name: "AstroHub",
+                  publisher: { "@id": "https://www.astrohub.live/#org" },
+                },
+              ],
+            }),
+          }}
+        />
         <PostHogProvider>
           <ClientLayout>
             {/* <SmoothScrollProvider> */}

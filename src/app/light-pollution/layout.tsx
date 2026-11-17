@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Light Pollution Map & Bortle Scale | AstroHub",
+  title: "Light Pollution Map & Bortle Scale",
   description:
     "Visualize global light pollution, explore the Bortle scale, and plan dark-sky observing sessions with AstroHub's interactive tools.",
   keywords: [
@@ -17,7 +17,7 @@ export const metadata: Metadata = {
     type: "website",
     images: [
       {
-        url: "/assets/AstroHub.avif",
+        url: "/opengraph-image",
         width: 1200,
         height: 630,
         alt: "Light pollution visualization preview",

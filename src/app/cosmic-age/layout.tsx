@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Cosmic Age Calculator | Your Age on Other Planets",
     description: "Discover your age across the solar system with our interactive cosmic calculator.",
-    images: ["/assets/AstroHub.avif"],
+    images: ["/opengraph-image"],
   },
 };
 

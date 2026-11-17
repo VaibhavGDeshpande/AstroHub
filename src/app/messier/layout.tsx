@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Messier Catalog | Deep-Sky Objects Guide",
     description: "A comprehensive guide to the Messier Catalog for amateur astronomers.",
-    images: ["/assets/AstroHub.avif"],
+    images: ["/opengraph-image"],
   },
 };
 

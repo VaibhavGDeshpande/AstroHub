@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     type: 'website',
     images: [
       {
-        url: '/assets/AstroHub.avif', // You can add a preview image
+        url: '/opengraph-image', // You can add a preview image
         width: 1200,
         height: 630,
         alt: 'NASA APOD Explorer Preview'

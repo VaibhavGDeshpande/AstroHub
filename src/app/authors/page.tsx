@@ -14,7 +14,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Authors | AstroHub Transmission",
     description: "Meet the writers behind AstroHub Transmission.",
-    images: ["/assets/AstroHub.avif"],
+    images: ["/opengraph-image"],
   },
 };
 

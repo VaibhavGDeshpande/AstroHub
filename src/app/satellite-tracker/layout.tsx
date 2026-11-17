@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Satellite Tracker | Real-Time ISS & Satellite Tracking",
     description: "Watch the movement of satellites across the globe in real-time.",
-    images: ["/assets/AstroHub.avif"],
+    images: ["/opengraph-image"],
   },
 };
 

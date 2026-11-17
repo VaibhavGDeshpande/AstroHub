@@ -55,7 +55,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     openGraph: {
       title: blog.title,
       description: blog.excerpt,
-      images: blog.coverImage ? [blog.coverImage] : ["/assets/AstroHub.avif"],
+      images: blog.coverImage ? [blog.coverImage] : ["/opengraph-image"],
       type: "article",
       publishedTime: blog.publishDate || blog.createdAt,
       authors: [blog.author || "AstroHub"],
@@ -64,7 +64,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       card: "summary_large_image",
       title: blog.title,
       description: blog.excerpt,
-      images: blog.coverImage ? [blog.coverImage] : ["/assets/AstroHub.avif"],
+      images: blog.coverImage ? [blog.coverImage] : ["/opengraph-image"],
     },
   };
 }
@@ -177,6 +177,24 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
   return (
     <LoaderWrapper>
     <article className="min-h-screen bg-slate-950 text-slate-200 pb-24 relative overflow-hidden font-sans">
+      <script
+        type="application/ld+json"
+        // "<" is escaped so post text can never close the script tag.
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BlogPosting",
+            headline: post.title,
+            description: post.excerpt,
+            image: post.coverImage || "https://www.astrohub.live/opengraph-image",
+            datePublished: post.publishDate || post.createdAt,
+            dateModified: post.updatedAt || post.publishDate || post.createdAt,
+            author: { "@type": "Person", name: bylineName },
+            publisher: { "@type": "Organization", name: "AstroHub", logo: { "@type": "ImageObject", url: "https://www.astrohub.live/icon.png" } },
+            mainEntityOfPage: `https://www.astrohub.live/blogs/${slug}`,
+          }).replace(/</g, "\\u003c"),
+        }}
+      />
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-[400px] bg-blue-900/10 rounded-full blur-[100px] pointer-events-none" />
 
       {/* Header Content */}

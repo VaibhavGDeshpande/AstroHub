@@ -89,7 +89,7 @@ export async function generateMetadata({ params }: { params: Promise<{ name: str
     openGraph: {
       title: `${displayName} | AstroHub Author`,
       description: `Explore all published articles by ${displayName}.`,
-      images: author?.avatar_url ? [author.avatar_url] : ["/assets/AstroHub.avif"],
+      images: author?.avatar_url ? [author.avatar_url] : ["/opengraph-image"],
     },
   };
 }
