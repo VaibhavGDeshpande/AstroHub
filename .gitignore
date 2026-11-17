@@ -43,3 +43,8 @@ next-env.d.ts
 #db
 /supabase
 .env.local
+
+.claude/
+.hallmark/
+graphify-out/
+src/graphify-out/

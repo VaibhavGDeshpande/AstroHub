@@ -6,6 +6,7 @@ import { NEOResponse } from "../../types/neo";
 import NEOExplorer from "@/components/NEO/NEO";
 import ErrorMessage from "@/components/Error";
 import LoaderWrapper from "@/components/Loader";
+import "./neo.css";
 
 export default function NEOPage() {
   const [data, setData] = useState<NEOResponse | null>(null);
@@ -89,9 +90,8 @@ export default function NEOPage() {
       isVisible={loading} 
       minDuration={1000}
     >
-      <div className="min-h-screen bg-black w-auto text-white relative overflow-hidden">
-
-        <div className="container flex flex-col gap-10">
+      <div className="min-h-screen bg-black w-auto text-white relative">
+        <div>
           {data && (
             <NEOExplorer/>
           )}
