@@ -4,42 +4,39 @@ import { motion } from 'framer-motion';
 import { ArrowLeftIcon, HomeIcon } from '@heroicons/react/24/outline';
 import dynamic from 'next/dynamic';
 import LoaderWrapper from '@/components/Loader';
+import './skycharts.css';
 
 // Dynamically import SkyMapsDownloader with SSR disabled
 const SkyMapsDownloader = dynamic(
   () => import('@/components/SkyMaps/SkyMapsDownloader'),
-  { 
+  {
     ssr: false,
-    loading: () => (
-      <div className="min-h-screen bg-black flex items-center justify-center">
-        <div className="text-white text-xl">Loading Sky Maps...</div>
-      </div>
-    )
+    loading: () => <p className="container label">Loading Sky Maps…</p>
   }
 );
 
 export default function SkyMapsPage() {
   return (
     <LoaderWrapper>
-    <>
-      <div className="fixed top-4 left-4 z-50">
-        <motion.div
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.6 }}
-        >
-          <Link
-            href="/"
-            className="flex items-center gap-2 px-3 py-2 rounded-lg bg-slate-800/50 hover:bg-slate-700/50 border border-slate-600/40 backdrop-blur-sm transition duration-300 group text-white"
+      <div className="sc">
+        <div className="fixed top-4 left-4 z-50">
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6 }}
           >
-            <ArrowLeftIcon className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
-            <HomeIcon className="h-4 w-4 hidden sm:block" />
-            <span className="text-sm">Back</span>
-          </Link>
-        </motion.div>
+            <Link
+              href="/"
+              className="flex items-center gap-2 px-3 py-2 rounded-lg bg-slate-800/50 hover:bg-slate-700/50 border border-slate-600/40 backdrop-blur-sm transition duration-300 group text-white"
+            >
+              <ArrowLeftIcon className="h-4 w-4 transition-transform group-hover:-translate-x-1 motion-reduce:transition-none motion-reduce:group-hover:translate-x-0" />
+              <HomeIcon className="h-4 w-4 hidden sm:block" />
+              <span className="text-sm">Back</span>
+            </Link>
+          </motion.div>
+        </div>
+        <SkyMapsDownloader />
       </div>
-      <SkyMapsDownloader />
-    </>
     </LoaderWrapper>
   )
 }
