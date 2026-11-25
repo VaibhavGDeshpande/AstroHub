@@ -15,6 +15,22 @@ export const revalidate = 0;
 function getReadingTime(text: string) {
   return Math.ceil(text.trim().split(/\s+/).length / 200);
 }
+
+const STOP_WORDS = new Set(["about", "after", "their", "there", "these", "this", "that", "with", "from", "your", "what", "when", "where", "which", "while", "into", "over", "will", "have"]);
+const keywords = (text: string) =>
+  new Set(text.toLowerCase().split(/[^a-z0-9]+/).filter((w) => w.length > 3 && !STOP_WORDS.has(w)));
+
+type RelatedCandidate = { slug: string; title: string; excerpt: string | null; publishDate: string | null; createdAt: string };
+
+// shortcut: keyword overlap on title + excerpt, newest first on ties; upgrade to Postgres full-text if posts grow past a few hundred
+function rankRelated(current: { title: string; excerpt?: string }, candidates: RelatedCandidate[], count = 3) {
+  const mine = keywords(`${current.title} ${current.excerpt || ""}`);
+  return candidates
+    .map((c) => ({ c, score: [...keywords(`${c.title} ${c.excerpt || ""}`)].filter((w) => mine.has(w)).length }))
+    .sort((a, b) => b.score - a.score || new Date(b.c.publishDate || b.c.createdAt).getTime() - new Date(a.c.publishDate || a.c.createdAt).getTime())
+    .slice(0, count)
+    .map(({ c }) => c);
+}
 const diffColors: Record<string, string> = {
   beginner: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
   intermediate: "bg-amber-500/10 text-amber-400 border-amber-500/20",
@@ -158,16 +174,16 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
     if (nxt) nextPost = nxt as Blog;
   }
 
-  // Fetch related posts of the same content type
+  // Related posts: the closest keyword matches among the 30 newest of the same content type
   const targetTable = tables.find((t) => t.type === foundType)?.table || "explainers";
   const { data: relatedPostsRaw } = await supabase
     .from(targetTable)
-    .select("slug, title, publishDate, createdAt")
+    .select("slug, title, excerpt, publishDate, createdAt")
     .eq("published", true)
     .neq("slug", slug)
     .order("createdAt", { ascending: false })
-    .limit(3);
-  const relatedPosts = (relatedPostsRaw || []) as { slug: string; title: string; publishDate: string | null; createdAt: string }[];
+    .limit(30);
+  const relatedPosts = rankRelated(post, (relatedPostsRaw || []) as RelatedCandidate[]);
 
   const badgeColors = typeColor === "blue" ? "bg-blue-500/10 text-blue-400 border-blue-500/20"
     : typeColor === "emerald" ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
@@ -271,7 +287,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
               <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500 border-b border-slate-800/80 pb-2">Interactive Tools</h4>
               <nav className="flex flex-col gap-1.5">
                 {[
-                  { label: "Stellarium", href: "/stellarium", icon: Sparkles, color: "text-emerald-400 hover:text-emerald-305" },
+                  // { label: "Stellarium", href: "/stellarium", icon: Sparkles, color: "text-emerald-400 hover:text-emerald-305" }, // hidden for now
                   { label: "Star Charts", href: "/sky-charts", icon: Compass, color: "text-amber-400 hover:text-amber-305" },
                   { label: "3D Earth View", href: "/3d-earth", icon: Globe, color: "text-cyan-400 hover:text-cyan-305" },
                   { label: "Space News Feed", href: "/space-news", icon: BookOpen, color: "text-rose-400 hover:text-rose-305" },
@@ -378,6 +394,21 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
               </div>
             )}
 
+            {/* Related posts for small screens, where the sidebar is hidden */}
+            {relatedPosts.length > 0 && (
+              <section className="lg:hidden mt-16">
+                <h3 className="text-sm font-bold uppercase tracking-wider text-slate-500 mb-4">Keep Reading</h3>
+                <div className="space-y-3">
+                  {relatedPosts.map((p) => (
+                    <Link key={p.slug} href={`/blogs/${p.slug}`} className="block p-4 rounded-xl bg-slate-900/50 border border-slate-800 hover:border-slate-700 transition-colors">
+                      <span className="font-semibold text-slate-200 line-clamp-2">{p.title}</span>
+                      {p.excerpt && <span className="text-sm text-slate-400 mt-1 line-clamp-2">{p.excerpt}</span>}
+                    </Link>
+                  ))}
+                </div>
+              </section>
+            )}
+
             {/* Footer */}
             <div className="mt-16 pt-8 border-t border-slate-800 flex flex-col sm:flex-row gap-4 justify-between items-center">
               <Link href={backLink} className="inline-flex items-center justify-center gap-2 w-full sm:w-auto px-6 py-3 rounded-xl bg-slate-900 border border-slate-800 hover:bg-slate-800 hover:border-slate-700 text-white font-medium transition-all">
@@ -410,7 +441,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
             {/* Related Posts Card */}
             {relatedPosts && relatedPosts.length > 0 && (
               <div className="bg-slate-900/40 backdrop-blur-md border border-slate-800/60 rounded-2xl p-5 space-y-4 shadow-lg shadow-black/20">
-                <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500 border-b border-slate-800/80 pb-2">Recent Articles</h4>
+                <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500 border-b border-slate-800/80 pb-2">Related Articles</h4>
                 <div className="space-y-4">
                   {relatedPosts.map((p) => (
                     <Link

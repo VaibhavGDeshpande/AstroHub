@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { LogOut, Shield, User } from "lucide-react";
+import { Camera, LogOut, Shield, User } from "lucide-react";
 import { useState } from "react";
 
 interface AuthorBadgeProps {
@@ -62,6 +62,16 @@ export default function AuthorBadge({ authorName, displayName, role }: AuthorBad
               <User className="w-4 h-4" />
               Profile
             </Link>
+            {role === 'admin' && (
+              <Link
+                href="/admin/gallery"
+                onClick={() => setShowMenu(false)}
+                className="w-full flex items-center gap-2 px-3 py-2.5 text-sm text-slate-300 hover:bg-slate-800 transition-colors"
+              >
+                <Camera className="w-4 h-4" />
+                Gallery queue
+              </Link>
+            )}
             <button
               onClick={handleLogout}
               className="w-full flex items-center gap-2 px-3 py-2.5 text-sm text-red-400 hover:bg-red-500/10 transition-colors"

@@ -67,7 +67,7 @@ const About = () => {
     },
     {
       icon: StarIcon,
-      title: 'Sky Charts & Stellarium',
+      title: 'Sky Charts & Live Sky Chart',
       description: 'Plan night-sky sessions with downloadable charts and a live interactive planetarium.',
       highlight: 'Night-sky planning'
     },

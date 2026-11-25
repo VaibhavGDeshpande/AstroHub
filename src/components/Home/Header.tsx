@@ -3,10 +3,11 @@
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 // import Image from 'next/image';
-import { ChevronDownIcon, Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
+import { ChevronDownIcon, Bars3Icon, XMarkIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 import { usePathname } from 'next/navigation';
 import { shouldPrefetchRoute } from '@/lib/routePrefetch';
 import SpaceLogo from './SpaceLogo';
+import { exploreCategories } from '@/lib/siteNav';
 
 const Header = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -94,78 +95,6 @@ const Header = () => {
     };
   }, []);
 
-  type ExploreItem = {
-    name: string;
-    path: string;
-  };
-
-  type ExploreCategory = {
-    id: string;
-    title: string;
-    items: ExploreItem[];
-  };
-
-  const exploreCategories: ExploreCategory[] = [
-    {
-      id: 'nasa-data',
-      title: 'NASA Data',
-      items: [
-        { name: 'Near Earth Objects', path: '/neo' },
-        { name: 'EPIC Earth Images', path: '/epic' },
-        { name: 'NASA Image Library', path: '/images' },
-        { name: 'NASA Eyes', path: '/nasa-eyes' },
-        { name: 'Astronomy Picture of the Day', path: '/apod' }
-      ]
-    },
-    {
-      id: '3d-models',
-      title: '3D Models',
-      items: [
-        { name: '3D View of Earth', path: '/3d-earth' },
-        { name: '3D View of Moon', path: '/3d-moon' },
-        { name: '3D View of Mars', path: '/3d-mars' }
-      ]
-    },
-    {
-      id: 'sky-tools',
-      title: 'Sky Tools',
-      items: [
-        { name: 'Stellarium Sky Map', path: '/stellarium' },
-        { name: 'Sky Charts', path: '/sky-charts' },
-        { name: 'Satellite Tracker', path: '/satellite-tracker' },
-        { name: 'Messier Catalog', path: '/messier' }
-      ]
-    },
-    {
-      id: 'advanced-tools',
-      title: 'Advanced Tools',
-      items: [
-        { name: 'Telescope Calculator', path: '/telescope-calculator' },
-        { name: 'Astrophotography Exposure Calculator', path: '/exposure-calculator' },
-        { name: 'Cosmic Age Calculator', path: '/cosmic-age' }
-      ]
-    },
-    {
-      id: 'news',
-      title: 'News & Media',
-      items: [
-        { name: 'Space News & Updates', path: '/space-news' },
-        { name: 'AstroHub Transmission', path: '/blogs' },
-        { name: 'Transmission Authors', path: '/authors' },
-        { name: 'Space Quiz', path: '/space-quiz' },
-        { name: 'Space Wallpapers', path: '/wallpapers' }
-      ]
-    },
-    {
-      id: 'earth-tools',
-      title: 'Earth Tools',
-      items: [
-        { name: 'Light Pollution Map', path: '/light-pollution' },
-        { name: 'Weather Dashboard', path: '/weather' }
-      ]
-    }
-  ];
-
   const filteredCategories = exploreCategories.map(category => ({
     ...category,
     items: category.items.filter(item =>
@@ -181,7 +110,7 @@ const Header = () => {
   };
 
   const pathname = usePathname();
-  const HIDE_HEADER_ROUTES = ['/3d-earth', '/3d-moon', '/3d-mars', '/stellarium', '/nasa-eyes'];
+  const HIDE_HEADER_ROUTES = ['/3d-earth', '/3d-moon', '/3d-mars', '/stellarium', '/nasa-eyes', '/sky-chart'];
 
   if (HIDE_HEADER_ROUTES.includes(pathname)) {
     return null;
@@ -288,6 +217,10 @@ const Header = () => {
                 <span className={`transition-all duration-300 font-medium ${scrollY > 50 ? 'text-sm' : 'text-base'}`}>Resources</span>
               </Link>
 
+              <Link href="/search" aria-label="Search AstroHub" className="text-white hover:text-cyan-400 transition-colors">
+                <MagnifyingGlassIcon className={`transition-all duration-300 ${scrollY > 50 ? 'h-4 w-4' : 'h-5 w-5'}`} />
+              </Link>
+
 
             </nav>
 
@@ -347,6 +280,9 @@ const Header = () => {
 
           {/* Mobile Additional Links */}
           <div className="pt-6 border-t border-white/5 space-y-3">
+            <Link href="/search" className="flex items-center gap-2 px-5 py-4 text-white font-semibold bg-white/5 rounded-2xl border border-white/10 hover:border-cyan-400/30 transition-all" onClick={() => setIsMobileMenuOpen(false)}>
+              <MagnifyingGlassIcon className="h-5 w-5" /> Search AstroHub
+            </Link>
             <Link href="/about" className="flex items-center px-5 py-4 text-white font-semibold bg-white/5 rounded-2xl border border-white/10 hover:border-cyan-400/30 transition-all" onClick={() => setIsMobileMenuOpen(false)}>
               About AstroHub
             </Link>

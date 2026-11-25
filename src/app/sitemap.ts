@@ -31,7 +31,7 @@ const routes: RouteConfig[] = [
   // { path: "/solar-system", priority: 0.7, changeFrequency: "monthly" },
 
   // --- 2. TOOLS & RESOURCES ---
-  { path: "/stellarium", priority: 0.7, changeFrequency: "monthly" },
+  // { path: "/stellarium", priority: 0.7, changeFrequency: "monthly" }, // hidden for now
   { path: "/sky-chart", priority: 0.7, changeFrequency: "monthly" },
   { path: "/sky-charts", priority: 0.7, changeFrequency: "monthly" },
   { path: "/satellite-tracker", priority: 0.7, changeFrequency: "monthly" },
@@ -43,6 +43,7 @@ const routes: RouteConfig[] = [
   { path: "/images", priority: 0.6, changeFrequency: "weekly" },
   { path: "/wallpapers", priority: 0.6, changeFrequency: "weekly" },
   { path: "/space-quiz", priority: 0.6, changeFrequency: "weekly" },
+  { path: "/gallery", priority: 0.7, changeFrequency: "daily" },
 
   // --- 3. 3D VISUALIZATIONS ---
   { path: "/3d-earth", priority: 0.7, changeFrequency: "monthly" },

@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import Script from "next/script";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
@@ -8,6 +8,7 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import Header from "@/components/Home/Header";
 import ClientLayout from "@/components/provider/NotificationProvider";
 import { PostHogProvider } from "@/components/provider/PostHogProvider";
+import ServiceWorker from "@/components/provider/ServiceWorker";
 // import SmoothScrollProvider from "@/components/provider/SmoothScrollProvider";
 
 const geistSans = Geist({
@@ -20,7 +21,13 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+export const viewport: Viewport = {
+  themeColor: "#020617",
+};
+
 export const metadata: Metadata = {
+  applicationName: "AstroHub",
+  appleWebApp: { capable: true, title: "AstroHub", statusBarStyle: "black-translucent" },
   title: {
     default: "AstroHub - Space Platform with Professional Observation Tools",
     template: "%s | AstroHub"
@@ -45,6 +52,7 @@ export const metadata: Metadata = {
   alternates: {
     // "./" resolves per route; a hard-coded "/" told Google every page was the homepage.
     canonical: "./",
+    types: { "application/rss+xml": [{ url: "/feed.xml", title: "AstroHub Transmission" }] },
   },
   openGraph: {
     type: "website",
@@ -130,6 +138,11 @@ export default function RootLayout({
                   url: "https://www.astrohub.live",
                   name: "AstroHub",
                   publisher: { "@id": "https://www.astrohub.live/#org" },
+                  potentialAction: {
+                    "@type": "SearchAction",
+                    target: "https://www.astrohub.live/search?q={search_term_string}",
+                    "query-input": "required name=search_term_string",
+                  },
                 },
               ],
             }),
@@ -139,6 +152,7 @@ export default function RootLayout({
           <ClientLayout>
             {/* <SmoothScrollProvider> */}
               <FloatingClientWidgets />
+              <ServiceWorker />
               <Analytics/>
               <SpeedInsights/>
               <Header />
