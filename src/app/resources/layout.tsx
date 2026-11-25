@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Astronomy Resources | Tools & Learning Materials",
     description: "Equip yourself with the best tools and materials for exploring the universe.",
-    images: ["/assets/AstroHub.avif"],
+    images: ["/opengraph-image"],
   },
 };
 

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Astronomy Weather Dashboard | AstroHub",
+  title: "Astronomy Weather Dashboard",
   description:
     "Check cloud cover, transparency, seeing, and planetary conditions with AstroHub's astronomy-focused weather dashboard.",
   keywords: [
@@ -17,7 +17,7 @@ export const metadata: Metadata = {
     type: "website",
     images: [
       {
-        url: "/assets/AstroHub.avif",
+        url: "/opengraph-image",
         width: 1200,
         height: 630,
         alt: "Astronomy weather preview",

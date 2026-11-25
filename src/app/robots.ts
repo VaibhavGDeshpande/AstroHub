@@ -1,12 +1,12 @@
 import type { MetadataRoute } from 'next'
- 
+
 export default function robots(): MetadataRoute.Robots {
   return {
     rules: {
-      userAgent: '*', // Allow all bots (Google, Bing, etc.)
-      allow: '/',     
-      disallow: [],   
+      userAgent: '*',
+      allow: '/',
+      disallow: ['/admin', '/api/'],
     },
-    sitemap: 'https://astrohub.live/sitemap.xml', 
+    sitemap: 'https://www.astrohub.live/sitemap.xml',
   }
 }

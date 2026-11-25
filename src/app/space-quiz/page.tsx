@@ -2,12 +2,19 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Rocket, AlertCircle } from 'lucide-react';
+import { Rocket, AlertCircle, Flame, SlidersHorizontal } from 'lucide-react';
 import LoaderWrapper from '@/components/Loader';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { ArrowLeftIcon, HomeIcon } from '@heroicons/react/24/outline';
 import SectionTitle from '@/components/SectionTitle';
+import DailyQuiz from '@/components/Space-Quiz/DailyQuiz';
+
+const MODES = [
+  { key: 'daily', label: 'Daily Question', icon: Flame },
+  { key: 'custom', label: 'Custom Quiz', icon: SlidersHorizontal },
+] as const;
+type Mode = typeof MODES[number]['key'];
 
 type Tag = 'space' | 'space_exploration' | 'astronomy' | 'astrophysics';
 
@@ -21,6 +28,7 @@ export default function QuizSelectionPage() {
   const [difficulty, setDifficulty] = useState<Difficulty>('hard');
   const [tags, setTags] = useState<Tag[]>(['space']);
   const [isLoading, setIsLoading] = useState(false);
+  const [mode, setMode] = useState<Mode>('daily');
 
   function toggleTag(tag: Tag) {
     setTags((prev) =>
@@ -103,7 +111,28 @@ export default function QuizSelectionPage() {
             subtitle="Test your cosmic knowledge!"
           />
 
+          <div role="tablist" aria-label="Quiz mode" className="max-w-xl mx-auto mb-6 grid grid-cols-2 gap-1 p-1 rounded-lg bg-slate-800/50 border border-slate-600/40 backdrop-blur-sm">
+            {MODES.map(({ key, label, icon: Icon }) => (
+              <button
+                key={key}
+                role="tab"
+                aria-selected={mode === key}
+                onClick={() => setMode(key)}
+                className={`flex items-center justify-center gap-2 py-2.5 rounded-md text-sm font-semibold transition-all ${
+                  mode === key
+                    ? 'bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-white shadow-md'
+                    : 'text-gray-300 hover:bg-slate-700/50'
+                }`}
+              >
+                <Icon className="w-4 h-4" aria-hidden /> {label}
+              </button>
+            ))}
+          </div>
+
+          {mode === 'daily' && <DailyQuiz />}
+
           {/* Settings Card */}
+          {mode === 'custom' && (
           <div className="max-w-xl mx-auto bg-slate-800/50 backdrop-blur-sm border border-slate-600/40 rounded-lg p-6 sm:p-8">
             <div className="space-y-5">
               {/* Number Input */}
@@ -202,6 +231,7 @@ export default function QuizSelectionPage() {
               </button>
             </div>
           </div>
+          )}
         </div>
       </div>
     </LoaderWrapper>

@@ -68,8 +68,8 @@ A 3D Mars surface explorer featuring geological features, major landmarks like O
 
 ─── SKY TOOLS ───
 
-/stellarium — Stellarium Sky Map
-Embeds the full Stellarium Web planetarium (stellarium-web.org) in an iframe. A real-time interactive sky map showing stars, constellations, planets, and deep-sky objects. Supports geolocation for accurate sky views. Users can control time, zoom, and navigate the sky.
+/sky-chart — Live Sky Chart
+A full-screen planetarium view of the sky from the user's location. Drag to look around, zoom into stars, constellations, Messier objects, the Moon and planets, search for any object, and speed time forwards or backwards. Works offline once opened.
 
 /sky-charts — Monthly Sky Charts
 Provides printable and interactive monthly sky charts from SkyMaps. Helps plan stargazing sessions by showing what's visible in the sky each month. Includes constellation guides.

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "NASA Eyes: Solar System Tour | AstroHub",
+  title: "NASA Eyes: Solar System Tour",
   description:
     "Explore planets, moons, and spacecraft trajectories through NASA Eyes' solar system simulator embedded in AstroHub.",
   keywords: [
@@ -17,7 +17,7 @@ export const metadata: Metadata = {
     type: "website",
     images: [
       {
-        url: "/assets/AstroHub.avif",
+        url: "/opengraph-image",
         width: 1200,
         height: 630,
         alt: "NASA Eyes solar system preview",

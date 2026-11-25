@@ -6,7 +6,8 @@
     "dev": "next dev --turbopack",
     "build": "next build --turbopack",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test": "node --test \"src/lib/**/*.test.mjs\""
   },
   "dependencies": {
     "@emailjs/browser": "^4.4.1",
@@ -30,6 +31,7 @@
     "@tiptap/starter-kit": "^3.22.4",
     "@vercel/analytics": "^1.5.0",
     "@vercel/speed-insights": "^1.2.0",
+    "astronomy-engine": "^2.1.19",
     "axios": "^1.12.2",
     "bcryptjs": "^3.0.3",
     "cheerio": "^1.1.2",

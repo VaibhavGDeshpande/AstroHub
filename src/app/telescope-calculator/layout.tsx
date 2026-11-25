@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Telescope Calculator & FOV Planner | AstroHub",
+  title: "Telescope Calculator & FOV Planner",
   description:
     "Analyze telescope and eyepiece combinations, magnification, and field of view with AstroHub's telescope calculator.",
   keywords: [
@@ -17,7 +17,7 @@ export const metadata: Metadata = {
     type: "website",
     images: [
       {
-        url: "/assets/AstroHub.avif",
+        url: "/opengraph-image",
         width: 1200,
         height: 630,
         alt: "Telescope calculator preview",

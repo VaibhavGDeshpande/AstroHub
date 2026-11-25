@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Astrophotography Exposure Calculator | AstroHub",
+  title: "Astrophotography Exposure Calculator",
   description:
     "Fine tune ISO, shutter speed, and aperture values with AstroHub's astrophotography exposure calculator built for night sky imaging.",
   keywords: [
@@ -17,7 +17,7 @@ export const metadata: Metadata = {
     type: "website",
     images: [
       {
-        url: "/assets/AstroHub.avif",
+        url: "/opengraph-image",
         width: 1200,
         height: 630,
         alt: "Astrophotography Exposure Calculator preview",

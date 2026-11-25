@@ -1,6 +1,10 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   output: 'standalone',
+  async redirects() {
+    // Stellarium is hidden for now (route moved to app/_stellarium); old links land on the live sky chart.
+    return [{ source: '/stellarium', destination: '/sky-chart', permanent: false }];
+  },
   images: {
     remotePatterns: [
       {

@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Space Wallpapers | HD Cosmic Imagery",
     description: "Transform your screens with breathtaking views of the universe.",
-    images: ["/assets/AstroHub.avif"],
+    images: ["/opengraph-image"],
   },
 };
 

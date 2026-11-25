@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Eyes on the Sky | Monthly Stargazing Guide",
     description: "Your monthly guide to the most spectacular events in the night sky.",
-    images: ["/assets/AstroHub.avif"],
+    images: ["/opengraph-image"],
   },
 };
 

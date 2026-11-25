@@ -192,17 +192,18 @@ export const cardSections: CardSection[] = [
     titleGradient: 'from-green-400 to-blue-500',
     subtitle: 'Professional tools for mapping and observing the night sky',
     cards: [
-      {
-        title: 'Stellarium Sky Map',
-        description: 'Interactive planetarium software showing realistic star maps, constellations, and celestial objects in real-time.',
-        icon: Eye,
-        color: 'from-indigo-500 to-purple-600',
-        path: '/stellarium',
-        features: ['Real-time sky', 'Constellation maps', 'Planet positions', 'Time control'],
-        glow: 'indigo',
-        ctaText: 'View Sky',
-        status:"Live"
-      },
+      // Stellarium is hidden for now; the Live Sky Chart below replaces it.
+//       {
+//         title: 'Stellarium Sky Map',
+//         description: 'Interactive planetarium software showing realistic star maps, constellations, and celestial objects in real-time.',
+//         icon: Eye,
+//         color: 'from-indigo-500 to-purple-600',
+//         path: '/stellarium',
+//         features: ['Real-time sky', 'Constellation maps', 'Planet positions', 'Time control'],
+//         glow: 'indigo',
+//         ctaText: 'View Sky',
+//         status:"Live"
+//       },
       {
         title: 'Live Sky Chart',
         description: 'Interactive star chart centered on the sky above your location right now, with constellations and deep-sky objects.',

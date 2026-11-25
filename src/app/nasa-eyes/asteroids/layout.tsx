@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "NASA Eyes: Asteroids Explorer | AstroHub",
+  title: "NASA Eyes: Asteroids Explorer",
   description:
     "Experience NASA Eyes Asteroids mode to track near-Earth objects, missions, and orbital paths in an immersive 3D environment.",
   keywords: [
@@ -17,7 +17,7 @@ export const metadata: Metadata = {
     type: "website",
     images: [
       {
-        url: "/assets/AstroHub.avif",
+        url: "/opengraph-image",
         width: 1200,
         height: 630,
         alt: "NASA Eyes asteroids preview",
